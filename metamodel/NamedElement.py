@@ -22,10 +22,3 @@ class NamedElement(Element):
     @label.setter
     def label(self, label):
         self._label = label
-
-
-if __name__ == '__main__':
-    ne = NamedElement(4, "Bla", "efg")
-    print(ne.id)
-    print(ne.name)
-

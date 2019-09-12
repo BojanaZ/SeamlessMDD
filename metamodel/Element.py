@@ -19,8 +19,3 @@ class Element(object):
     @container.setter
     def container(self, container):
         self._container = container
-        
-if __name__ == '__main__':
-    el = Element(5)
-    el.id = 7
-    print(el.id)
