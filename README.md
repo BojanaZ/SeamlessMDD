@@ -7,7 +7,7 @@ To be able to run the project, You should have installed python and :
 1. [Python3](https://www.python.org/) (tested on Python 3.5)
 2. [Virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/)
 
-Dependancies for these project are listed in venv/requirements.txt. To install them, activate the Virtual environment, and use pip.
+Dependancies for these project are listed in venv/requirements.txt. To install them, move to SeamlessMDD directory, activate the Virtual environment, and use pip.
 
 On macOS and Linux:
 ```
