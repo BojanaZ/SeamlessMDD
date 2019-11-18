@@ -1,4 +1,4 @@
-from Container import Container
+from metamodel.Container import Container
 
 class Project(Container):
 

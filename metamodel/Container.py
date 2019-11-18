@@ -1,4 +1,4 @@
-from Element import Element
+from metamodel.Element import Element
 
 class Container(Element):
 
