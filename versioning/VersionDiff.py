@@ -1,3 +1,6 @@
+import gettext
+from utilities.dictionary_utility import DictionaryUtility
+
 class VersionDiff(object):
 
     def __init__(self, previous_element, current_element, diff = None):
@@ -33,5 +36,14 @@ class VersionDiff(object):
         self._diff = diff
 
     def calculate_diff(self):
-        pass
+        if type(self._previous_element) != type(self._current_element):
+            raise TypeError
+
+        return DictionaryUtility.get_different_keys(self.previous_element, self.current_element)
+
+
+
+
+
+
 
