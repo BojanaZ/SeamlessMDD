@@ -3,6 +3,7 @@ from tests.dummy_structures import dummy_data
 from transformation.data_manipulation import DataManipulation
 import json
 
+
 class DataManipulationSerializationTest(unittest.TestCase):
 
     def test_dm_dill_serialization(self):

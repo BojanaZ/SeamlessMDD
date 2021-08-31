@@ -5,6 +5,7 @@ from transformation.data_manipulation import DataManipulation
 from tests.dummy_structures import dummy_data
 import os
 
+
 class GeneratorHandlerSerializationTest(unittest.TestCase):
 
     def test_generator_handler_dill_serialization(self):

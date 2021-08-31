@@ -3,6 +3,7 @@ from metamodel.field import Field
 from diff.diff_calculator import get_diff
 from tests.dummy_structures import dummy_data
 
+
 class DiffCalculatorTest(unittest.TestCase):
 
     def test_get_diff_field(self):

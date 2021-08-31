@@ -9,6 +9,7 @@ from transformation.generators.generator_register import GeneratorRegister
 from transformation.tasks.task_heap import Heap
 from utilities.utilities import get_project_root
 
+
 class GeneratorHandler(object):
 
     def __init__(self, loading_path=None):
@@ -16,8 +17,7 @@ class GeneratorHandler(object):
         self._generators = GeneratorRegister()
 
         if loading_path is None:
-            self._data_loading_path = os.path.join(get_project_root(),
-                                               'files')
+            self._data_loading_path = os.path.join(get_project_root(), 'files')
         else:
             self._data_loading_path = loading_path
 
@@ -123,11 +123,11 @@ class GeneratorHandler(object):
     def __ne__(self, other):
         return not self == other
 
-    def generate_by_element(self, model, outfolder=None):
+    def generate_by_element(self, model_, outfolder=None):
 
         task_heap = Heap()
 
-        for model_element in model:
+        for model_element in model_:
             generator_list = self.element_generator_table.get_generators(model_element.id)
 
             for generator_id in generator_list:
@@ -139,11 +139,11 @@ class GeneratorHandler(object):
         task_heap.sort()
         sorted_tasks = task_heap.get_items()
         for task in sorted_tasks:
-            for element in task.filtered_elements(model):
+            for element in task.filtered_elements(model_):
                 task.run(element, outfolder)
             #task.invoke()
 
-    def generate_by_generator(self, model, outfolder=None):
+    def generate_by_generator(self, model_, outfolder=None):
 
         generator_list = self.element_generator_table.get_active_generators()
 
@@ -153,7 +153,7 @@ class GeneratorHandler(object):
 
             #generator.create_environment()
 
-            for model_element in model:
+            for model_element in model_:
                 for task in generator.tasks:
                     task_heap.add(task)
 
@@ -161,12 +161,12 @@ class GeneratorHandler(object):
         sorted_tasks = task_heap.get_items()
 
         for task in sorted_tasks:
-            for element in task.filtered_elements(model):
+            for element in task.filtered_elements(model_):
                 task.run(element, outfolder)
 
                 #task.invoke()
 
-    def generate_single_generator(self, data_manipulation, generator, outfolder=None):
+    def generate_single_generator(self, data_manipulation_, generator, outfolder=None):
 
         elements = self.element_generator_table.get_elements(generator)
 
@@ -178,9 +178,8 @@ class GeneratorHandler(object):
         sorted_tasks = task_heap.get_items()
 
         for task in sorted_tasks:
-            for element in task.filtered_elements(data_manipulation):
+            for element in task.filtered_elements(data_manipulation_):
                 task.run(element, outfolder)
-
 
     def generate_single_element(self, element, outfolder=None):
         generators = self.element_generator_table.get_generators(element)
@@ -199,6 +198,7 @@ class GeneratorHandler(object):
                 if model_element == element:
                     task.run(element, outfolder)
             task.invoke()
+
 
 if __name__ == '__main__':
     handler = GeneratorHandler()

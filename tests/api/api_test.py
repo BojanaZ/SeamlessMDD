@@ -11,6 +11,7 @@ from tests.dummy_structures import dummy_data
 
 from api.app import create_app
 
+
 class APITest(unittest.TestCase):
 
     def setUp(self):
@@ -27,7 +28,6 @@ class APITest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         loaded_model = Model.from_json(response.data.decode())
         self.assertEqual(loaded_model, self.data_manipulation.get_latest_model())
-
 
     def test_model_get(self):
         """Test /model (GET request)"""
@@ -66,7 +66,6 @@ class APITest(unittest.TestCase):
 
         self.assertEqual(data, new_model)
 
-
     def test_model_by_version_get(self):
         """Test /models/<version_id> (GET request)"""
 
@@ -95,7 +94,6 @@ class APITest(unittest.TestCase):
         del self.data_manipulation.versions[random_version]
         response = self.client().get('/models/'+str(random_version))
         self.assertEqual(response.status_code, 404)
-
 
     def test_generators_get(self):
         """Test /generators (GET request)"""
@@ -147,7 +145,6 @@ class APITest(unittest.TestCase):
         response = self.client().get('/generators')
         loaded_generators_after_all_generators_removal = GeneratorRegister.from_json(response.data.decode())
         self.assertEqual(empty_register, loaded_generators_after_all_generators_removal)
-
 
     def test_generator_by_id_get(self):
         """Test /generators/<generator_id> (GET request)"""

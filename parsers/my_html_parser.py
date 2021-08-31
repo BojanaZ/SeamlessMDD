@@ -1,6 +1,7 @@
 from parsers.parser_interface import IParser
 import AdvancedHTMLParser
 
+
 class MyHTMLParser(IParser):
 
     def __init__(self, file_path):

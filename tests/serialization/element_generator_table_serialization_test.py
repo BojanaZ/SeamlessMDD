@@ -5,6 +5,7 @@ from utilities.exceptions import ElementNotFoundError, GeneratorNotFoundError
 from tests.dummy_structures import dummy_data
 import os
 
+
 class TableSerializationTest(unittest.TestCase):
 
     def test_table_dill_serialization(self):
@@ -14,7 +15,6 @@ class TableSerializationTest(unittest.TestCase):
         new_table = self.table.load_from_dill("table.dill")
 
         assert new_table == old_table
-
 
     def test_table_complex_json_serialization_element_exception(self):
         table_json = self.table.to_json()

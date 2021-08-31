@@ -4,8 +4,10 @@ import pkgutil
 from pathlib import Path
 import os
 
+
 def iterable(obj):
     return isinstance(obj, Iterable)
+
 
 def import_submodules(package, recursive=True):
     """ Import all submodules of a module, recursively, including subpackages
@@ -23,6 +25,7 @@ def import_submodules(package, recursive=True):
             results.update(import_submodules(full_name))
     return results
 
+
 def get_class_from_parent_module(class_name, package, recursive=True):
     modules = import_submodules(package, recursive)
     for module in modules.values():
@@ -34,9 +37,11 @@ def get_class_from_parent_module(class_name, package, recursive=True):
 
     raise ImportError("Class %s is not part of %s module." % (class_name, package))
 
+
 def get_project_root():
     """Returns project root folder."""
     return Path(__file__).parent.parent
+
 
 def get_file_path_for_format(type_name, formats, use_root=True):
 

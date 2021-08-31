@@ -1,6 +1,7 @@
 from parsers.parser_interface import IParser
 from lxml import html, etree
 
+
 class MyLXMLParser(IParser):
 
     def __init__(self, file_path):
@@ -37,8 +38,8 @@ class MyLXMLParser(IParser):
         parent = element_to_replace.getparent()
         parent.remove(element_to_replace)
 
-    def pretty_print(self, element):
-        content = etree.tostring(element, pretty_print=True)
+    def pretty_print(self, element_):
+        content = etree.tostring(element_, pretty_print=True)
         print(content.decode('UTF-8'))
         print()
 
@@ -48,6 +49,7 @@ class MyLXMLParser(IParser):
         content = etree.tostring(self.tree, pretty_print=True)
         file.write(content.decode('UTF-8'))
         file.close()
+
 
 if __name__ == '__main__':
     my_parser = MyLXMLParser("sample_files/F1.html")

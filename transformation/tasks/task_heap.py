@@ -1,6 +1,7 @@
 class EmptyHeapError(Exception):
     pass
 
+
 class Heap(object):
 
     def __init__(self, data=None):
@@ -16,7 +17,6 @@ class Heap(object):
         self._data = data
         self._size = len(self._data)
         self._build_max_heap()
-
 
     def _left(self, i):
         """
@@ -77,7 +77,6 @@ class Heap(object):
             self._swap(i, largest)
             self._downheap(largest)
 
-
     def _build_max_heap(self):
         """
         Builds max heap from all nodes.
@@ -97,7 +96,6 @@ class Heap(object):
         self._data.append(new_item)
         self._size += 1
         self._upheap(len(self._data)-1)
-
 
     def extend(self, items):
         for item in items:

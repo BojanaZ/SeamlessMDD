@@ -4,10 +4,11 @@ import json
 from json import JSONEncoder
 from utilities.utilities import get_class_from_parent_module, get_project_root
 
+
 class BaseGenerator(JinjaGenerator):
 
-    def __init__(self, id=-1, file_path="", file_content="", file_template_path=""):
-        self._id = id
+    def __init__(self, id_=-1, file_path="", file_content="", file_template_path=""):
+        self._id = id_
         self._file_path = file_path
         self._file_content = file_content
         self._file_template_path = file_template_path
@@ -76,7 +77,7 @@ class BaseGenerator(JinjaGenerator):
         return json.dumps(self, cls=BaseGeneratorJSONEncoder)
 
     @classmethod
-    def from_json(cls, data: dict):
+    def from_json(cls, data):
 
         if type(data) == str:
             data = json.loads(data)
@@ -115,21 +116,22 @@ class BaseGenerator(JinjaGenerator):
     def __ne__(self, other):
         return not self == other
 
+
 class BaseGeneratorJSONEncoder(JSONEncoder):
 
-    def default(self, object):
+    def default(self, object_):
 
-        if isinstance(object, BaseGenerator):
+        if isinstance(object_, BaseGenerator):
 
-            object_dict = {key: value for (key, value) in object.__dict__.items() if
+            object_dict = {key: value for (key, value) in object_.__dict__.items() if
                            key not in ['tasks']}
 
-            object_dict['class'] = type(object).__name__
+            object_dict['class'] = type(object_).__name__
 
-            if hasattr(object, "tasks"):
+            if hasattr(object_, "tasks"):
                 object_dict["tasks"] = []
 
-                for task in object.tasks:
+                for task in object_.tasks:
                     task_dict = task.to_dict()
                     object_dict["tasks"].append(task_dict)
 
@@ -141,4 +143,4 @@ class BaseGeneratorJSONEncoder(JSONEncoder):
 
             # raising exceptions for unsupported types
 
-            return JSONEncoder.default(self, object)
+            return JSONEncoder.default(self, object_)

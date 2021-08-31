@@ -3,8 +3,10 @@ from utilities.utilities import get_project_root
 import dill, json
 from metamodel.model import Model
 
+
 class VersionUnavailableError(Exception):
     pass
+
 
 class DataManipulation(object):
 
@@ -67,7 +69,6 @@ class DataManipulation(object):
         with open(path, "rb") as file:
             return dill.load(file)
 
-
     @staticmethod
     def load_from_json(path=None):
         if not path:
@@ -105,7 +106,7 @@ class DataManipulation(object):
         return json.dumps(self, cls=DataManipulationJSONEncoder)
 
     @classmethod
-    def from_json(cls, data: dict):
+    def from_json(cls, data):
 
         if type(data) == str:
             data = json.loads(data)
@@ -145,23 +146,22 @@ class DataManipulation(object):
 
         return True
 
-
     def __ne__(self, other):
         return not self == other
 
 
 class DataManipulationJSONEncoder(json.JSONEncoder):
 
-    def default(self, object):
+    def default(self, object_):
 
-        if isinstance(object, DataManipulation):
+        if isinstance(object_, DataManipulation):
 
-            object_dict = {key: value for (key, value) in object.__dict__.items() if
+            object_dict = {key: value for (key, value) in object_.__dict__.items() if
                            key not in ['_versions']}
 
             object_dict["versions"] = {}
 
-            for version_number, model in object.versions.items():
+            for version_number, model in object_.versions.items():
                 object_dict["versions"][version_number] = model.to_dict()
 
             return object_dict
@@ -172,7 +172,7 @@ class DataManipulationJSONEncoder(json.JSONEncoder):
 
             # raising exceptions for unsupported types
 
-            return json.JSONEncoder.default(self, object)
+            return json.JSONEncoder.default(self, object_)
 
 
 

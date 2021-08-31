@@ -8,9 +8,9 @@ from utilities.utilities import get_project_root
 
 class DocumentsOutputGenerator(BaseGenerator):
 
-    def __init__(self, id=-1, file_path="", file_content="", file_template_path=""):
+    def __init__(self, id_=-1, file_path="", file_content="", file_template_path=""):
 
-        super().__init__(id, file_path, file_content, file_template_path)
+        super().__init__(id_, file_path, file_content, file_template_path)
         self.tasks = []
 
     # Root path where Jinja templates are found.
@@ -25,7 +25,6 @@ class DocumentsOutputGenerator(BaseGenerator):
 
     def generate(self, model, outfolder):
         super().generate(model, outfolder)
-
 
     def flush(self):
         with open(self._file_path, 'w') as file:

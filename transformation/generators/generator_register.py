@@ -2,6 +2,7 @@ import dill
 import json
 from utilities.utilities import get_file_path_for_format, get_class_from_parent_module
 
+
 class GeneratorRegister(dict):
 
     def __init__(self, loading_path_dill=None, loading_path_json=None):
@@ -72,7 +73,6 @@ class GeneratorRegister(dict):
         except OSError:
             print("Unable to load generators.")
 
-
     def save_to_json(self, path=None):
 
         if path is None:
@@ -90,7 +90,6 @@ class GeneratorRegister(dict):
         with open(path, "r") as file:
             content = file.read()
             return GeneratorRegister.from_json(content)
-
 
     def to_json(self):
         # generators = {}
@@ -142,13 +141,13 @@ class GeneratorRegister(dict):
 
 class GeneratorsJSONEncoder(json.JSONEncoder):
 
-    def default(self, object):
+    def default(self, object_):
 
-        if isinstance(object, GeneratorRegister):
+        if isinstance(object_, GeneratorRegister):
 
-            object_dict = dict(generator_register={key: value.to_dict() for (key, value) in object.items()})
-            object_dict["data_path_dill"] = object.data_path_dill
-            object_dict["data_path_json"] = object.data_path_json
+            object_dict = dict(generator_register={key: value.to_dict() for (key, value) in object_.items()})
+            object_dict["data_path_dill"] = object_.data_path_dill
+            object_dict["data_path_json"] = object_.data_path_json
 
             return object_dict
 
@@ -158,4 +157,4 @@ class GeneratorsJSONEncoder(json.JSONEncoder):
 
             # raising exceptions for unsupported types
 
-            return json.JSONEncoder.default(self, object)
+            return json.JSONEncoder.default(self, object_)

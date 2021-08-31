@@ -4,6 +4,7 @@ from tests.serialization.element_generator_table_serialization_test import Table
 from tests.serialization.generator_handler_serialization_test import GeneratorHandlerSerializationTest
 from tests.serialization.generator_register_serialization_test import GeneratorRegisterSerializationTest
 
+
 def run_serialization_tests():
 
     loader = unittest.TestLoader()
@@ -18,6 +19,7 @@ def run_serialization_tests():
     # initialize a runner, pass it your suite and run it
     runner = unittest.TextTestRunner(verbosity=3)
     runner.run(suite)
+
 
 if __name__ == '__main__':
     run_serialization_tests()

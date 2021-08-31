@@ -116,3 +116,18 @@ def get_full_model_diff(old_model, new_model):
         diffs.append(Diff(key, None, new_dict[key], new_model, OperationType.ADD_PROPERTY))
 
     return diffs
+
+
+def filter_unique_diff(diffs):
+    filtered_diffs = []
+    
+    for diff in diffs:
+        found = False
+        for unique_diff in filtered_diffs:
+            if diff == unique_diff:
+                found = True
+                break
+        if not found:
+            filtered_diffs.append(diff)
+
+    return filtered_diffs

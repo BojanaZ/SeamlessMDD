@@ -1,15 +1,16 @@
 import json
 from multigen.generator import Task
 
+
 class BaseTaskJSONEncoder(json.JSONEncoder):
 
-    def default(self, object):
+    def default(self, object_):
 
-        if isinstance(object, Task):
+        if isinstance(object_, Task):
 
-            object_dict = {key: value for (key, value) in object.__dict__.items() if key not in ['environment', 'formatter']}
+            object_dict = {key: value for (key, value) in v.__dict__.items() if key not in ['environment', 'formatter']}
 
-            object_dict['class'] = type(object).__name__
+            object_dict['class'] = type(object_).__name__
 
             return object_dict
 
@@ -19,4 +20,4 @@ class BaseTaskJSONEncoder(json.JSONEncoder):
 
             # raising exceptions for unsupported types
 
-            return json.JSONEncoder.default(self, object)
+            return json.JSONEncoder.default(self, object_)

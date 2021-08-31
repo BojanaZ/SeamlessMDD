@@ -3,6 +3,7 @@ from transformation.generator_handler import GeneratorHandler
 from transformation.generators.documents_output_generator import DocumentsOutputGenerator
 import os
 
+
 class GeneratorRegisterSerializationTest(unittest.TestCase):
 
     def test_generators_register_dill_serialization(self):
@@ -25,7 +26,6 @@ class GeneratorRegisterSerializationTest(unittest.TestCase):
         generator.initialize()
         self.handler.register(generator)
         self.generator_register = self.handler.generators
-
 
     def tearDown(self):
         try:

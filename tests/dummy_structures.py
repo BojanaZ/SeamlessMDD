@@ -3,6 +3,7 @@ from metamodel.project import Project
 from metamodel.document import Document
 from metamodel.field import Field
 
+
 def dummy_data():
 
     model = Model()

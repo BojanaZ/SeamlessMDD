@@ -8,25 +8,24 @@ from transformation.generators.generator_register import GeneratorRegister
 from metamodel.model import Model
 from transformation.data_manipulation import DataManipulation, VersionUnavailableError
 
-def create_app(data_manipulation, handler):
+
+def create_app(data_manipulation_, handler_):
 
     app =  Flask(__name__)
     app.config["DEBUG"] = True
     os.environ['PYTHONPATH'] = os.getcwd()
 
-
     @app.route('/', methods=['GET'])
     def home():
-        model = data_manipulation.get_latest_model()
-        json = model.to_json()
+        model_ = data_manipulation_.get_latest_model()
+        json = model_.to_json()
         return make_response(json, 200)
-
 
     @app.route('/model', methods=['GET', 'POST'])
     def model():
         if request.method == 'GET':
             try:
-                content = data_manipulation.get_latest_model()
+                content = data_manipulation_.get_latest_model()
                 return make_response(content.to_json(), 200)
             except VersionUnavailableError as version_error:
                 return make_response(jsonify({"error": "Not found"}), 404)
@@ -34,26 +33,24 @@ def create_app(data_manipulation, handler):
         if request.method == 'POST':
             """modify/update model"""
             content = request.get_json()
-            model = Model.from_json(content)
-            data_manipulation.update_model(model)
+            model_ = Model.from_json(content)
+            data_manipulation_.update_model(model_)
             return make_response("CREATED", 201)
-
 
     @app.route('/models/<version_id>', methods=['GET'])
     def model_by_version(version_id):
         if request.method == 'GET':
             try:
-                content = data_manipulation.get_model_by_version(version_id)
+                content = data_manipulation_.get_model_by_version(version_id)
                 return make_response(content.to_json(), 200)
             except VersionUnavailableError:
                 return make_response(jsonify({"error": "Not found"}), 404)
-
 
     @app.route('/generators', methods=['GET', 'POST'])
     def generators():
         if request.method == 'GET':
             try:
-                content = handler.generators.to_json()
+                content = handler_.generators.to_json()
                 return make_response(content, 200)
             except:
                 return make_response(jsonify({"error": "Not found"}), 404)
@@ -61,14 +58,14 @@ def create_app(data_manipulation, handler):
         if request.method == 'POST':
             """modify/update generator"""
             content = request.get_json()
-            handler.generators = GeneratorRegister.from_json(content)
+            handler_.generators = GeneratorRegister.from_json(content)
             return make_response("CREATED", 201)
 
     @app.route('/generators/<generator_id>', methods=['GET', 'POST'])
     def generator_by_id(generator_id):
         if request.method == 'GET':
             try:
-                found_generator = handler.get_generator(int(generator_id))
+                found_generator = handler_.get_generator(int(generator_id))
                 return make_response(found_generator.to_json(), 200)
             except KeyError:
                 return make_response(jsonify({"error": "Not found"}), 404)
@@ -80,7 +77,7 @@ def create_app(data_manipulation, handler):
     def element_generator_table():
         if request.method == 'GET':
             try:
-                content = handler.element_generator_table.to_json()
+                content = handler_.element_generator_table.to_json()
                 return make_response(content, 200)
             except Exception as e:
                 print(e)
@@ -88,7 +85,7 @@ def create_app(data_manipulation, handler):
         elif request.method == 'POST':
             try:
                 content = request.get_json()
-                handler.element_generator_table.from_json(content)
+                handler_.element_generator_table.from_json(content)
                 return make_response("OK", 200)
             except:
                 return make_response(jsonify({'error':'Bad request'}), 400)
@@ -96,13 +93,14 @@ def create_app(data_manipulation, handler):
     @app.route('/generation/<element_id>', methods = ['GET'])
     def generate_single_element(element_id):
         try:
-            element = handler.element_generator_table.get_element_by_id(int(element_id))
-            handler.generate_single_element(element)
+            element = handler_.element_generator_table.get_element_by_id(int(element_id))
+            handler_.generate_single_element(element)
             return make_response("OK", 200)
         except ValueError:
             return make_response(jsonify({'error': 'Bad request'}), 400)
 
     return app
+
 
 if __name__ == '__main__':
     data_manipulation = DataManipulation()

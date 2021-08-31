@@ -34,7 +34,7 @@ class VersionDiff(object):
         self._diff = diff
 
     def calculate_diff(self):
-        if type(self._previous_element)!=type(self._current_element):
+        if isinstance(self._previous_element, type(self._current_element)):
             raise TypeError
 
         return DictionaryUtility.get_different_keys(self.previous_element, self.current_element)

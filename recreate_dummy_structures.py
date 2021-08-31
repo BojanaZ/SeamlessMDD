@@ -8,9 +8,11 @@ from utilities.utilities import get_project_root
 from transformation.data_manipulation import DataManipulation
 from tests.dummy_structures import dummy_data
 
+
 def save_table_dill(table):
     with open("table.dill", "wb") as file:
         dill.dump(table, file)
+
 
 def dummy_table():
     data = dummy_data()
@@ -21,6 +23,7 @@ def dummy_table():
     for element in elements.values():
         table.insert_pair(element, generator)
     return table
+
 
 def recreate_dummy_table():
     #TABLE RECREATION FOR FILE
@@ -33,6 +36,7 @@ def recreate_dummy_table():
     path = join(get_project_root(), "files", "table.json")
     with open(path, "w") as file:
         file.write(table.to_json())
+
 
 def recreate_dummy_generator_handler():
     try:
@@ -52,6 +56,7 @@ def recreate_dummy_generator_handler():
     handler.save_to_dill()
     handler.save_to_json()
 
+
 def recreate_dummy_data_manipulation():
     model = dummy_data()
 
@@ -62,6 +67,7 @@ def recreate_dummy_data_manipulation():
     data_manipulation.save_to_dill()
 
     return data_manipulation
+
 
 if __name__ == '__main__':
     dm = recreate_dummy_data_manipulation()
