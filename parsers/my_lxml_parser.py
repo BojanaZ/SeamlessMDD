@@ -1,4 +1,4 @@
-from parsers.ParserInterface import IParser
+from parsers.parser_interface import IParser
 from lxml import html, etree
 
 class MyLXMLParser(IParser):

@@ -1,4 +1,4 @@
-from parsers.ParserInterface import IParser
+from parsers.parser_interface import IParser
 import AdvancedHTMLParser
 
 class MyHTMLParser(IParser):
