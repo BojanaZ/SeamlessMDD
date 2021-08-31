@@ -1,13 +1,13 @@
-from transformation.tasks.diff_tasks.base_diff_task import BaseDiffTask
+from transformation.tasks.jinja_tasks.base_jinja_tasks import BaseJinjaTask
 
-class DiffDemoTask(BaseDiffTask):
+class MyTask(BaseJinjaTask):
 
-    def __init__(self, priority=2, _template_name=None, **kwargs):
+    def __init__(self, priority=2, _template_name=None, _formatter=None, **kwargs):
         if not _template_name:
             self._template_name = _template_name
         else:
             self._template_name = "documents_output_template.html"
-        super().__init__(priority = priority, template_name=_template_name)
+        super().__init__(priority = priority, template_name=_template_name, formatter=_formatter)
 
     @property
     def template_name(self):
@@ -21,7 +21,3 @@ class DiffDemoTask(BaseDiffTask):
     def relative_path_for_element(self, document):
         """Return relative file path receiving the generator output for given element."""
         return "./"+document.name+".task1.html"
-
-    def generate_content(self, element, filepath):
-        """Actual file generation from model element."""
-        raise NotImplementedError()
