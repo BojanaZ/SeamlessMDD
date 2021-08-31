@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Documents</title>
+    <title>Document <li><a href="{{ element.id }}">{{ element.name }}</a></li></title>
 </head>
 <body>
+    <h1>Document <a href="{{ element.id }}">{{ element.name }}</a></h1>
     <ul id="navigation">
-    {% for item in documents %}
-        <li><a href="{{ item.id }}">{{ item.name }}</a></li>
+    {% for value in element.elements %}
+        <li><a href="{{ value.id }}">{{ value.name }}</a></li>
     {% endfor %}
     </ul>
-=
 </body>
 </html>

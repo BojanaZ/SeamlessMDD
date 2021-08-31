@@ -1,50 +1,35 @@
-from GeneratorHandler import GeneratorHandler
-from generators.documents_output_generator import DocumentsOutputGenerator
-from element_generator_table import ElementGeneratorTable
-from DataManipulation import DataManipulation
-import json
-import dill
-
-
-def save_generators_json():
-    generator_dict = {}
-    g1 = DocumentsOutputGenerator()
-    g1.id = 1
-    #generator_dict[g1.id] = g1
-    with open("generators.json", "w") as file:
-        file.write(g1.toJSON())
-
-# def load_generators_json():
-#     with open("generators.json") as file:
-#         generators = file.read()
-#         generator_dict = json.loads(generators)
-
-def save_table_dill(table):
-    with open("table.dill", "wb") as file:
-        dill.dump(table, file)
-
-# def dummy_table():
-#     data = GeneratorHandler.dummy_data()
-#     generator = DocumentsOutputGenerator()
-#     table = ElementGeneratorTable()
-#     elements = data.elements
-#     for element in elements:
-#         table.insert_pair(element, generator)
-#     save_table_dill(table)
-
+from recreate_dummy_structures import recreate_dummy_data_manipulation, recreate_dummy_generator_handler, recreate_dummy_table
+from deepdiff import DeepDiff
+from diff.diff_calculator import get_full_model_diff
+from tests.dummy_structures import dummy_data
 
 if __name__ == '__main__':
+    # dm = recreate_dummy_data_manipulation()
+    # recreate_dummy_generator_handler()
+    # recreate_dummy_table()
 
-    handler = GeneratorHandler()
-    handler.load_generators_dill()
+    old_model = dummy_data()
+    new_model = dummy_data()
+    old_model.version = 1
+    new_model.version = 2
+    new_model.root.text = "RANDOM TEXT"
+    del new_model.elements[12]
+    #ddiff = DeepDiff(old_model.to_dict(), new_model.to_dict())
+    #print(ddiff)
+    diffs = get_full_model_diff(old_model, new_model)
 
-    data = GeneratorHandler.dummy_data()
+    filtered_diffs = []
+    for diff in diffs:
+        found = False
+        for unique_diff in filtered_diffs:
+            if diff == unique_diff:
+                found = True
+                break
+        if not found:
+            filtered_diffs.append(diff)
 
-    generator = DocumentsOutputGenerator()
-    handler.register(generator)
-    #dummy_table()
-    handler.load_table_dill()
-    handler.generate_by_generator(data, "../out/")
+    for diff in filtered_diffs:
+        print(diff)
 
 
 
