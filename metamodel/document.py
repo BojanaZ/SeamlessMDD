@@ -1,0 +1,7 @@
+from metamodel.container import Container
+
+
+class Document(Container):
+
+    def __init__(self, _id, name, deleted, label=None, model=None):
+        super().__init__(_id, name, deleted, label, model)
