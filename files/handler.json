@@ -1,0 +1,179 @@
+{
+    "_data_loading_path": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS rad/SeamlessMDD/files",
+    "element_generator_table": {
+        "table_by_element": {
+            "1": [
+                [
+                    {
+                        "_id": 0,
+                        "_file_path": "",
+                        "_file_content": "",
+                        "_file_template_path": "",
+                        "class": "DocumentsOutputGenerator",
+                        "tasks": [
+                            {
+                                "_template_name": "model_data.tpl",
+                                "_priority": 2,
+                                "class": "MyTask"
+                            }
+                        ]
+                    },
+                    true
+                ]
+            ],
+            "11": [
+                [
+                    {
+                        "_id": 0,
+                        "_file_path": "",
+                        "_file_content": "",
+                        "_file_template_path": "",
+                        "class": "DocumentsOutputGenerator",
+                        "tasks": [
+                            {
+                                "_template_name": "model_data.tpl",
+                                "_priority": 2,
+                                "class": "MyTask"
+                            }
+                        ]
+                    },
+                    true
+                ]
+            ],
+            "12": [
+                [
+                    {
+                        "_id": 0,
+                        "_file_path": "",
+                        "_file_content": "",
+                        "_file_template_path": "",
+                        "class": "DocumentsOutputGenerator",
+                        "tasks": [
+                            {
+                                "_template_name": "model_data.tpl",
+                                "_priority": 2,
+                                "class": "MyTask"
+                            }
+                        ]
+                    },
+                    true
+                ]
+            ],
+            "89": [
+                [
+                    {
+                        "_id": 0,
+                        "_file_path": "",
+                        "_file_content": "",
+                        "_file_template_path": "",
+                        "class": "DocumentsOutputGenerator",
+                        "tasks": [
+                            {
+                                "_template_name": "model_data.tpl",
+                                "_priority": 2,
+                                "class": "MyTask"
+                            }
+                        ]
+                    },
+                    true
+                ]
+            ],
+            "90": [
+                [
+                    {
+                        "_id": 0,
+                        "_file_path": "",
+                        "_file_content": "",
+                        "_file_template_path": "",
+                        "class": "DocumentsOutputGenerator",
+                        "tasks": [
+                            {
+                                "_template_name": "model_data.tpl",
+                                "_priority": 2,
+                                "class": "MyTask"
+                            }
+                        ]
+                    },
+                    true
+                ]
+            ],
+            "91": [
+                [
+                    {
+                        "_id": 0,
+                        "_file_path": "",
+                        "_file_content": "",
+                        "_file_template_path": "",
+                        "class": "DocumentsOutputGenerator",
+                        "tasks": [
+                            {
+                                "_template_name": "model_data.tpl",
+                                "_priority": 2,
+                                "class": "MyTask"
+                            }
+                        ]
+                    },
+                    true
+                ]
+            ],
+            "92": [
+                [
+                    {
+                        "_id": 0,
+                        "_file_path": "",
+                        "_file_content": "",
+                        "_file_template_path": "",
+                        "class": "DocumentsOutputGenerator",
+                        "tasks": [
+                            {
+                                "_template_name": "model_data.tpl",
+                                "_priority": 2,
+                                "class": "MyTask"
+                            }
+                        ]
+                    },
+                    true
+                ]
+            ],
+            "93": [
+                [
+                    {
+                        "_id": 0,
+                        "_file_path": "",
+                        "_file_content": "",
+                        "_file_template_path": "",
+                        "class": "DocumentsOutputGenerator",
+                        "tasks": [
+                            {
+                                "_template_name": "model_data.tpl",
+                                "_priority": 2,
+                                "class": "MyTask"
+                            }
+                        ]
+                    },
+                    true
+                ]
+            ]
+        }
+    },
+    "_generators": {
+        "generator_register": {
+            "0": {
+                "_id": 0,
+                "_file_path": "",
+                "_file_content": "",
+                "_file_template_path": "",
+                "class": "DocumentsOutputGenerator",
+                "tasks": [
+                    {
+                        "_template_name": "model_data.tpl",
+                        "_priority": 2,
+                        "class": "MyTask"
+                    }
+                ]
+            }
+        },
+        "data_path_dill": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS rad/SeamlessMDD/files/generators.dill",
+        "data_path_json": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS rad/SeamlessMDD/files/generators.json"
+    }
+}
