@@ -3,6 +3,7 @@ from transformation.tasks.priority_mixin import PriorityMixin
 from transformation.tasks.base_task_json_encoder import BaseTaskJSONEncoder
 import json
 
+
 class BaseDiffTask(TemplateFileTask, PriorityMixin):
 
     def __init__(self, priority=2, template_name=None):
@@ -29,7 +30,6 @@ class BaseDiffTask(TemplateFileTask, PriorityMixin):
 
     @classmethod
     def from_json(cls, data: dict):
-        #return cls(formatter=data['formatter'], template_name=data["_template_name"])
         return cls(**data)
 
     def to_json(self):
@@ -43,7 +43,7 @@ class BaseDiffTask(TemplateFileTask, PriorityMixin):
 
     def __eq__(self, other):
         if self.priority != other.priority:
-           return False
+            return False
 
         if self._template_name != other.template_name:
             return False

@@ -7,8 +7,8 @@ class MyHTMLParser(IParser):
     def __init__(self, file_path):
         self.parser = AdvancedHTMLParser.AdvancedHTMLParser(file_path, encoding='utf-8')
 
-    def get_element_by_id(self, id):
-        return self.parser.getElementById(str(id))
+    def get_element_by_id(self, id_):
+        return self.parser.getElementById(str(id_))
 
     def get_element_by_name(self, name):
         elements = self.parser.getElementsByAttr("name", name)

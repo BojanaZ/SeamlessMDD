@@ -1,13 +1,16 @@
+from abc import ABC
+
 from transformation.tasks.diff_tasks.base_diff_task import BaseDiffTask
 
-class DiffDemoTask(BaseDiffTask):
+
+class DiffDemoTask(BaseDiffTask, ABC):
 
     def __init__(self, priority=2, _template_name=None, **kwargs):
         if not _template_name:
             self._template_name = _template_name
         else:
             self._template_name = "documents_output_template.html"
-        super().__init__(priority = priority, template_name=_template_name)
+        super().__init__(priority=priority, template_name=_template_name)
 
     @property
     def template_name(self):

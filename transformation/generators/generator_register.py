@@ -38,17 +38,17 @@ class GeneratorRegister(dict):
 
     @staticmethod
     def new_id_generator():
-        id = 0
+        id_ = 0
         while True:
-            yield id
-            id += 1
+            yield id_
+            id_ += 1
 
     def generate_new_id(self):
         id_generator = self.new_id_generator()
         while True:
-            id = next(id_generator)
-            if id not in self:
-                return id
+            id_ = next(id_generator)
+            if id_ not in self:
+                return id_
 
     def register(self, generator):
         generator_id = self.generate_new_id()

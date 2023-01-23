@@ -31,9 +31,9 @@ class MyLXMLParser(IParser):
     def element_from_string(self, string):
         return html.fromstring(string)
 
-    def replace_element_by_id(self, id, new_element):
+    def replace_element_by_id(self, id_, new_element):
         self.pretty_print(self.tree)
-        element_to_replace = self.get_element_by_id(id)
+        element_to_replace = self.get_element_by_id(id_)
         element_to_replace.addnext(new_element)
         parent = element_to_replace.getparent()
         parent.remove(element_to_replace)
