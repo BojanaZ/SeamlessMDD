@@ -20,6 +20,9 @@ class GeneratorRegister(dict):
 
         self._data_path_json = loading_path_json
 
+    def get_generator_by_id(self, id):
+        return self[id]
+
     @property
     def data_path_dill(self):
         return self._data_path_dill
@@ -145,7 +148,7 @@ class GeneratorsJSONEncoder(json.JSONEncoder):
 
         if isinstance(object_, GeneratorRegister):
 
-            object_dict = dict(generator_register={key: value.to_dict() for (key, value) in object_.items()})
+            object_dict = {key: value.to_dict() for (key, value) in object_.items()}
             object_dict["data_path_dill"] = object_.data_path_dill
             object_dict["data_path_json"] = object_.data_path_json
 

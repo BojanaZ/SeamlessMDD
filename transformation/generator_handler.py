@@ -90,12 +90,13 @@ class GeneratorHandler(object):
             print("Unable to load generator handler.")
 
     def from_json(self, content):
+
         if type(content) == str:
             content = json.loads(content)
 
         self.data_loading_path = content['_data_loading_path']
         self.generators = self._generators.from_json(content['_generators'])
-        self.element_generator_table.from_json(content['element_generator_table'])
+        self.element_generator_table.register_from_json(content['element_generator_table'])
         return self
 
     def load_from_dill(self, path=None):
@@ -145,13 +146,13 @@ class GeneratorHandler(object):
 
     def generate_by_generator(self, model_, outfolder=None):
 
-        generator_list = self.element_generator_table.get_active_generators()
+        generator_id_list = self.element_generator_table.get_active_generators()
 
         task_heap = Heap()
 
-        for generator in generator_list:
+        for generator_id in generator_id_list:
 
-            #generator.create_environment()
+            generator = self._generators.get_generator_by_id(generator_id)
 
             for model_element in model_:
                 for task in generator.tasks:
@@ -181,11 +182,12 @@ class GeneratorHandler(object):
             for element in task.filtered_elements(data_manipulation_):
                 task.run(element, outfolder)
 
-    def generate_single_element(self, element, outfolder=None):
-        generators = self.element_generator_table.get_generators(element)
+    def generate_single_element(self, element, data_manipulation, outfolder=None):
+        generator_ids = self.element_generator_table.get_generators(element.id)
         task_heap = Heap()
 
-        for generator in generators:
+        for generator_id in generator_ids:
+            generator = self._generators.get_generator_by_id(generator_id)
             task_heap.extend(generator.tasks)
 
         task_heap.sort()
@@ -197,7 +199,6 @@ class GeneratorHandler(object):
             for model_element in task.filtered_elements(model):
                 if model_element == element:
                     task.run(element, outfolder)
-            task.invoke()
 
 
 if __name__ == '__main__':

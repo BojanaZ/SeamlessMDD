@@ -122,6 +122,7 @@ class DataManipulation(object):
         for version_id, model_json in data['versions'].items():
             new_object._versions[int(version_id)] = Model.from_json(model_json)
 
+        new_object._latest_version_number = data["_latest_version_number"]
         return new_object
 
     def to_dict(self):

@@ -94,7 +94,7 @@ class Element(object):
 class ElementJSONEncoder(JSONEncoder):
     def default(self, object_):
 
-        if isinstance(object, Element):
+        if isinstance(object_, Element):
 
             object_dict = {key: value for (key, value) in object_.__dict__.items() if key not in ['_model',
                                                                                                   '_container']}

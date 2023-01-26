@@ -1,7 +1,7 @@
 import json
 import os
 
-from tasks.jinja_tasks.my_task import MyTask
+from transformation.tasks.jinja_tasks.my_task import MyTask
 from transformation.generators.base_generator import BaseGenerator, BaseGeneratorJSONEncoder
 from utilities.utilities import get_project_root
 
@@ -9,9 +9,9 @@ from utilities.utilities import get_project_root
 class DocumentsOutputGenerator(BaseGenerator):
 
     def __init__(self, id_=-1, file_path="", file_content="", file_template_path=""):
-
+        self.initialize()
         super().__init__(id_, file_path, file_content, file_template_path)
-        self.tasks = []
+        #self.tasks = []
 
     # Root path where Jinja templates are found.
     templates_path = os.path.join(
@@ -19,9 +19,12 @@ class DocumentsOutputGenerator(BaseGenerator):
         'templates'
     )
 
-    def initialize(self):
+    def initialize(self, file_template_path=None):
         self.tasks = []
-        self.tasks.append(MyTask(_template_name=self._file_template_path))
+        if file_template_path is not None:
+            self.tasks.append(MyTask(_template_name=self._file_template_path))
+        else:
+            self.tasks.append(MyTask(_template_name=file_template_path))
 
     def generate(self, model, outfolder):
         super().generate(model, outfolder)

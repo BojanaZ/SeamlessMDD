@@ -86,9 +86,12 @@ class BaseGenerator(JinjaGenerator):
 
         if data['tasks']:
             new_object.tasks = []
+            environment = new_object.create_environment()
             for task in data['tasks']:
                 _type = get_class_from_parent_module(task['class'], 'transformation.tasks')
-                new_object.tasks.append(_type.from_json(task))
+                task = _type.from_json(task)
+                task.environment = environment
+                new_object.tasks.append(task)
 
         return new_object
 
@@ -124,7 +127,7 @@ class BaseGeneratorJSONEncoder(JSONEncoder):
         if isinstance(object_, BaseGenerator):
 
             object_dict = {key: value for (key, value) in object_.__dict__.items() if
-                           key not in ['tasks']}
+                           key not in ['tasks', '__len__']}
 
             object_dict['class'] = type(object_).__name__
 

@@ -15,7 +15,7 @@ class MyTask(BaseJinjaTask):
 
     def filtered_elements(self, model):
         """Return iterator over elements in model that are passed to the above template."""
-        for document in model.elements:
+        for document in model.elements.values():
             yield document
 
     def relative_path_for_element(self, document):

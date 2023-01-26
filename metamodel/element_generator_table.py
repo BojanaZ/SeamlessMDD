@@ -27,10 +27,10 @@ class ElementGeneratorTable(object):
     def to_json(self):
         table_by_element = {}
 
-        for element, generators in self._by_element.items():
-            table_by_element[element.id] = []
-            for generator, value in generators.items():
-                table_by_element[element.id].append((generator, value))
+        for element_id, generators in self._by_element.items():
+            table_by_element[element_id] = []
+            for generator_id, value in generators.items():
+                table_by_element[element_id].append((generator_id, value))
 
         table = {'table_by_element': table_by_element}
 
@@ -111,6 +111,46 @@ class ElementGeneratorTable(object):
             if json_generator_id not in found_old_generator_ids:
                 raise GeneratorNotFoundError("Deserialized generator is not registered.")
 
+    def register_from_json(self, table_):
+        if type(table_) == str:
+            table_ = json.loads(table_)
+
+        table_by_element = table_['table_by_element']
+
+        found_element_ids = set()
+        all_json_generators_ids = set()
+        found_old_generator_ids = set()
+
+        for element, generators in self._by_element.items():
+            element_found = False
+            for json_element_id, json_generators in table_by_element.items():
+                if element.id == int(json_element_id):
+                    element_found = True
+                    found_element_ids.add(element.id)
+                    for generator, value in generators.items():
+                        for json_generator, json_value in json_generators:
+                            if generator.id == json_generator["_id"]:
+                                found_old_generator_ids.add(generator.id)
+                                self.update_pair(element, generator, json_value)
+                                break
+                        else:
+                            self.remove_connection(element, generator)
+                    break
+            if not element_found:
+                self.deactivate_element(element)
+
+        elements_to_add = []
+        for json_element_id, json_generators in table_by_element.items():
+            element_id = int(json_element_id)
+            if element_id not in found_element_ids:
+                self._by_element[element_id] = {}
+
+        for json_element_id, json_generators in table_by_element.items():
+            for json_generator, json_value in json_generators:
+                if json_generator["_id"] not in found_old_generator_ids:
+                    self._by_generator[json_generator["_id"]] = {}
+                    self.update_pair(int(json_element_id), json_generator["_id"], json_value)
+
     def update_pair(self, element, generator, value=True, all_generators=False):
         if element not in self._by_element:
             self._by_element[element] = {}
@@ -136,8 +176,8 @@ class ElementGeneratorTable(object):
         insert_for_all_generators = generator is None
         self.update_pair(element, generator, True, insert_for_all_generators)
 
-    def get_generators(self, element):
-        return (generator for generator, value in self._by_element[element].items() if value)
+    def get_generators(self, element_id):
+        return (generator for generator, value in self._by_element[element_id].items() if value)
 
     def get_elements(self, generator):
         return (element for element in self._by_generator[generator] if
@@ -232,10 +272,10 @@ class ElementGeneratorTable(object):
     def has_element_by_id(self, element_id):
         return self.get_element_by_id(element_id) is not None
 
-    def get_element_by_id(self, element_id):
-        for element in self._by_element.keys():
-            if element.id == element_id:
-                return element
+    def get_element_by_id(self, id_):
+        for element_id in self._by_element.keys():
+            if id_ == element_id:
+                return element_id
 
         return None
 

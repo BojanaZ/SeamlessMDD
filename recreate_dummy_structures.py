@@ -1,6 +1,6 @@
-import dill
+#import dill
 
-from element_generator_table import ElementGeneratorTable
+from metamodel.element_generator_table import ElementGeneratorTable
 from transformation.generator_handler import GeneratorHandler
 from transformation.generators.documents_output_generator import DocumentsOutputGenerator
 from os.path import join
@@ -9,9 +9,9 @@ from transformation.data_manipulation import DataManipulation
 from tests.dummy_structures import dummy_data
 
 
-def save_table_dill(table):
-    with open("table.dill", "wb") as file:
-        dill.dump(table, file)
+#def save_table_dill(table):
+    #with open("table.dill", "wb") as file:
+        #dill.dump(table, file)
 
 
 def dummy_table():
@@ -30,8 +30,8 @@ def recreate_dummy_table():
     table = dummy_table()
 
     path = join(get_project_root(), "files", "table.dill")
-    with open(path, "wb") as file:
-        dill.dump(table, file)
+    #with open(path, "wb") as file:
+        #dill.dump(table, file)
 
     path = join(get_project_root(), "files", "table.json")
     with open(path, "w") as file:
@@ -39,10 +39,10 @@ def recreate_dummy_table():
 
 
 def recreate_dummy_generator_handler():
-    try:
-        data_manipulation = DataManipulation().load_from_dill()
-    except:
-        data_manipulation = recreate_dummy_data_manipulation()
+    #try:
+        #data_manipulation = DataManipulation().load_from_dill()
+    #except:
+    data_manipulation = recreate_dummy_data_manipulation()
 
     handler = GeneratorHandler()
     generator = DocumentsOutputGenerator()
@@ -53,7 +53,7 @@ def recreate_dummy_generator_handler():
     for element_id, element in elements.items():
         handler.element_generator_table.insert_pair(element, generator)
 
-    handler.save_to_dill()
+    #handler.save_to_dill()
     handler.save_to_json()
 
 
@@ -64,17 +64,17 @@ def recreate_dummy_data_manipulation():
     data_manipulation.update_model(model)
 
     data_manipulation.save_to_json()
-    data_manipulation.save_to_dill()
+    #data_manipulation.save_to_dill()
 
     return data_manipulation
 
 
 if __name__ == '__main__':
     dm = recreate_dummy_data_manipulation()
-    recreate_dummy_generator_handler()
-    recreate_dummy_table()
-
-    print(dm.get_latest_model().get_first_level_dict())
+    # recreate_dummy_generator_handler()
+    # recreate_dummy_table()
+    #
+    # print(dm.get_latest_model().get_first_level_dict())
 
 
 

@@ -2,18 +2,21 @@ import os
 
 from flask import Flask, request, jsonify, make_response
 from transformation.generator_handler import GeneratorHandler
-from transformation.generators.documents_output_generator import DocumentsOutputGenerator
 from transformation.generators.generator_register import GeneratorRegister
 
 from metamodel.model import Model
 from transformation.data_manipulation import DataManipulation, VersionUnavailableError
 
 
-def create_app(data_manipulation_, handler_):
-
-    app =  Flask(__name__)
+#def create_app(data_manipulation_, handler_):
+def create_app():
+    app = Flask(__name__)
     app.config["DEBUG"] = True
+    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
     os.environ['PYTHONPATH'] = os.getcwd()
+    data_manipulation_ = DataManipulation()
+    data_manipulation_ = data_manipulation_.load_from_json()
+    handler_ = GeneratorHandler().load_from_json()
 
     @app.route('/', methods=['GET'])
     def home():
@@ -26,7 +29,10 @@ def create_app(data_manipulation_, handler_):
         if request.method == 'GET':
             try:
                 content = data_manipulation_.get_latest_model()
-                return make_response(content.to_json(), 200)
+                response = make_response(content.to_json(), 200)
+                response.headers['Content-type'] = "application/json"
+                return response
+
             except VersionUnavailableError as version_error:
                 return make_response(jsonify({"error": "Not found"}), 404)
 
@@ -42,7 +48,9 @@ def create_app(data_manipulation_, handler_):
         if request.method == 'GET':
             try:
                 content = data_manipulation_.get_model_by_version(version_id)
-                return make_response(content.to_json(), 200)
+                response = make_response(content.to_json(), 200)
+                response.headers['Content-type'] = "application/json"
+                return response
             except VersionUnavailableError:
                 return make_response(jsonify({"error": "Not found"}), 404)
 
@@ -51,7 +59,9 @@ def create_app(data_manipulation_, handler_):
         if request.method == 'GET':
             try:
                 content = handler_.generators.to_json()
-                return make_response(content, 200)
+                response = make_response(content, 200)
+                response.headers['Content-type'] = "application/json"
+                return response
             except:
                 return make_response(jsonify({"error": "Not found"}), 404)
 
@@ -66,7 +76,9 @@ def create_app(data_manipulation_, handler_):
         if request.method == 'GET':
             try:
                 found_generator = handler_.get_generator(int(generator_id))
-                return make_response(found_generator.to_json(), 200)
+                response = make_response(found_generator.to_json(), 200)
+                response.headers['Content-type'] = "application/json"
+                return response
             except KeyError:
                 return make_response(jsonify({"error": "Not found"}), 404)
 
@@ -78,7 +90,9 @@ def create_app(data_manipulation_, handler_):
         if request.method == 'GET':
             try:
                 content = handler_.element_generator_table.to_json()
-                return make_response(content, 200)
+                response = make_response(content, 200)
+                response.headers['Content-type'] = "application/json"
+                return response
             except Exception as e:
                 print(e)
                 return make_response(jsonify({"error": "Not found"}), 404)
@@ -93,8 +107,8 @@ def create_app(data_manipulation_, handler_):
     @app.route('/generation/<element_id>', methods = ['GET'])
     def generate_single_element(element_id):
         try:
-            element = handler_.element_generator_table.get_element_by_id(int(element_id))
-            handler_.generate_single_element(element)
+            element_id = handler_.element_generator_table.get_element_by_id(int(element_id))
+            handler_.generate_single_element(data_manipulation_.get_element_by_id(element_id), data_manipulation_)
             return make_response("OK", 200)
         except ValueError:
             return make_response(jsonify({'error': 'Bad request'}), 400)
@@ -104,8 +118,8 @@ def create_app(data_manipulation_, handler_):
 
 if __name__ == '__main__':
     data_manipulation = DataManipulation()
-    data_manipulation = data_manipulation.load_from_dill()
-    handler = GeneratorHandler().load_from_dill()
+    data_manipulation = data_manipulation.load_from_json()
+    handler = GeneratorHandler().load_from_json()
 
-    app = create_app(data_manipulation, handler)
+    app = create_app()
     app.run(use_reloader=False)
