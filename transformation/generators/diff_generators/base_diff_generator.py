@@ -1,17 +1,19 @@
-from multigen.jinja import JinjaGenerator
+from multigen.generator import TemplateGenerator
 import os
 import json
-from json import JSONEncoder
-from utilities.utilities import get_class_from_parent_module, get_project_root
+from utilities.utilities import get_project_root, get_class_from_parent_module
+from generators.jinja_generators.base_generator import BaseGeneratorJSONEncoder
 
+class BaseDiffGenerator(TemplateGenerator):
 
-class BaseGenerator(JinjaGenerator):
-
-    def __init__(self, id_=-1, file_path="", file_content="", file_template_path=""):
-        self._id = id_
+    def __init__(self, id=-1, file_path="", file_content="", file_template_path="", parser_type=None):
+        self._id = id
         self._file_path = file_path
         self._file_content = file_content
         self._file_template_path = file_template_path
+        self.parsers = {}
+        self._parser_type = parser_type
+        self._tracer = None
 
         super().__init__()
 
@@ -56,28 +58,41 @@ class BaseGenerator(JinjaGenerator):
     def file_template_path(self, value):
         self._file_template_path = value
 
-    def create_environment(self, **kwargs):
-        """
-        Return a new Jinja environment.
+    @property
+    def parser_type(self):
+        return self._parser_type
 
-        Derived classes may override method to pass additional parameters or to change the template
-        loader type.
-        """
-        return super().create_environment(**kwargs)
+    @parser_type.setter
+    def parser_type(self, type_):
+        self._parser_type = type_
+
+    @property
+    def tracer(self):
+        return self._tracer
+
+    @tracer.setter
+    def tracer(self, new_ref):
+        self._tracer = new_ref
+
+    def get_parser(self, file_path):
+        if file_path not in self.parsers:
+            parser = self._parser_type(file_path)
+            self.parsers[file_path] = parser
+
+        return self.parsers[file_path]
 
     def generate(self, model, outfolder):
         super().generate(model, outfolder)
 
-
     def flush(self):
-        with open(self._file_path, 'w') as file:
-            file.write(self._file_content)
+        for file_path, parser in self.parsers.items():
+            parser.write_to_file(file_path)
 
     def to_json(self):
         return json.dumps(self, cls=BaseGeneratorJSONEncoder)
 
     @classmethod
-    def from_json(cls, data):
+    def from_json(cls, data: dict):
 
         if type(data) == str:
             data = json.loads(data)
@@ -86,12 +101,9 @@ class BaseGenerator(JinjaGenerator):
 
         if data['tasks']:
             new_object.tasks = []
-            environment = new_object.create_environment()
             for task in data['tasks']:
-                _type = get_class_from_parent_module(task['class'], 'transformation.tasks')
-                task = _type.from_json(task)
-                task.environment = environment
-                new_object.tasks.append(task)
+                _type = get_class_from_parent_module(task['class'], 'tasks')
+                new_object.tasks.append(_type.from_json(task))
 
         return new_object
 
@@ -118,32 +130,3 @@ class BaseGenerator(JinjaGenerator):
 
     def __ne__(self, other):
         return not self == other
-
-
-class BaseGeneratorJSONEncoder(JSONEncoder):
-
-    def default(self, object_):
-
-        if isinstance(object_, BaseGenerator):
-
-            object_dict = {key: value for (key, value) in object_.__dict__.items() if
-                           key not in ['tasks', '__len__']}
-
-            object_dict['class'] = type(object_).__name__
-
-            if hasattr(object_, "tasks"):
-                object_dict["tasks"] = []
-
-                for task in object_.tasks:
-                    task_dict = task.to_dict()
-                    object_dict["tasks"].append(task_dict)
-
-            return object_dict
-
-        else:
-
-            # call base class implementation which takes care of
-
-            # raising exceptions for unsupported types
-
-            return JSONEncoder.default(self, object_)

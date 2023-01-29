@@ -147,8 +147,8 @@ class GeneratorsJSONEncoder(json.JSONEncoder):
     def default(self, object_):
 
         if isinstance(object_, GeneratorRegister):
-
-            object_dict = {key: value.to_dict() for (key, value) in object_.items()}
+            object_dict = {}
+            object_dict["generator_register"] = {key: value.to_dict() for (key, value) in object_.items()}
             object_dict["data_path_dill"] = object_.data_path_dill
             object_dict["data_path_json"] = object_.data_path_json
 

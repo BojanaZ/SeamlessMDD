@@ -52,7 +52,7 @@ class GeneratorHandler(object):
         return self._generators[generator_id]
 
     def to_json(self):
-        table = self.element_generator_table.to_dict()
+        table = self.element_generator_table.to_json()
         generators = self._generators.to_dict()
 
         return json.dumps({

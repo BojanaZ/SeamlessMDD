@@ -1,8 +1,7 @@
 import json
 import os
 
-from transformation.tasks.diff_tasks.html_demo_task import DiffDemoTask
-from transformation.generators.base_generator import BaseGenerator, BaseGeneratorJSONEncoder
+from transformation.generators.jinja_generators.base_generator import BaseGenerator, BaseGeneratorJSONEncoder
 from utilities.utilities import get_project_root
 
 

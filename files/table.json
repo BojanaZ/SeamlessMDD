@@ -2,153 +2,49 @@
     "table_by_element": {
         "1": [
             [
-                {
-                    "_id": -1,
-                    "_file_path": "",
-                    "_file_content": "",
-                    "_file_template_path": "",
-                    "class": "DocumentsOutputGenerator",
-                    "tasks": [
-                        {
-                            "_template_name": "model_data.tpl",
-                            "_priority": 2,
-                            "class": "MyTask"
-                        }
-                    ]
-                },
+                0,
                 true
             ]
         ],
         "11": [
             [
-                {
-                    "_id": -1,
-                    "_file_path": "",
-                    "_file_content": "",
-                    "_file_template_path": "",
-                    "class": "DocumentsOutputGenerator",
-                    "tasks": [
-                        {
-                            "_template_name": "model_data.tpl",
-                            "_priority": 2,
-                            "class": "MyTask"
-                        }
-                    ]
-                },
+                0,
                 true
             ]
         ],
         "12": [
             [
-                {
-                    "_id": -1,
-                    "_file_path": "",
-                    "_file_content": "",
-                    "_file_template_path": "",
-                    "class": "DocumentsOutputGenerator",
-                    "tasks": [
-                        {
-                            "_template_name": "model_data.tpl",
-                            "_priority": 2,
-                            "class": "MyTask"
-                        }
-                    ]
-                },
+                0,
                 true
             ]
         ],
         "89": [
             [
-                {
-                    "_id": -1,
-                    "_file_path": "",
-                    "_file_content": "",
-                    "_file_template_path": "",
-                    "class": "DocumentsOutputGenerator",
-                    "tasks": [
-                        {
-                            "_template_name": "model_data.tpl",
-                            "_priority": 2,
-                            "class": "MyTask"
-                        }
-                    ]
-                },
+                0,
                 true
             ]
         ],
         "90": [
             [
-                {
-                    "_id": -1,
-                    "_file_path": "",
-                    "_file_content": "",
-                    "_file_template_path": "",
-                    "class": "DocumentsOutputGenerator",
-                    "tasks": [
-                        {
-                            "_template_name": "model_data.tpl",
-                            "_priority": 2,
-                            "class": "MyTask"
-                        }
-                    ]
-                },
+                0,
                 true
             ]
         ],
         "91": [
             [
-                {
-                    "_id": -1,
-                    "_file_path": "",
-                    "_file_content": "",
-                    "_file_template_path": "",
-                    "class": "DocumentsOutputGenerator",
-                    "tasks": [
-                        {
-                            "_template_name": "model_data.tpl",
-                            "_priority": 2,
-                            "class": "MyTask"
-                        }
-                    ]
-                },
+                0,
                 true
             ]
         ],
         "92": [
             [
-                {
-                    "_id": -1,
-                    "_file_path": "",
-                    "_file_content": "",
-                    "_file_template_path": "",
-                    "class": "DocumentsOutputGenerator",
-                    "tasks": [
-                        {
-                            "_template_name": "model_data.tpl",
-                            "_priority": 2,
-                            "class": "MyTask"
-                        }
-                    ]
-                },
+                0,
                 true
             ]
         ],
         "93": [
             [
-                {
-                    "_id": -1,
-                    "_file_path": "",
-                    "_file_content": "",
-                    "_file_template_path": "",
-                    "class": "DocumentsOutputGenerator",
-                    "tasks": [
-                        {
-                            "_template_name": "model_data.tpl",
-                            "_priority": 2,
-                            "class": "MyTask"
-                        }
-                    ]
-                },
+                0,
                 true
             ]
         ]

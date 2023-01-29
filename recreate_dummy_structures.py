@@ -1,17 +1,10 @@
-#import dill
-
 from metamodel.element_generator_table import ElementGeneratorTable
 from transformation.generator_handler import GeneratorHandler
-from transformation.generators.documents_output_generator import DocumentsOutputGenerator
+from transformation.generators.jinja_generators.documents_output_generator import DocumentsOutputGenerator
 from os.path import join
 from utilities.utilities import get_project_root
 from transformation.data_manipulation import DataManipulation
 from tests.dummy_structures import dummy_data
-
-
-#def save_table_dill(table):
-    #with open("table.dill", "wb") as file:
-        #dill.dump(table, file)
 
 
 def dummy_table():
@@ -53,8 +46,8 @@ def recreate_dummy_generator_handler():
     for element_id, element in elements.items():
         handler.element_generator_table.insert_pair(element, generator)
 
-    #handler.save_to_dill()
     handler.save_to_json()
+    handler.element_generator_table.save_to_json(handler.data_loading_path)
 
 
 def recreate_dummy_data_manipulation():
@@ -71,7 +64,7 @@ def recreate_dummy_data_manipulation():
 
 if __name__ == '__main__':
     dm = recreate_dummy_data_manipulation()
-    # recreate_dummy_generator_handler()
+    recreate_dummy_generator_handler()
     # recreate_dummy_table()
     #
     # print(dm.get_latest_model().get_first_level_dict())

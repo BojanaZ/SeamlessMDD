@@ -8,21 +8,22 @@ from metamodel.model import Model
 from transformation.data_manipulation import DataManipulation, VersionUnavailableError
 
 
-#def create_app(data_manipulation_, handler_):
-def create_app():
+def create_app(data_manipulation_, handler_):
+#def create_app():
     app = Flask(__name__)
     app.config["DEBUG"] = True
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
     os.environ['PYTHONPATH'] = os.getcwd()
-    data_manipulation_ = DataManipulation()
-    data_manipulation_ = data_manipulation_.load_from_json()
-    handler_ = GeneratorHandler().load_from_json()
+    #data_manipulation_ = DataManipulation()
+    #data_manipulation_ = data_manipulation_.load_from_json()
+    #handler_ = GeneratorHandler().load_from_json()
 
     @app.route('/', methods=['GET'])
     def home():
         model_ = data_manipulation_.get_latest_model()
-        json = model_.to_json()
-        return make_response(json, 200)
+        response = make_response(model_.to_json(), 200)
+        response.headers['Content-type'] = "application/json"
+        return response
 
     @app.route('/model', methods=['GET', 'POST'])
     def model():
@@ -99,12 +100,12 @@ def create_app():
         elif request.method == 'POST':
             try:
                 content = request.get_json()
-                handler_.element_generator_table.from_json(content)
+                handler_.element_generator_table.register_from_json(content)
                 return make_response("OK", 200)
             except:
-                return make_response(jsonify({'error':'Bad request'}), 400)
+                return make_response(jsonify({'error': 'Bad request'}), 400)
 
-    @app.route('/generation/<element_id>', methods = ['GET'])
+    @app.route('/generation/<element_id>', methods=['GET'])
     def generate_single_element(element_id):
         try:
             element_id = handler_.element_generator_table.get_element_by_id(int(element_id))
@@ -121,5 +122,5 @@ if __name__ == '__main__':
     data_manipulation = data_manipulation.load_from_json()
     handler = GeneratorHandler().load_from_json()
 
-    app = create_app()
+    app = create_app(data_manipulation, handler)
     app.run(use_reloader=False)

@@ -1,6 +1,6 @@
 import unittest
 from transformation.generator_handler import GeneratorHandler
-from transformation.generators.documents_output_generator import DocumentsOutputGenerator
+from transformation.generators.jinja_generators.documents_output_generator import DocumentsOutputGenerator
 from transformation.data_manipulation import DataManipulation
 from tests.dummy_structures import dummy_data
 import os

@@ -5,8 +5,9 @@ import json
 from transformation.data_manipulation import DataManipulation
 from transformation.generator_handler import GeneratorHandler
 from transformation.generators.generator_register import GeneratorRegister
-from transformation.generators.base_generator import BaseGenerator
+from transformation.generators.jinja_generators.base_generator import BaseGenerator
 from metamodel.model import Model
+from metamodel.element_generator_table import ElementGeneratorTable
 from tests.dummy_structures import dummy_data
 
 from api.app import create_app
@@ -15,8 +16,8 @@ from api.app import create_app
 class APITest(unittest.TestCase):
 
     def setUp(self):
-        self.data_manipulation = DataManipulation().load_from_dill()
-        self.handler = GeneratorHandler().load_from_dill()
+        self.data_manipulation = DataManipulation().load_from_json()
+        self.handler = GeneratorHandler().load_from_json()
 
         self.app = create_app(self.data_manipulation, self.handler)
         self.client = self.app.test_client
@@ -205,7 +206,10 @@ class APITest(unittest.TestCase):
         """Test /table (GET request)"""
         response = self.client().get('/table')
         self.assertEqual(response.status_code, 200)
-        self.handler.element_generator_table.from_json(response.data.decode())
+        new_table = ElementGeneratorTable()
+        new_table.register_from_json(response.data.decode())
+
+        self.assertEqual(self.handler.element_generator_table, new_table)
 
     def test_element_generator_table_post(self):
         """Test /table (POST request)"""
@@ -229,10 +233,10 @@ class APITest(unittest.TestCase):
 
         n = len(table_dict['table_by_element'][element_id])
         random_index = random.randrange(0, n)
-        generator, value = table_dict['table_by_element'][element_id][random_index]
+        generator_id, value = table_dict['table_by_element'][element_id][random_index]
         new_value = not value
         del table_dict['table_by_element'][element_id][random_index]
-        table_dict['table_by_element'][element_id].append((generator, new_value))
+        table_dict['table_by_element'][element_id].append((generator_id, new_value))
 
         table_json = json.dumps(table_dict)
 
@@ -241,7 +245,7 @@ class APITest(unittest.TestCase):
             json=table_json)
 
         self.assertEqual(result.status_code, 200)
-        current_table_value = self.handler.element_generator_table.check_connection_by_ids(element_id, generator["_id"])
+        current_table_value = self.handler.element_generator_table.check_connection_by_ids(element_id, generator_id)
         self.assertEqual(current_table_value, new_value)
 
     def test_generate_single_element_get(self):
