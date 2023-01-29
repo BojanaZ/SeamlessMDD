@@ -5,3 +5,6 @@ class ElementNotFoundError(Exception):
 class GeneratorNotFoundError(Exception):
     pass
 
+
+class ParsingError(Exception):
+    pass

@@ -8,15 +8,17 @@ from metamodel.model import Model
 from transformation.data_manipulation import DataManipulation, VersionUnavailableError
 
 
-def create_app(data_manipulation_, handler_):
-#def create_app():
+def create_app(data_manipulation_=None, handler_=None):
     app = Flask(__name__)
     app.config["DEBUG"] = True
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
     os.environ['PYTHONPATH'] = os.getcwd()
-    #data_manipulation_ = DataManipulation()
-    #data_manipulation_ = data_manipulation_.load_from_json()
-    #handler_ = GeneratorHandler().load_from_json()
+    if data_manipulation_ is None:
+        data_manipulation_ = DataManipulation()
+        data_manipulation_ = data_manipulation_.load_from_json()
+
+    if handler_ is not None:
+        handler_ = GeneratorHandler().load_from_json()
 
     @app.route('/', methods=['GET'])
     def home():

@@ -55,3 +55,16 @@ def get_file_path_for_format(type_name, formats, use_root=True):
             paths[_format] = os.path.join(root, "files", type_name + "." + _format)
 
     return paths
+
+
+def class_name_to_underscore_format(type_):
+    class_name = type_.__name__
+    underscore_format_name = class_name[0].lower()
+    for character in class_name[1:]:
+        if character.isupper():
+            underscore_format_name += "_"
+            character = character.lower()
+
+        underscore_format_name += character
+
+    return underscore_format_name
