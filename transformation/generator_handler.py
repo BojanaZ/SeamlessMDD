@@ -3,7 +3,6 @@ import os
 import dill
 
 from metamodel.element_generator_table import ElementGeneratorTable
-from tests.dummy_structures import dummy_data
 from transformation.data_manipulation import DataManipulation
 from transformation.generators.generator_register import GeneratorRegister
 from transformation.tasks.task_heap import Heap
@@ -199,11 +198,3 @@ class GeneratorHandler(object):
             for model_element in task.filtered_elements(model):
                 if model_element == element:
                     task.run(element, outfolder)
-
-
-if __name__ == '__main__':
-    handler = GeneratorHandler()
-    model = dummy_data()
-
-    data_manipulation = DataManipulation()
-    data_manipulation.update_model(model)

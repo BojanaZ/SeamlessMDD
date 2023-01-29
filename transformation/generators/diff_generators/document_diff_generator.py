@@ -1,10 +1,10 @@
-from generators.diff_generators.base_diff_generator import BaseDiffGenerator
-import os
-from utilities.utilities import get_project_root
-from tasks.diff_tasks.html_demo_task import DiffDemoTask
-import json
-from generators.jinja_generators.base_generator import BaseGeneratorJSONEncoder
+from transformation.generators.diff_generators.base_diff_generator import BaseDiffGenerator
+from transformation.tasks.diff_tasks.html_demo_task import DiffDemoTask
+from transformation.generators.jinja_generators.base_generator import BaseGeneratorJSONEncoder
 from parsers.my_html_parser import MyHTMLParser
+from utilities.utilities import get_project_root
+import os
+import json
 
 
 class DocumentDiffGenerator(BaseDiffGenerator):

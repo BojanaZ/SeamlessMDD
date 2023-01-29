@@ -4,10 +4,11 @@ import json
 from utilities.utilities import get_project_root, get_class_from_parent_module
 from generators.jinja_generators.base_generator import BaseGeneratorJSONEncoder
 
+
 class BaseDiffGenerator(TemplateGenerator):
 
-    def __init__(self, id=-1, file_path="", file_content="", file_template_path="", parser_type=None):
-        self._id = id
+    def __init__(self, id_=-1, file_path="", file_content="", file_template_path="", parser_type=None):
+        self._id = id_
         self._file_path = file_path
         self._file_content = file_content
         self._file_template_path = file_template_path
@@ -92,7 +93,7 @@ class BaseDiffGenerator(TemplateGenerator):
         return json.dumps(self, cls=BaseGeneratorJSONEncoder)
 
     @classmethod
-    def from_json(cls, data: dict):
+    def from_json(cls, data):
 
         if type(data) == str:
             data = json.loads(data)

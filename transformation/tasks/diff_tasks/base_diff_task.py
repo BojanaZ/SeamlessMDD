@@ -9,7 +9,8 @@ class BaseDiffTask(TemplateFileTask, PriorityMixin):
     def __init__(self, priority=2, template_name=None):
         super().__init__()
         self.priority = priority
-        self._template_name = template_name
+        if template_name is not None:
+            self._template_name = template_name
 
     @property
     def template_name(self):
