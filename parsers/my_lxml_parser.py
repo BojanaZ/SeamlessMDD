@@ -28,7 +28,8 @@ class MyLXMLParser(IParser):
         path = xpath.format(**kwargs)
         return self.tree.xpath(path)
 
-    def element_from_string(self, string):
+    @classmethod
+    def element_from_string(cls, string):
         return html.fromstring(string)
 
     def replace_element_by_id(self, id_, new_element):
@@ -38,7 +39,8 @@ class MyLXMLParser(IParser):
         parent = element_to_replace.getparent()
         parent.remove(element_to_replace)
 
-    def pretty_print(self, element_):
+    @classmethod
+    def pretty_print(cls, element_):
         content = etree.tostring(element_, pretty_print=True)
         print(content.decode('UTF-8'))
         print()
