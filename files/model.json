@@ -1,6 +1,6 @@
 {
     "path": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/files/model.dill",
-    "_latest_version_number": 0,
+    "_latest_version_number": 1,
     "versions": {
         "0": {
             "_version": 0,
@@ -17,47 +17,18 @@
                             "_name": "Document1",
                             "_label": null,
                             "_elements": {
-                                "89": {
-                                    "_id": 89,
+                                "111": {
+                                    "_id": 111,
                                     "_deleted": false,
                                     "_name": "Fifi1",
                                     "_label": null,
-                                    "class": "Field"
+                                    "_type": "string",
+                                    "class": "TypedField"
                                 },
-                                "90": {
-                                    "_id": 90,
+                                "112": {
+                                    "_id": 112,
                                     "_deleted": false,
                                     "_name": "Fifi2",
-                                    "_label": null,
-                                    "class": "Field"
-                                },
-                                "91": {
-                                    "_id": 91,
-                                    "_deleted": false,
-                                    "_name": "Fifi3",
-                                    "_label": null,
-                                    "class": "Field"
-                                }
-                            },
-                            "class": "Document"
-                        },
-                        "12": {
-                            "_id": 12,
-                            "_deleted": false,
-                            "_name": "Document2",
-                            "_label": null,
-                            "_elements": {
-                                "92": {
-                                    "_id": 92,
-                                    "_deleted": false,
-                                    "_name": "Fifi4",
-                                    "_label": null,
-                                    "class": "Field"
-                                },
-                                "93": {
-                                    "_id": 93,
-                                    "_deleted": false,
-                                    "_name": "Fifi5",
                                     "_label": null,
                                     "class": "Field"
                                 }
@@ -73,85 +44,36 @@
                     "_name": "Document1",
                     "_label": null,
                     "_elements": {
-                        "89": {
-                            "_id": 89,
+                        "111": {
+                            "_id": 111,
                             "_deleted": false,
                             "_name": "Fifi1",
                             "_label": null,
-                            "class": "Field"
+                            "_type": "string",
+                            "class": "TypedField"
                         },
-                        "90": {
-                            "_id": 90,
+                        "112": {
+                            "_id": 112,
                             "_deleted": false,
                             "_name": "Fifi2",
                             "_label": null,
                             "class": "Field"
-                        },
-                        "91": {
-                            "_id": 91,
-                            "_deleted": false,
-                            "_name": "Fifi3",
-                            "_label": null,
-                            "class": "Field"
                         }
                     },
                     "class": "Document"
                 },
-                "12": {
-                    "_id": 12,
-                    "_deleted": false,
-                    "_name": "Document2",
-                    "_label": null,
-                    "_elements": {
-                        "92": {
-                            "_id": 92,
-                            "_deleted": false,
-                            "_name": "Fifi4",
-                            "_label": null,
-                            "class": "Field"
-                        },
-                        "93": {
-                            "_id": 93,
-                            "_deleted": false,
-                            "_name": "Fifi5",
-                            "_label": null,
-                            "class": "Field"
-                        }
-                    },
-                    "class": "Document"
-                },
-                "89": {
-                    "_id": 89,
+                "111": {
+                    "_id": 111,
                     "_deleted": false,
                     "_name": "Fifi1",
                     "_label": null,
-                    "class": "Field"
+                    "_type": "string",
+                    "class": "TypedField"
                 },
-                "90": {
-                    "_id": 90,
+                "112": {
+                    "_id": 112,
                     "_deleted": false,
                     "_name": "Fifi2",
-                    "_label": null,
-                    "class": "Field"
-                },
-                "91": {
-                    "_id": 91,
-                    "_deleted": false,
-                    "_name": "Fifi3",
-                    "_label": null,
-                    "class": "Field"
-                },
-                "92": {
-                    "_id": 92,
-                    "_deleted": false,
-                    "_name": "Fifi4",
-                    "_label": null,
-                    "class": "Field"
-                },
-                "93": {
-                    "_id": 93,
-                    "_deleted": false,
-                    "_name": "Fifi5",
                     "_label": null,
                     "class": "Field"
                 }
@@ -168,49 +90,135 @@
                         "_name": "Document1",
                         "_label": null,
                         "_elements": {
-                            "89": {
-                                "_id": 89,
+                            "111": {
+                                "_id": 111,
                                 "_deleted": false,
                                 "_name": "Fifi1",
                                 "_label": null,
-                                "class": "Field"
+                                "_type": "string",
+                                "class": "TypedField"
                             },
-                            "90": {
-                                "_id": 90,
+                            "112": {
+                                "_id": 112,
                                 "_deleted": false,
                                 "_name": "Fifi2",
-                                "_label": null,
-                                "class": "Field"
-                            },
-                            "91": {
-                                "_id": 91,
-                                "_deleted": false,
-                                "_name": "Fifi3",
                                 "_label": null,
                                 "class": "Field"
                             }
                         },
                         "class": "Document"
+                    }
+                },
+                "class": "Project"
+            },
+            "class": "Model"
+        },
+        "1": {
+            "_version": 1,
+            "_elements": {
+                "1": {
+                    "_id": 1,
+                    "_deleted": false,
+                    "_name": "MyProject",
+                    "_label": null,
+                    "_elements": {
+                        "11": {
+                            "_id": 11,
+                            "_deleted": false,
+                            "_name": "Document1",
+                            "_label": null,
+                            "_elements": {
+                                "111": {
+                                    "_id": 111,
+                                    "_deleted": false,
+                                    "_name": "Fifi1",
+                                    "_label": null,
+                                    "_type": "string",
+                                    "class": "TypedField"
+                                },
+                                "112": {
+                                    "_id": 112,
+                                    "_deleted": false,
+                                    "_name": "Fifi2",
+                                    "_label": null,
+                                    "_type": "String",
+                                    "class": "TypedField"
+                                }
+                            },
+                            "class": "Document"
+                        }
                     },
-                    "12": {
-                        "_id": 12,
+                    "class": "Project"
+                },
+                "11": {
+                    "_id": 11,
+                    "_deleted": false,
+                    "_name": "Document1",
+                    "_label": null,
+                    "_elements": {
+                        "111": {
+                            "_id": 111,
+                            "_deleted": false,
+                            "_name": "Fifi1",
+                            "_label": null,
+                            "_type": "string",
+                            "class": "TypedField"
+                        },
+                        "112": {
+                            "_id": 112,
+                            "_deleted": false,
+                            "_name": "Fifi2",
+                            "_label": null,
+                            "_type": "String",
+                            "class": "TypedField"
+                        }
+                    },
+                    "class": "Document"
+                },
+                "111": {
+                    "_id": 111,
+                    "_deleted": false,
+                    "_name": "Fifi1",
+                    "_label": null,
+                    "_type": "string",
+                    "class": "TypedField"
+                },
+                "112": {
+                    "_id": 112,
+                    "_deleted": false,
+                    "_name": "Fifi2",
+                    "_label": null,
+                    "_type": "String",
+                    "class": "TypedField"
+                }
+            },
+            "_root_element": {
+                "_id": 1,
+                "_deleted": false,
+                "_name": "MyProject",
+                "_label": null,
+                "_elements": {
+                    "11": {
+                        "_id": 11,
                         "_deleted": false,
-                        "_name": "Document2",
+                        "_name": "Document1",
                         "_label": null,
                         "_elements": {
-                            "92": {
-                                "_id": 92,
+                            "111": {
+                                "_id": 111,
                                 "_deleted": false,
-                                "_name": "Fifi4",
+                                "_name": "Fifi1",
                                 "_label": null,
-                                "class": "Field"
+                                "_type": "string",
+                                "class": "TypedField"
                             },
-                            "93": {
-                                "_id": 93,
+                            "112": {
+                                "_id": 112,
                                 "_deleted": false,
-                                "_name": "Fifi5",
+                                "_name": "Fifi2",
                                 "_label": null,
-                                "class": "Field"
+                                "_type": "String",
+                                "class": "TypedField"
                             }
                         },
                         "class": "Document"

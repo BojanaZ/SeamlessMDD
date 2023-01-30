@@ -14,37 +14,13 @@
                     true
                 ]
             ],
-            "12": [
+            "111": [
                 [
                     0,
                     true
                 ]
             ],
-            "89": [
-                [
-                    0,
-                    true
-                ]
-            ],
-            "90": [
-                [
-                    0,
-                    true
-                ]
-            ],
-            "91": [
-                [
-                    0,
-                    true
-                ]
-            ],
-            "92": [
-                [
-                    0,
-                    true
-                ]
-            ],
-            "93": [
+            "112": [
                 [
                     0,
                     true
@@ -59,12 +35,12 @@
                 "_file_path": "",
                 "_file_content": "",
                 "_file_template_path": "",
-                "class": "DocumentsOutputGenerator",
+                "class": "DocumentDiffGenerator",
                 "tasks": [
                     {
-                        "_template_name": "model_data.tpl",
+                        "_template_name": "first_template.tpl",
                         "_priority": 2,
-                        "class": "MyTask"
+                        "class": "DiffDemoTask"
                     }
                 ]
             }
