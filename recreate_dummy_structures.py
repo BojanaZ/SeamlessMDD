@@ -105,11 +105,10 @@ def recreate_super_simple_dummy_data_manipulation(write_to_file=False):
     # document2.add(field3)
 
     data_manipulation.update_model(new_model)
+    tracer = Tracer()
 
     if write_to_file:
         data_manipulation.save_to_json()
-
-    tracer = Tracer()
 
     return data_manipulation, tracer
 
@@ -120,10 +119,10 @@ def recreate_dummy_diff_generator_handler(data_manipulation=None, tracer_=None, 
 
     handler_ = GeneratorHandler()
     generator = DocumentDiffGenerator()
+    if tracer_:
+        generator.tracer = tracer_
     generator.initialize()
     handler_.register(generator)
-    if tracer:
-        generator.tracer = tracer
 
     elements = data_manipulation.get_latest_model().elements
     for element_id, element in elements.items():
@@ -131,10 +130,11 @@ def recreate_dummy_diff_generator_handler(data_manipulation=None, tracer_=None, 
 
     if write_to_file:
         handler_.save_to_json()
+        tracer_.save_to_json()
 
     return handler_
 
 
 if __name__ == "__main__":
-    dm, tracer = recreate_super_simple_dummy_data_manipulation()
-    handler = recreate_dummy_diff_generator_handler(dm, tracer)
+    dm, tracer = recreate_super_simple_dummy_data_manipulation(True)
+    handler = recreate_dummy_diff_generator_handler(dm, tracer, True)
