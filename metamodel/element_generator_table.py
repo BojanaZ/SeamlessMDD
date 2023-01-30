@@ -3,6 +3,7 @@ import json
 from utilities.exceptions import ElementNotFoundError, GeneratorNotFoundError
 import os
 
+
 class ElementGeneratorTable(object):
 
     def __init__(self):

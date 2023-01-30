@@ -3,7 +3,6 @@ import os
 import dill
 
 from metamodel.element_generator_table import ElementGeneratorTable
-from transformation.data_manipulation import DataManipulation
 from transformation.generators.generator_register import GeneratorRegister
 from transformation.tasks.task_heap import Heap
 from utilities.utilities import get_project_root
@@ -51,7 +50,7 @@ class GeneratorHandler(object):
         return self._generators[generator_id]
 
     def to_json(self):
-        table = self.element_generator_table.to_json()
+        table = self.element_generator_table.to_dict()
         generators = self._generators.to_dict()
 
         return json.dumps({

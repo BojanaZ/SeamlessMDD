@@ -6,18 +6,7 @@ from jinja2 import Template
 import os
 from jinja_variable_extraction.jinja2schema_extraction import relevant_jinja_variables2
 from tracing.trace import Trace
-from enum import Enum
-
-
-class OperationType(Enum):
-
-    UNKNOWN = 0
-    ADD = 1
-    CHANGE = 2
-    REMOVE = 3
-    SUBELEMENT_ADD = 4
-    SUBELEMENT_REMOVE = 5
-    SUBELEMENT_CHANGE = 6
+from diff.operation_type import OperationType
 
 
 class DiffDemoTask(BaseDiffTask):

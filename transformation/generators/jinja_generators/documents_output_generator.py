@@ -1,8 +1,8 @@
 import json
 import os
-
 from transformation.tasks.jinja_tasks.my_task import MyTask
-from transformation.generators.jinja_generators.base_generator import BaseGenerator, BaseGeneratorJSONEncoder
+from transformation.generators.jinja_generators.base_generator import BaseGenerator
+from transformation.generators.encoders.generator_json_encoder import BaseGeneratorJSONEncoder
 from utilities.utilities import get_project_root
 
 

@@ -86,7 +86,7 @@ def create_app(data_manipulation_=None, handler_=None):
                 return make_response(jsonify({"error": "Not found"}), 404)
 
         elif request.method == 'POST':
-            return make_response(jsonify({'error':'Not implemented'}), 501)
+            return make_response(jsonify({'error': 'Not implemented'}), 501)
 
     @app.route('/table', methods=['GET', 'POST'])
     def element_generator_table():

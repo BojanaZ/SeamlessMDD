@@ -2,7 +2,7 @@ from multigen.generator import TemplateGenerator
 import os
 import json
 from utilities.utilities import get_project_root, get_class_from_parent_module
-from generators.jinja_generators.base_generator import BaseGeneratorJSONEncoder
+from transformation.generators.encoders.generator_json_encoder import BaseGeneratorJSONEncoder
 
 
 class BaseDiffGenerator(TemplateGenerator):
