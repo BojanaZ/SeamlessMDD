@@ -1,0 +1,6 @@
+UPDATE = "Update element"
+DELETE = "Delete element"
+ADD = "Add element"
+IGNORE = "Ignore existing changes"
+RECREATE = "Recreate element"
+RAISE_ISSUE = "Raise issue"
