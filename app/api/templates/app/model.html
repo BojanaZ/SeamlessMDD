@@ -1,0 +1,9 @@
+{% extends 'app/layout.html' %}
+
+{% block content %}
+<h2> Model </h2>
+{%if version_id: %} <h2> Version id: {{ version_id }} </h2> {% endif %}
+<div class="container-fluid col-xl-12 col-md-12">
+    <pre>{{ model }}</pre>
+</div>
+{% endblock %}

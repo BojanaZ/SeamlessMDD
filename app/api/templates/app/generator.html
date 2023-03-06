@@ -1,0 +1,9 @@
+{% extends 'app/layout.html' %}
+
+{% block content %}
+<h2> Generators </h2>
+{%if generator_id: %} <h2> Generator id: {{ generator_id }} </h2> {% endif %}
+<div class="container-fluid col-xl-12 col-md-12">
+    <pre>{{ generators }}</pre>
+</div>
+{% endblock %}
