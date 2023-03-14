@@ -120,6 +120,8 @@ class GeneratorRegister(dict):
             generator_id = int(generator_id)
             generator.id = generator_id
             new_register[generator_id] = generator
+            for task in generator.tasks:
+                task.generator = generator
 
         return new_register
 

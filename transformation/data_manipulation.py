@@ -1,6 +1,7 @@
 from os.path import join
 from utilities.utilities import get_project_root
-import dill, json
+import dill
+import json
 from metamodel.model import Model
 
 
@@ -53,7 +54,27 @@ class DataManipulation(object):
 
     def get_element_by_id(self, _id, version=None):
         model = self.get_model_by_version(version)
-        return model[_id]
+        if _id in model:
+            return model[_id]
+        return None
+
+    def get_old_and_new_model_for_element(self, element):
+        old_version = element.model.version
+        return self._versions[old_version], self._versions[self._latest_version_number]
+
+    def generate_old_and_new_pairs(self, old_version, elements):
+        old_and_new_pairs = []
+
+        for element in elements:
+            old_and_new_pairs.append(self.generate_old_and_new_pair(old_version, element))
+        return old_and_new_pairs
+
+    def generate_old_and_new_pair(self, old_version, element):
+        if old_version > -1:
+            old_element = self.get_element_by_id(element.id, old_version)
+        else:
+            old_element = None
+        return old_element, element
 
     def save_to_dill(self, path=None):
         if path is None:

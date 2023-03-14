@@ -1,5 +1,5 @@
 from transformation.generators.diff_generators.base_diff_generator import BaseDiffGenerator
-from transformation.tasks.diff_tasks.html_demo_task import DiffDemoTask
+from transformation.tasks.diff_tasks.demo_manual_traces_task import DiffDemoManualTracingTask
 from transformation.generators.encoders.generator_json_encoder import BaseGeneratorJSONEncoder
 from parsers.my_html_parser import MyHTMLParser
 from utilities.utilities import get_project_root
@@ -20,7 +20,7 @@ class DocumentDiffGenerator(BaseDiffGenerator):
 
     def initialize(self):
         self.tasks = []
-        task = DiffDemoTask(generator=self, template_name_=self._file_template_path)
+        task = DiffDemoManualTracingTask(generator=self, template_name_=self._file_template_path)
         self.tasks.append(task)
 
         # # pass Jinja environment to tasks:

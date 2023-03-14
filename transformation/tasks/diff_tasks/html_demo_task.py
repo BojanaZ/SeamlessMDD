@@ -12,7 +12,7 @@ from diff.operation_type import OperationType
 class DiffDemoTask(BaseDiffTask):
 
     def __init__(self, generator, priority=2, template_name_=None):
-        if not template_name_ and template_name_ != "":
+        if template_name_ is not None and template_name_ != "":
             self._template_name = template_name_
         else:
             self._template_name = "first_template.tpl"
@@ -20,6 +20,14 @@ class DiffDemoTask(BaseDiffTask):
         self._generator = generator
 
         super().__init__(priority=priority)
+
+    @property
+    def generator(self):
+        return self._generator
+
+    @generator.setter
+    def generator(self, gen):
+        self._generator = gen
 
     @property
     def template_name(self):

@@ -76,8 +76,12 @@ class BaseDiffGenerator(TemplateGenerator):
         self._tracer = new_ref
 
     def get_parser(self, file_path):
+        parser_path = file_path
         if file_path not in self.parsers:
-            parser = self._parser_type(file_path)
+            if not os.path.isfile(file_path):
+                parser_path = None
+            parser = self._parser_type(parser_path)
+
             self.parsers[file_path] = parser
 
         return self.parsers[file_path]

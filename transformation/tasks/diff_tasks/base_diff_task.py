@@ -2,12 +2,13 @@ from multigen.jinja import TemplateFileTask
 from transformation.tasks.priority_mixin import PriorityMixin
 from transformation.tasks.base_task_json_encoder import BaseTaskJSONEncoder
 import json
+from transformation.tasks.validation_task import ValidationTask
 
 
-class BaseDiffTask(TemplateFileTask, PriorityMixin):
+class BaseDiffTask(ValidationTask, PriorityMixin):
 
-    def __init__(self, priority=2, template_name=None):
-        super().__init__()
+    def __init__(self, priority=2, template_name=None, generator=None):
+        super().__init__(generator=generator)
         self.priority = priority
         if template_name is not None:
             self._template_name = template_name
@@ -30,8 +31,8 @@ class BaseDiffTask(TemplateFileTask, PriorityMixin):
         raise NotImplementedError()
 
     @classmethod
-    def from_json(cls, data: dict):
-        return cls(**data)
+    def from_json(cls, data):
+        return cls(data['_priority'], data['_template_name'])
 
     def to_json(self):
         return json.dumps(self, cls=BaseTaskJSONEncoder)

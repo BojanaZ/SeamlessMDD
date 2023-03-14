@@ -6,6 +6,9 @@ from metamodel.element_generator_table import ElementGeneratorTable
 from transformation.generators.generator_register import GeneratorRegister
 from transformation.tasks.task_heap import Heap
 from utilities.utilities import get_project_root
+from diff.diff_store import DiffStore
+
+from preview.preview import Preview
 
 
 class GeneratorHandler(object):
@@ -122,6 +125,12 @@ class GeneratorHandler(object):
     def __ne__(self, other):
         return not self == other
 
+    def get_active_generators(self):
+        generator_list = []
+        for gen_id in self.element_generator_table.get_active_generators():
+            generator_list.append(self._generators[gen_id])
+        return generator_list
+
     def generate_by_element(self, model_, outfolder=None):
 
         task_heap = Heap()
@@ -141,6 +150,34 @@ class GeneratorHandler(object):
             for element in task.filtered_elements(model_):
                 task.run(element, outfolder)
             #task.invoke()
+
+    def generate_by_diff_generator(self, data_manipulation, other_version, outfolder=None):
+
+        generator_list = self.get_active_generators()
+
+        task_heap = Heap()
+
+        model = data_manipulation.get_latest_model()
+
+        for generator in generator_list:
+            task_heap.extend(generator.tasks)
+
+        task_heap.sort()
+        sorted_tasks = task_heap.get_items()
+
+        for task in sorted_tasks:
+            elements = task.filtered_elements(model)
+            old_and_new_element_pairs = data_manipulation.generate_old_and_new_pairs(other_version, elements)
+            diffs = DiffStore.get_diffs_for_model_elements(old_and_new_element_pairs)
+
+            for property_diffs in diffs.values():
+                for property_diff in property_diffs:
+                    question = task.run(property_diff, outfolder)
+                    if question is not None:
+                        yield question, outfolder
+
+        for generator in generator_list:
+            generator.flush()
 
     def generate_by_generator(self, model_, outfolder=None):
 
@@ -167,7 +204,7 @@ class GeneratorHandler(object):
 
     def generate_single_generator(self, data_manipulation_, generator, outfolder=None):
 
-        elements = self.element_generator_table.get_elements(generator)
+        element_ids = self.element_generator_table.get_element_ids(generator)
 
         task_heap = Heap()
 
@@ -180,12 +217,14 @@ class GeneratorHandler(object):
             for element in task.filtered_elements(data_manipulation_):
                 task.run(element, outfolder)
 
-    def generate_single_element(self, element, data_manipulation, outfolder=None):
-        generator_ids = self.element_generator_table.get_generators(element.id)
+    def generate_single_element(self, element, data_manipulation, outfolder=None, write_to_files=True):
+        generator_ids = self.element_generator_table.get_generator_ids(element.id)
+        generator_list = []
         task_heap = Heap()
 
         for generator_id in generator_ids:
             generator = self._generators.get_generator_by_id(generator_id)
+            generator_list.append(generator)
             task_heap.extend(generator.tasks)
 
         task_heap.sort()
@@ -195,5 +234,30 @@ class GeneratorHandler(object):
 
         for task in sorted_tasks:
             for model_element in task.filtered_elements(model):
-                if model_element == element:
-                    task.run(element, outfolder)
+
+                connection_data = self.element_generator_table.get_connection_data(model_element.id, task.generator.id)
+                if connection_data["value"]:
+                    last_generated_version = connection_data["last_generated_version"]
+
+                    old_and_new_element_pairs = data_manipulation.generate_old_and_new_pairs(last_generated_version,
+                                                                                             [model_element])
+                    diffs = DiffStore.get_diffs_for_model_elements(old_and_new_element_pairs)
+
+                    for property_diffs in diffs.values():
+                        for property_diff in property_diffs:
+                            preview = Preview(last_generated_version, data_manipulation.get_latest_version_number())
+                            task.preview = preview
+                            question = task.run(property_diff, outfolder)
+                            yield question, outfolder, preview
+                            # if question is not None:
+                            #     yield question, outfolder
+
+        if write_to_files:
+            for generator in generator_list:
+                generator.flush()
+
+
+if __name__ == '__main__':
+    handler = GeneratorHandler()
+    handler = handler.load_from_json('../files/handler.json')
+    table = handler.element_generator_table

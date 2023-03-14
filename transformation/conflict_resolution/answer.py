@@ -5,10 +5,10 @@ from utilities.utilities import get_project_root
 
 class Answer(object):
 
-    def __init__(self, text, task=None):
+    def __init__(self, text, executable_set=None):
         self._id = None
         self._text = text
-        self._task = task
+        self._executable_set = executable_set
 
     @property
     def id(self):
@@ -27,12 +27,12 @@ class Answer(object):
         self._text = text
 
     @property
-    def task(self):
-        return self._task
+    def executable_set(self):
+        return self._executable_set
 
-    @task.setter
-    def task(self, task):
-        self._task = task
+    @executable_set.setter
+    def executable_set(self, executable_set):
+        self._executable_set = executable_set
 
     def to_json(self):
         return json.dumps(self, cls=AnswerJSONEncoder)
@@ -58,9 +58,15 @@ class Answer(object):
         if self._text != other.text:
             return False
 
-        if self._task != other.task:
+        if len(self._executable_set) != len(other.executable_set):
             return False
 
+        for executable in self._executable_set:
+            for other_executable in other.executable_set:
+                if executable == other_executable:
+                    break
+            else:
+                return False
         return True
 
     def __ne__(self, other):
@@ -74,12 +80,12 @@ class AnswerJSONEncoder(json.JSONEncoder):
         if isinstance(object_, Answer):
 
             object_dict = {key: value for (key, value) in object_.__dict__.items() if
-                           key not in ['_task']}
+                           key not in ['_tasks']}
 
-            if object_.task is not None:
-                object_dict["_task"] = object_.task.id
+            if object_.tasks is not None:
+                object_dict["_tasks"] = object_.tasks.id
             else:
-                object_dict["_task"] = None
+                object_dict["_tasks"] = None
 
             return object_dict
 
