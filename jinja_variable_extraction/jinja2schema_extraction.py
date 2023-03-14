@@ -12,7 +12,7 @@ def extract_variables_from_path(path_, template_name_=None, **kwargs):
     # )
     #
     # template = environment.get_template(template_name)
-    if template_name is not None:
+    if template_name_ is not None:
         path_ = os.path.join(path_, template_name_)
 
     with open(path_) as file:
@@ -166,7 +166,7 @@ def extract_elements_from_template(template_path, template_name_, leaf=True):
 
 
 if __name__ == '__main__':
-    path = "../templates/"
+    path = "../generator_templates/"
     template_name = "first_template.tpl"
     # list = create_lookup_strings(extract_variables_from_path(path, template_name))
     # print(list)

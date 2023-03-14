@@ -1,1 +1,1 @@
-<li _id="{{ element.id }}"  name="{{ field.name }}">Field ({{ element.name }})</li>
+<li _id="{{ element.id }}"  name="{{ element.name }}">Field ({{ element.name }})</li>

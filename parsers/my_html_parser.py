@@ -1,5 +1,6 @@
 from parsers.parser_interface import IParser
 import AdvancedHTMLParser
+from utilities.exceptions import ParsingError
 
 
 class MyHTMLParser(IParser):
@@ -9,6 +10,15 @@ class MyHTMLParser(IParser):
 
     def get_element_by_id(self, id_):
         return self.parser.getElementById(str(id_))
+
+    def check_if_element_exists(self, id_):
+        result = False
+        try:
+            if self.get_element_by_id(id_):
+                result = True
+        except:
+            pass
+        return result
 
     def get_element_by_name(self, name):
         elements = self.parser.getElementsByAttr("name", name)
@@ -33,9 +43,8 @@ class MyHTMLParser(IParser):
         self.update_node(element, new_element)
 
     def remove_element_by_id(self, id_):
-        elements = self.get_element_by_id(id_)
-        for element in elements:
-            element.parentNode.removeNode(element)
+        element = self.get_element_by_id(id_)
+        element.parentNode.removeNode(element)
 
     def get_elements_by_jinja_variable(self, variable_name):
         nodes = self.parser.getAllNodes()
@@ -79,19 +88,33 @@ class MyHTMLParser(IParser):
         #error handling
         self.update_node(old_element, new_parser.parser.root, important_data)
 
-    def update_element_by_path(self, old_element_path, new_element_content, important_data=None):
-        # index = new_element_path.rindex("/")
-        # new_element_text = new_element_path[index+1:]
-        # new_element_path = new_element_path[:index]
-        # parent_xpath = self.get_element_xpath(old_element.parentNode)
-        # if parent_xpath != new_element_path:
-        #     raise Exception("Old element xpath does not match the new one.")
+    # def update_element_by_path(self, old_element_path, new_element_content, important_data=None):
+    #     # index = new_element_path.rindex("/")
+    #     # new_element_text = new_element_path[index+1:]
+    #     # new_element_path = new_element_path[:index]
+    #     # parent_xpath = self.get_element_xpath(old_element.parentNode)
+    #     # if parent_xpath != new_element_path:
+    #     #     raise Exception("Old element xpath does not match the new one.")
+    #
+    #     old_element = self.get_elements_by_path(old_element_path)
+    #     if len(old_element) != 1:
+    #         return
+    #     old_element = old_element[0]
+    #     self.merge_nodes(old_element, new_element_content, important_data)
 
+    def update_element_by_path(self, old_element_path, new_element_path, new_element_content, important_data=None):
         old_element = self.get_elements_by_path(old_element_path)
         if len(old_element) != 1:
-            return
+            raise ParsingError("Xpath " + new_element_path + "does not selects single node.")
         old_element = old_element[0]
-        self.merge_nodes(old_element, new_element_content, important_data)
+
+        new_parser = MyHTMLParser()
+        new_parser.parser.parseStr(new_element_content)
+        new_element = new_parser.parser.getElementsByXPath(new_element_path)
+        if len(new_element) != 1:
+            raise ParsingError("Xpath " + new_element_path + "does not selects single node.")
+        new_element = new_element[0]
+        self.update_node(old_element, new_element, important_data)
 
     def merge_nodes(self, first_subtree, second_subtree, important_data=None):
         self.update_node(first_subtree, second_subtree, important_data)
@@ -112,10 +135,14 @@ class MyHTMLParser(IParser):
 
     @classmethod
     def update_node(cls, first_node, second_node, important_data=None):
-        for second_attr in second_node.attributes:
-            if important_data is None or second_attr in important_data:
-                #insert attribute with value from second_node
-                first_node.attributes[second_attr] = second_node.attributes[second_attr]
+        if hasattr(second_node, "attributes"):
+            for second_attr in second_node.attributes:
+                if important_data is None or second_attr in important_data:
+                    #insert attribute with value from second_node
+                    if not hasattr(first_node, "attributes"):
+                        first_node.attributes = {}
+
+                    first_node.attributes[second_attr] = second_node.attributes[second_attr]
 
         if important_data is None or 'text' in important_data:
             first_node.removeText(first_node.text)
@@ -304,6 +331,8 @@ class MyHTMLParser(IParser):
         return self.parser.toHTML()
 
     def write_to_file(self, file_path):
+        import os
+        print(os.path.abspath(file_path))
         with open(file_path, "w") as file:
             file.write(str(self))
 

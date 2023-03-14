@@ -131,7 +131,7 @@ class ElementGeneratorTable(object):
                         for json_generator_id, json_value in json_generators:
                             if generator_id == json_generator_id:
                                 found_old_generator_ids.add(generator_id)
-                                self.update_pair(element_id, generator_id, json_value)
+                                self.load_pair(element_id, generator_id, json_value)
                                 break
                         else:
                             self.remove_connection(element_id, generator_id)
@@ -142,17 +142,43 @@ class ElementGeneratorTable(object):
         for json_element_id, json_generators in table_by_element.items():
             for json_generator_id, json_value in json_generators:
                 if json_generator_id not in found_old_generator_ids:
-                    self.update_pair(int(json_element_id), json_generator_id, json_value)
+                    self.load_pair(int(json_element_id), json_generator_id, json_value)
 
-    def update_pair(self, element_id, generator_id, value=True, all_generators=False):
+    def update_for_all_generators(self, element_id, value=True):
         if element_id not in self._by_element:
             self._by_element[element_id] = {}
 
-        if all_generators:
-            for key in self._by_generator.keys():
-                self._by_generator[key][element_id] = value
-                self._by_element[element_id][key] = value
-            return
+        for key in self._by_generator.keys():
+            last_generated_version = self._by_generator[key][element_id]["last_generated_version"]
+            self._by_generator[key][element_id] = {"value": value, "last_generated_version": last_generated_version}
+            self._by_element[element_id][key] = {"value": value, "last_generated_version": last_generated_version}
+
+    def update_pair(self, element_id, generator_id, value=True):
+
+        if element_id not in self._by_element:
+            self._by_element[element_id] = {}
+
+        if generator_id not in self._by_element[element_id]:
+            last_generated_version = -1
+        else:
+            last_generated_version = self._by_element[element_id][generator_id]["last_generated_version"]
+
+        self._by_element[element_id][generator_id] = {"value": value, "last_generated_version": last_generated_version}
+
+        if generator_id not in self._by_generator:
+            self._by_generator[generator_id] = {}
+
+        if element_id not in self._by_generator[generator_id]:
+            last_generated_version = -1
+        else:
+            last_generated_version = self._by_generator[generator_id][element_id]["last_generated_version"]
+
+        self._by_generator[generator_id][element_id] = {"value": value, "last_generated_version": last_generated_version}
+
+    def load_pair(self, element_id, generator_id, value):
+
+        if element_id not in self._by_element:
+            self._by_element[element_id] = {}
 
         self._by_element[element_id][generator_id] = value
 
@@ -165,20 +191,22 @@ class ElementGeneratorTable(object):
         Inserts element-generator pair to the table. If generator id is not specified, element is connected with all
         available generator.
     '''
-    def insert_pair(self, element, generator=None):
-        insert_for_all_generators = generator is None
-        self.update_pair(element.id, generator.id, True, insert_for_all_generators)
+    def insert_pair(self, element_id, generator_id):
+        self.update_pair(element_id, generator_id, True)
 
-    def get_generators(self, element_id):
-        return (generator for generator, value in self._by_element[element_id].items() if value)
+    def get_generator_ids(self, element_id):
+        return (generator_id for generator_id, value_pair
+                in self._by_element[element_id].items() if value_pair["value"])
 
-    def get_elements(self, generator):
-        return (element for element in self._by_generator[generator] if
-                self._by_generator[generator][element])
+    def get_element_ids(self, generator_id):
+        return (element_id for element_id in self._by_generator[generator_id] if
+                self._by_generator[generator_id][element_id])
 
     def get_active_generators(self):
-        return (generator for generator in self._by_generator.keys() if
-                self._by_generator[generator])
+        for generator_id in self._by_generator.keys():
+            for element_id, value_pair in self._by_generator[generator_id].items():
+                if value_pair["value"]:
+                    yield generator_id
 
     def check_generator_status(self, generator):
         return any(self._by_generator[generator].values())
@@ -187,90 +215,48 @@ class ElementGeneratorTable(object):
         for element in self._by_generator[generator].keys():
             self._by_generator[generator][element] = new_value
 
-    def check_connection(self, element, generator):
-        if element.id in self._by_element.keys():
-            if generator.id in self._by_element[element.id]:
-                return self._by_element[element.id][generator.id]
-        return False
+    def get_connection_data(self, element_id, generator_id):
+        if element_id in self._by_element.keys():
+            if generator_id in self._by_element[element_id]:
+                return self._by_element[element_id][generator_id]
+        return {"value": False, "last_generated_version": -1}
 
-    def check_connection_by_ids(self, element_id, generator_id):
-        for current_element_id in self._by_element.keys():
-            if current_element_id == element_id:
-                for current_generator_id in self._by_element[current_element_id].keys():
-                    if current_generator_id == generator_id:
-                        return self._by_element[current_element_id][current_generator_id]
-        return False
+    def remove_connection(self, element_id, generator_id):
+        self.update_pair(element_id, generator_id, False)
 
-    def remove_connection(self, element, generator):
-        if element in self._by_element:
-            if generator in self._by_element[element]:
-                self._by_element[element][generator] = False
-                self._by_generator[generator][element] = False
+    def remove_element(self, element_id):
+        if element_id in self._by_element:
+            del self._by_element[element_id]
+            for generator_id in self._by_generator:
+                if element_id in self._by_generator[generator_id]:
+                    del self._by_generator[generator_id][element_id]
 
-    def remove_element(self, element):
-        if element in self._by_element:
-            del self._by_element[element]
-            for generator in self._by_generator:
-                if element in self._by_generator[generator]:
-                    del self._by_generator[generator][element]
+    def remove_generator(self, generator_id):
+        if generator_id in self._by_generator:
+            del self._by_generator[generator_id]
+            for element_id in self._by_element:
+                if generator_id in self._by_element[element_id]:
+                    del self._by_element[element_id][generator_id]
 
-    def remove_generator(self, generator):
-        if generator in self._by_generator:
-            del self._by_generator[generator]
-            for element in self._by_element:
-                if generator in self._by_element[element]:
-                    del self._by_element[element][generator]
+    def deactivate_element(self, element_id):
+        if element_id in self._by_element:
+            self.update_for_all_generators(element_id, False)
 
-    def deactivate_element(self, element):
-        if element in self._by_element:
-            for generator in self._by_element[element]:
-                self._by_element[element][generator] = False
-            for generator in self._by_generator:
-                if element in self._by_generator[generator]:
-                    self._by_generator[generator][element] = False
+    def is_element_deactivated_for_generator(self, element_id, generator_id):
+        return self.get_connection_data(element_id, generator_id)["value"]
 
-    def is_element_deactivated(self, element):
-        if element in self._by_element:
-            for generator in self._by_element[element]:
-                if self._by_element[element][generator]:
-                    return False
-            for generator in self._by_generator:
-                if element in self._by_generator[generator]:
-                    if self._by_generator[generator][element]:
-                        return False
-        return True
-
-    def is_element_deactivated_by_id(self, element_id):
-        element = self.get_element_by_id(element_id)
-        if element is not None:
-            return self.is_element_deactivated(element)
-
-        return True
-
-    def deactivate_generator(self, generator):
-        if generator in self._by_generator:
-            for element in self._by_generator[generator]:
-                self._by_generator[generator][element] = False
-            for element in self._by_element:
-                if generator in self._by_element[element]:
-                    self._by_element[element][generator] = False
-
-    def turn_all_generators_for_element(self, element):
-        generators = self._by_generator.keys()
-        if element not in self._by_element:
-            self._by_element[element] = {}
-        for generator in generators:
-            self._by_element[element][generator] = True
+    def deactivate_generator(self, generator_id):
+        if generator_id in self._by_generator:
+            for element_id in self._by_generator[generator_id]:
+                self.update_pair(element_id, generator_id, False)
 
     def has_element_by_id(self, element_id):
-        return self.get_element_by_id(element_id) is not None
+        return element_id in self._by_element
 
-    def get_element_by_id(self, id_):
-        for element_id in self._by_element.keys():
-            if id_ == element_id:
-                return element_id
+    def update_last_generated_versions(self, element_id, generator_id, last_generated_version):
+        self._by_element[element_id][generator_id] = {"value": True, "last_generated_version": last_generated_version}
 
-        return None
+        self._by_generator[generator_id][element_id] = {"value": True, "last_generated_version": last_generated_version}
 
     def __str__(self):
         result = "| %30s " % ""
@@ -352,14 +338,3 @@ class ElementGeneratorTable(object):
 
         with open(file_path, "w") as file:
             file.write(content)
-
-
-if __name__ == '__main__':
-    table = ElementGeneratorTable()
-    table = table.load_from_dill()
-    print(table)
-
-
-
-
-

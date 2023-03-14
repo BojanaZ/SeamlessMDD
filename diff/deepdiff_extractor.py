@@ -2,6 +2,7 @@ from deepdiff import DeepDiff
 from diff.diff import Diff
 from diff.operation_type import OperationType
 import re
+from utilities.exceptions import DiffError
 
 
 def extract_property_name(extracted_property, iterable=False, placeholder_word="root"):
@@ -87,8 +88,24 @@ def extract_detailed_property_name(extracted_property, iterable=False, placehold
 
 
 def diffs_from_deepdiff(old_element, new_element, **kwargs):
+
+    if old_element is None and new_element is None:
+        raise DiffError("DiffError: Both elements are None.")
+
+    if old_element is None:
+        operation_type = OperationType.ADD
+        return {"": [Diff(None, None, new_element, None, None, old_element, new_element, operation_type, "",
+                          new_element.id)]}
+
     old_element_dict = old_element.to_dict()
+
+    if new_element is None:
+        operation_type = OperationType.REMOVE
+        return {"": [Diff(None, old_element, None, None, None, old_element, new_element, operation_type, "",
+                          old_element.id)]}
+
     new_element_dict = new_element.to_dict()
+
     diffs = DeepDiff(old_element_dict, new_element_dict, verbose_level=2, **kwargs)
     changed_properties = {}
     for change in diffs:
@@ -120,24 +137,27 @@ def diffs_from_deepdiff(old_element, new_element, **kwargs):
             key = ''
             prefix = ''
 
+            if operation_type in [OperationType.CHANGE, OperationType.ADD]:
+                key = new_element.id
+            elif operation_type in [OperationType.REMOVE]:
+                key = old_element.id
+
             if operation_type == OperationType.CHANGE and property_name_contains_key(property_name):
                 operation_type = OperationType.SUBELEMENT_CHANGE
                 property_name, key, prefix = extract_detailed_property_name(property_name, iterable)
-                property_name = property_name
-                key = key
-                prefix = prefix
                 #new_element = getattr(new_element, prefix)[key]
                 #old_element = getattr(old_element, prefix)[key]
             else:
                 property_name = extract_property_name(property_name, iterable)
 
             if iterable:
+
                 key = value['_id']
+
                 if 'added' in change:
                     new_value = new_element.elements[value['_id']]
                 elif 'removed' in change:
                     old_value = old_element.elements[value['_id']]
-
             else:
                 old_value = value['old_value']
                 new_value = value['new_value']

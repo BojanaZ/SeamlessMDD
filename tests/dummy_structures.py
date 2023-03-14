@@ -3,6 +3,10 @@ from metamodel.project import Project
 from metamodel.document import Document
 from metamodel.field import Field
 
+from transformation.conflict_resolution.question_registry import QuestionRegistry
+from transformation.conflict_resolution.answer import Answer
+from transformation.conflict_resolution.question import Question
+
 
 def dummy_data():
 
@@ -30,3 +34,23 @@ def dummy_data():
     document2.add(field5)
 
     return model
+
+
+def question_registry():
+    question_registry = QuestionRegistry()
+    q1 = Question("Test question 1", "What?")
+    a11 = Answer("Answer 11")
+    a12 = Answer("Answer 12")
+    a13 = Answer("Answer 13")
+    q1.answers = [a11, a12, a13]
+    question_registry.register_question(q1)
+    q1.chosen_answer_id = a13.id
+
+    q2 = Question("Test question 2", "Why?")
+    a21 = Answer("Answer 21")
+    a22 = Answer("Answer 22")
+    q2.answers = [a21, a22]
+    question_registry.register_question(q2)
+    q2.chosen_answer_id = a22.id
+
+    return question_registry

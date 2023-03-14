@@ -1,0 +1,45 @@
+{
+    "_questions": {
+        "0": {
+            "_id": 0,
+            "_title": "Test question 1",
+            "_text": "What?",
+            "_chosen_answer_id": 2,
+            "_answers": [
+                {
+                    "_id": 0,
+                    "_text": "Answer 11",
+                    "_tasks": null
+                },
+                {
+                    "_id": 1,
+                    "_text": "Answer 12",
+                    "_tasks": null
+                },
+                {
+                    "_id": 2,
+                    "_text": "Answer 13",
+                    "_tasks": null
+                }
+            ]
+        },
+        "1": {
+            "_id": 1,
+            "_title": "Test question 2",
+            "_text": "Why?",
+            "_chosen_answer_id": 4,
+            "_answers": [
+                {
+                    "_id": 3,
+                    "_text": "Answer 21",
+                    "_tasks": null
+                },
+                {
+                    "_id": 4,
+                    "_text": "Answer 22",
+                    "_tasks": null
+                }
+            ]
+        }
+    }
+}

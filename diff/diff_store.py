@@ -6,9 +6,6 @@ from diff.operation_type import OperationType
 
 class DiffStore(object):
 
-    def __init__(self):
-        pass
-
     @staticmethod
     def get_diffs_for_model_elements(element_pairs):
 

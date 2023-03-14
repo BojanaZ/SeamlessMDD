@@ -25,7 +25,7 @@ class Tracer(object):
         trace_id = self.new_trace_id(self._last_trace_id)
         while True:
             id_ = next(trace_id)
-            if id_ not in self:
+            if id_ not in self._element_traces:
                 return id_
 
     @property
@@ -165,6 +165,7 @@ class Tracer(object):
                 if json_generator_id not in found_old_generator_ids:
                     trace = Trace.from_json(json_value)
                     self.update_trace(int(json_element_id), json_generator_id, trace)
+        return self
 
 
 class TracerJSONEncoder(json.JSONEncoder):

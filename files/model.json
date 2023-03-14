@@ -16,23 +16,7 @@
                             "_deleted": false,
                             "_name": "Document1",
                             "_label": null,
-                            "_elements": {
-                                "111": {
-                                    "_id": 111,
-                                    "_deleted": false,
-                                    "_name": "Fifi1",
-                                    "_label": null,
-                                    "_type": "string",
-                                    "class": "TypedField"
-                                },
-                                "112": {
-                                    "_id": 112,
-                                    "_deleted": false,
-                                    "_name": "Fifi2",
-                                    "_label": null,
-                                    "class": "Field"
-                                }
-                            },
+                            "_elements": {},
                             "class": "Document"
                         }
                     },
@@ -43,39 +27,8 @@
                     "_deleted": false,
                     "_name": "Document1",
                     "_label": null,
-                    "_elements": {
-                        "111": {
-                            "_id": 111,
-                            "_deleted": false,
-                            "_name": "Fifi1",
-                            "_label": null,
-                            "_type": "string",
-                            "class": "TypedField"
-                        },
-                        "112": {
-                            "_id": 112,
-                            "_deleted": false,
-                            "_name": "Fifi2",
-                            "_label": null,
-                            "class": "Field"
-                        }
-                    },
+                    "_elements": {},
                     "class": "Document"
-                },
-                "111": {
-                    "_id": 111,
-                    "_deleted": false,
-                    "_name": "Fifi1",
-                    "_label": null,
-                    "_type": "string",
-                    "class": "TypedField"
-                },
-                "112": {
-                    "_id": 112,
-                    "_deleted": false,
-                    "_name": "Fifi2",
-                    "_label": null,
-                    "class": "Field"
                 }
             },
             "_root_element": {
@@ -89,23 +42,7 @@
                         "_deleted": false,
                         "_name": "Document1",
                         "_label": null,
-                        "_elements": {
-                            "111": {
-                                "_id": 111,
-                                "_deleted": false,
-                                "_name": "Fifi1",
-                                "_label": null,
-                                "_type": "string",
-                                "class": "TypedField"
-                            },
-                            "112": {
-                                "_id": 112,
-                                "_deleted": false,
-                                "_name": "Fifi2",
-                                "_label": null,
-                                "class": "Field"
-                            }
-                        },
+                        "_elements": {},
                         "class": "Document"
                     }
                 },
@@ -135,14 +72,6 @@
                                     "_label": null,
                                     "_type": "string",
                                     "class": "TypedField"
-                                },
-                                "112": {
-                                    "_id": 112,
-                                    "_deleted": false,
-                                    "_name": "Fifi2",
-                                    "_label": null,
-                                    "_type": "String",
-                                    "class": "TypedField"
                                 }
                             },
                             "class": "Document"
@@ -163,14 +92,6 @@
                             "_label": null,
                             "_type": "string",
                             "class": "TypedField"
-                        },
-                        "112": {
-                            "_id": 112,
-                            "_deleted": false,
-                            "_name": "Fifi2",
-                            "_label": null,
-                            "_type": "String",
-                            "class": "TypedField"
                         }
                     },
                     "class": "Document"
@@ -181,14 +102,6 @@
                     "_name": "Fifi1",
                     "_label": null,
                     "_type": "string",
-                    "class": "TypedField"
-                },
-                "112": {
-                    "_id": 112,
-                    "_deleted": false,
-                    "_name": "Fifi2",
-                    "_label": null,
-                    "_type": "String",
                     "class": "TypedField"
                 }
             },
@@ -210,14 +123,6 @@
                                 "_name": "Fifi1",
                                 "_label": null,
                                 "_type": "string",
-                                "class": "TypedField"
-                            },
-                            "112": {
-                                "_id": 112,
-                                "_deleted": false,
-                                "_name": "Fifi2",
-                                "_label": null,
-                                "_type": "String",
                                 "class": "TypedField"
                             }
                         },

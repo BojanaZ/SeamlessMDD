@@ -6,5 +6,13 @@ class GeneratorNotFoundError(Exception):
     pass
 
 
+class GenerationValidationException(Exception):
+    pass
+
+
 class ParsingError(Exception):
+    pass
+
+
+class DiffError(Exception):
     pass

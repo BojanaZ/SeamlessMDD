@@ -1,12 +1,26 @@
 import json
+from tracing.trace_type import TraceType
 
 
 class Trace(object):
 
-    def __init__(self, old_path=None, new_path=None, id_=-1):
+    def __init__(self, type_=None, old_path=None, new_path=None, id_=-1):
+        if type_ is None:
+            self._type = TraceType.INSERTION
+        else:
+            self._type = type_
+
         self._id = id_
         self._old_path = old_path
         self._new_path = new_path
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, type_):
+        self._type = type_
 
     @property
     def id(self):

@@ -5,25 +5,28 @@
             "1": [
                 [
                     0,
-                    true
+                    {
+                        "value": true,
+                        "last_generated_version": 0
+                    }
                 ]
             ],
             "11": [
                 [
                     0,
-                    true
+                    {
+                        "value": true,
+                        "last_generated_version": 0
+                    }
                 ]
             ],
             "111": [
                 [
                     0,
-                    true
-                ]
-            ],
-            "112": [
-                [
-                    0,
-                    true
+                    {
+                        "value": true,
+                        "last_generated_version": 0
+                    }
                 ]
             ]
         }
@@ -38,9 +41,19 @@
                 "class": "DocumentDiffGenerator",
                 "tasks": [
                     {
-                        "_template_name": "first_template.tpl",
+                        "_template_name": "",
+                        "_additional_templates_path": "diff_demo_task/",
+                        "_additional_templates": {
+                            "field": "field_template.tpl",
+                            "fields": "fields_template.tpl",
+                            "document": "document_template.tpl"
+                        },
+                        "_template_folder_path": "../../generator_templates/",
+                        "_methods": [],
+                        "_questions": [],
+                        "_preview": null,
                         "_priority": 2,
-                        "class": "DiffDemoTask"
+                        "class": "DiffDemoManualTracingTask"
                     }
                 ]
             }
