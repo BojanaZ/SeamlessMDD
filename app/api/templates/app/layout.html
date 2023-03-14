@@ -23,8 +23,6 @@
     <script>
         function load_model_version() {
             version_id = document.getElementById("model_version_button").value;
-            console.log(version_id);
-            console.log("/models/" + version_id);
             window.location.replace("/models/" + version_id);
         }
 
@@ -33,6 +31,28 @@
             console.log(generator_id);
             console.log("/generators/" + generator_id);
             window.location.replace("/generators/" + generator_id);
+        }
+        function submit_answer(question_id) {
+            button = document.getElementById("question"+question_id);
+            console.log(button);
+            for(i = 0; i < button.children.length; i++) {
+                if(button.children[i].classList.contains('active')) {
+                    console.log(button.children[i]);
+                    console.log(button.children[i].id);
+<!--                    fetch('/questions/' + question_id, {-->
+<!--                        method: 'POST',-->
+<!--                        headers: {-->
+<!--                            'Accept': 'application/json',-->
+<!--                            'Content-Type': 'application/json'-->
+<!--                        },-->
+<!--                        body: JSON.stringify({ "answer_id": button.children[i].id })-->
+<!--                    })-->
+<!--                   .then(response => response.json())-->
+<!--                   .then(response => console.log(JSON.stringify(response)));-->
+                    window.location.replace("/questions/" + question_id + "/" + button.children[i].id);
+                    break;
+                }
+            }
         }
     </script>
 </head>

@@ -1,10 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+
+ <div class="card shadow mb-4 col-lg-12 col-xl-12 col-md-12">
+    <!-- Card Header - Accordion -->
+    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
+        role="button" aria-expanded="true" aria-controls="collapseCardExample">
+        <h6 class="d-inline m-0 font-weight-bold text-primary">Question</h6>
+        {% if question and question.chosen_answer_id: %}<div href="#" class=" d-inline btn btn-success btn-circle btn-sm"><i class="fas fa-check"></i></div> {% endif %}
+    </a>
+    <!-- Card Content - Collapse -->
+    <div class="collapse show" id="collapseCardExample">
+        <div class="card-body">
+            {% include preview.generate_diff_view() %}
+
+            {% if question: %}
+            <div class="py-2 h5"><b>{{ question.text }}</b></div>
+            <div class="btn-group-toggle" id="question{{ question.id }}" data-toggle="buttons">
+                {% for answer in question.answers: %}
+                <label class="btn btn-primary" id="{{ answer.id }}">
+                  <input type="radio" name="options" autocomplete="off"> {{ answer.text }}
+                </label>
+                {% endfor %}
+                <button class="btn btn-primary float-right" type="button" onclick="submit_answer({{ question.id }})">
+                    <i class="fas fa-search fa-sm">Submit</i>
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
