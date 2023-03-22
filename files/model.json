@@ -72,6 +72,14 @@
                                     "_label": null,
                                     "_type": "string",
                                     "class": "TypedField"
+                                },
+                                "112": {
+                                    "_id": 112,
+                                    "_deleted": false,
+                                    "_name": "Fifi2",
+                                    "_label": null,
+                                    "_type": "String",
+                                    "class": "TypedField"
                                 }
                             },
                             "class": "Document"
@@ -92,6 +100,14 @@
                             "_label": null,
                             "_type": "string",
                             "class": "TypedField"
+                        },
+                        "112": {
+                            "_id": 112,
+                            "_deleted": false,
+                            "_name": "Fifi2",
+                            "_label": null,
+                            "_type": "String",
+                            "class": "TypedField"
                         }
                     },
                     "class": "Document"
@@ -102,6 +118,14 @@
                     "_name": "Fifi1",
                     "_label": null,
                     "_type": "string",
+                    "class": "TypedField"
+                },
+                "112": {
+                    "_id": 112,
+                    "_deleted": false,
+                    "_name": "Fifi2",
+                    "_label": null,
+                    "_type": "String",
                     "class": "TypedField"
                 }
             },
@@ -123,6 +147,14 @@
                                 "_name": "Fifi1",
                                 "_label": null,
                                 "_type": "string",
+                                "class": "TypedField"
+                            },
+                            "112": {
+                                "_id": 112,
+                                "_deleted": false,
+                                "_name": "Fifi2",
+                                "_label": null,
+                                "_type": "String",
                                 "class": "TypedField"
                             }
                         },

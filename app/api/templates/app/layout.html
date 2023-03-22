@@ -34,22 +34,19 @@
         }
         function submit_answer(question_id) {
             button = document.getElementById("question"+question_id);
-            console.log(button);
             for(i = 0; i < button.children.length; i++) {
                 if(button.children[i].classList.contains('active')) {
-                    console.log(button.children[i]);
-                    console.log(button.children[i].id);
-<!--                    fetch('/questions/' + question_id, {-->
-<!--                        method: 'POST',-->
-<!--                        headers: {-->
-<!--                            'Accept': 'application/json',-->
-<!--                            'Content-Type': 'application/json'-->
-<!--                        },-->
-<!--                        body: JSON.stringify({ "answer_id": button.children[i].id })-->
-<!--                    })-->
-<!--                   .then(response => response.json())-->
-<!--                   .then(response => console.log(JSON.stringify(response)));-->
-                    window.location.replace("/questions/" + question_id + "/" + button.children[i].id);
+                fetch('http://127.0.0.1:5000/questions/' + question_id, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ "answer_id": button.children[i].id })
+                    })
+                           .then(response => response.json())
+                           .then(response => console.log(JSON.stringify(response)));
+                    window.location.reload();
                     break;
                 }
             }
@@ -132,7 +129,8 @@
                         <a class="collapse-item" href="{{ url_for('generators') }}" >All</a>
                         <a class="collapse-item" href="#" >By id</a>
                         <form
-                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            class="d-none d-sm-inline-block form-inline ml-md-3 my-2 my-md-0 mw-100 navbar-search"
+                            style="margin-right: 10px;">
                             <div class="input-group">
                                 <input id="generator_id_button" type="text" class="form-control bg-light border-0 small"
                                     aria-label="Search" aria-describedby="basic-addon2">
@@ -162,6 +160,23 @@
                         <a class="collapse-item" href="{{ url_for('generate_all_elements') }}">All</a>
                         <a class="collapse-item" href="login.html">By generators</a>
                         <a class="collapse-item" href="register.html">By model element</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Nav Item - Preview Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePreview"
+                    aria-expanded="true" aria-controls="collapsePreview">
+                    <i class="fas fa-fw fa-scroll"></i>
+                    <span>Preview</span>
+                </a>
+                <div id="collapsePreview" class="collapse" aria-labelledby="headingPreview" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="{{ url_for('preview_all_elements') }}">All</a>
                     </div>
                 </div>
             </li>

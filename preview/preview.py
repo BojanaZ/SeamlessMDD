@@ -2,6 +2,7 @@ import difflib
 from pathlib import Path
 import os
 import AdvancedHTMLParser
+from parsers.my_html_parser import MyHTMLParser
 
 
 class Preview(object):
@@ -57,6 +58,8 @@ class Preview(object):
         return Path(self._filepath).stem + "_" + str(hash(self._old_view)) + "_" + str(hash(self._new_view)) + ".html"
 
     def generate_diff_view(self):
+
+        return self.generate_question_view_from_diff("//*[@_id='111']", MyHTMLParser(), False)
         f1_content = self._old_view.strip().splitlines()
         if self._new_view:
             f2_content = self._new_view.strip().splitlines()
@@ -74,6 +77,50 @@ class Preview(object):
 
         filepath_to_return = os.path.join("temp_diff", self.generate_diff_view_filename())
         filepath_to_write = os.path.join("templates", filepath_to_return)
+        file = open(filepath_to_write, "w")
+        file.writelines(str(table))
+        file.close()
+
+        return filepath_to_return
+
+    def generate_question_view(self, question):
+        xpath = question.element_xpath
+        parser = question.task.generator.parser_type()
+        f1_content = self._old_view.strip().splitlines()
+        parser.parser.parseStr(self._old_view)
+        parser.delete_elements_by_path(xpath)
+        f2_content = str(parser).strip().splitlines()
+
+        diff = difflib.HtmlDiff().make_file(f1_content, f2_content, self.filepath, self.filepath)
+        parser = AdvancedHTMLParser.AdvancedHTMLParser()
+        parser.parseStr(diff)
+        tables = parser.getElementsByXPath("""//body/table""")
+        if len(tables) == 0:
+            raise Exception("Table tag does not exist")
+
+        table = tables[0]
+
+        colgroups = tables.getElementsByXPathExpression("""//colgroup""")
+        for i in range(3):
+            colgroups[i].remove()
+
+        ths = table.getElementsByXPathExpression("""//thead/tr/th""")
+        for i in range(2):
+            ths[i].remove()
+
+        trs = table.getElementsByXPathExpression("""//tbody/tr""")
+        for tr in trs:
+            if len(tr.childNodes) == 6:
+                child_node1 = tr.childNodes[5]
+                child_node2 = tr.childNodes[4]
+                child_node3 = tr.childNodes[3]
+                child_node1.remove()
+                child_node2.remove()
+                child_node3.remove()
+
+        filepath_to_return = os.path.join("temp_diff", self.generate_diff_view_filename())
+        filepath_to_write = os.path.join("templates", filepath_to_return)
+
         file = open(filepath_to_write, "w")
         file.writelines(str(table))
         file.close()

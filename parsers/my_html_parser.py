@@ -12,13 +12,13 @@ class MyHTMLParser(IParser):
         return self.parser.getElementById(str(id_))
 
     def check_if_element_exists(self, id_):
-        result = False
         try:
-            if self.get_element_by_id(id_):
-                result = True
+            element = self.get_element_by_id(id_)
+            if element:
+                return True, element
         except:
             pass
-        return result
+        return False, None
 
     def get_element_by_name(self, name):
         elements = self.parser.getElementsByAttr("name", name)
@@ -202,6 +202,17 @@ class MyHTMLParser(IParser):
         elements = self.parser.getElementsByXPath(path)
         for element in elements:
             element.remove()
+
+    def wrap_element(self, element, wrapper_tag, classes=None):
+        new_parser = MyHTMLParser()
+        new_parser.parser.parseStr(wrapper_tag)
+        new_node = new_parser.parser.root
+        for class_ in classes:
+            new_node.addClass(class_)
+
+        element.parentNode.insertBefore(new_node, element)
+        element.parentNode.removeChild(element)
+        new_node.appendChild(element)
 
     def replace_content(self, path, new_content):
         elements = self.parser.getElementsByXPath(path)

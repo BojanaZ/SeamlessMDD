@@ -5,3 +5,4 @@ td.diff_header {text-align:right}
 .diff_add {background-color:#1cc88a}
 .diff_chg {background-color:#f6c23e}
 .diff_sub {background-color:#e74a3b}
+table.td { word-wrap: break-word; overflow-wrap !important: break-word !important; max-width: 40% !important;}

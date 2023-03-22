@@ -8,18 +8,15 @@
             "_answers": [
                 {
                     "_id": 0,
-                    "_text": "Answer 11",
-                    "_tasks": null
+                    "_text": "Answer 11"
                 },
                 {
                     "_id": 1,
-                    "_text": "Answer 12",
-                    "_tasks": null
+                    "_text": "Answer 12"
                 },
                 {
                     "_id": 2,
-                    "_text": "Answer 13",
-                    "_tasks": null
+                    "_text": "Answer 13"
                 }
             ]
         },
@@ -31,13 +28,11 @@
             "_answers": [
                 {
                     "_id": 3,
-                    "_text": "Answer 21",
-                    "_tasks": null
+                    "_text": "Answer 21"
                 },
                 {
                     "_id": 4,
-                    "_text": "Answer 22",
-                    "_tasks": null
+                    "_text": "Answer 22"
                 }
             ]
         }

@@ -20,8 +20,8 @@ class Element(object):
         return self._id
 
     @id.setter
-    def element_id(self, id):
-        self._id = id
+    def element_id(self, id_):
+        self._id = id_
 
     @property
     def container(self):

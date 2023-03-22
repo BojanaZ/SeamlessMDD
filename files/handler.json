@@ -28,6 +28,15 @@
                         "last_generated_version": 0
                     }
                 ]
+            ],
+            "112": [
+                [
+                    0,
+                    {
+                        "value": true,
+                        "last_generated_version": 0
+                    }
+                ]
             ]
         }
     },
@@ -60,5 +69,8 @@
         },
         "data_path_dill": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/files/generators.dill",
         "data_path_json": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/files/generators.json"
+    },
+    "_question_registry": {
+        "_questions": {}
     }
 }

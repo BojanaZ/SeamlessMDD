@@ -73,6 +73,13 @@ class Tracer(object):
             trace.id = self.generate_new_trace_id()
             self._element_traces[element_id][generator_id].append(trace)
 
+    def has_traces(self, element_id, generator_id):
+        if element_id in self._element_traces:
+            if generator_id is not None and generator_id in self._element_traces[element_id]:
+                return True
+
+        return False
+
     def get_traces(self, element_id, generator_id):
         result = []
         if element_id in self._element_traces:

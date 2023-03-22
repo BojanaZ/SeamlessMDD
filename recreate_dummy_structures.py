@@ -97,9 +97,9 @@ def recreate_super_simple_dummy_data_manipulation(write_to_file=False):
     document1 = Document(11, "Document1", False, None, new_model)
     project.add(document1)
     field1 = TypedField(111, "Fifi1", "string", False, None, new_model)
-    #field2 = TypedField(112, "Fifi2", "String", False, None, new_model)
+    field2 = TypedField(112, "Fifi2", "String", False, None, new_model)
     document1.add(field1)
-    #document1.add(field2)
+    document1.add(field2)
 
     #document2 = Document(12, "Document2", False, None, new_model)
     #project.add(document2)
@@ -130,6 +130,7 @@ def recreate_dummy_diff_generator_handler(data_manipulation=None, tracer_=None, 
     for element_id, element in elements.items():
         handler_.element_generator_table.load_pair(element_id, generator.id,
                                                    {"value": True, "last_generated_version": 0})
+    handler_.question_registry = QuestionRegistry()
     if write_to_file:
         handler_.save_to_json()
         tracer_.save_to_json()
