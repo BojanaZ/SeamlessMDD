@@ -93,6 +93,10 @@ class BaseDiffGenerator(TemplateGenerator):
         for file_path, parser in self.parsers.items():
             parser.write_to_file(file_path)
 
+    def reload(self):
+        for file_path, parser in self.parsers.items():
+            self.parsers[file_path] = self.parser_type(file_path)
+
     def to_json(self):
         return json.dumps(self, cls=BaseGeneratorJSONEncoder)
 

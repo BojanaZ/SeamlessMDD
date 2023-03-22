@@ -11,7 +11,6 @@ class DocumentsOutputGenerator(BaseGenerator):
     def __init__(self, id_=-1, file_path="", file_content="", file_template_path=""):
         self.initialize()
         super().__init__(id_, file_path, file_content, file_template_path)
-        #self.tasks = []
 
     # Root path where Jinja templates are found.
     templates_path = os.path.join(

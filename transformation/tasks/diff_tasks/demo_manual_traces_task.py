@@ -1,6 +1,6 @@
 from transformation.tasks.diff_tasks.base_diff_task import BaseDiffTask
-from transformation.executable.executable import Executable
-from transformation.executable.executable_set import ExecutableSet
+from transformation.assignment.assignment import Assignment
+from transformation.assignment.assignment_set import AssignmentSet
 from metamodel.document import Document
 from metamodel.field import Field
 from utilities.utilities import class_name_to_underscore_format
@@ -174,58 +174,116 @@ class DiffDemoManualTracingTask(BaseDiffTask, IManualTracing):
         self.insert_traces(diff)
 
         method = None
-        question = None
+        questions = []
 
         if diff.operation_type == OperationType.ADD:
             method = self.add
 
         elif diff.operation_type == OperationType.REMOVE:
-            if self.check_if_element_exists(diff.key, filepath):
+            exists, element = self.check_if_element_exists(diff.key, filepath)
+            if exists:
                 method = self.remove
             else:
                 question = Question(DOES_NOT_EXIST_TITLE, DOES_NOT_EXIST_TEXT.format(str(diff.old_object_ref)))
-                a1 = Answer(IGNORE, self.ignore)
-                a2 = Answer(RAISE_ISSUE, self.raise_issue)
+                question.element_xpath = self.generator.get_parser(filepath).get_element_xpath(element)
+                assignment_set_a1 = AssignmentSet(Assignment(self.ignore))
+                assignment_set_a1.setup_context(diff=diff, filepath=filepath)
+                a1 = Answer(IGNORE, assignment_set_a1)
+
+                assignment_set_a2 = AssignmentSet(Assignment(self.raise_issue))
+                assignment_set_a2.setup_context(diff=diff, filepath=filepath)
+                a2 = Answer(RAISE_ISSUE, assignment_set_a2)
                 question.answers = [a1, a2]
+                questions.append(question)
 
         elif diff.operation_type in [OperationType.CHANGE, OperationType.SUBELEMENT_CHANGE]:
-            if self.check_if_element_exists(diff.key, filepath):
+            exists, element = self.check_if_element_exists(diff.key, filepath)
+            if exists:
                 self.compare_versions(diff, filepath)
                 method = self.change
             else:
                 question = Question(DOES_NOT_EXIST_TITLE, DOES_NOT_EXIST_TEXT.format(str(diff.old_object_refl)))
-                a1 = Answer(IGNORE, [self.ignore])
-                a2 = Answer(RECREATE, [self.recreate])
+                question.element_xpath = self.generator.get_parser(filepath).get_element_xpath(element)
+                assignment_set_a1 = AssignmentSet(Assignment(self.ignore))
+                assignment_set_a1.setup_context(diff=diff, filepath=filepath)
+                a1 = Answer(IGNORE, assignment_set_a1)
+
+                assignment_set_a2 = AssignmentSet(Assignment(self.recreate))
+                assignment_set_a2.setup_context(diff=diff, filepath=filepath)
+                a2 = Answer(RECREATE, assignment_set_a2)
                 question.answers = [a1, a2]
+                questions.append(question)
 
         elif diff.operation_type == OperationType.SUBELEMENT_ADD:
             parent_element = diff.old_object_ref
-            if not self.check_if_element_exists(parent_element.id, filepath):
+            exists, element = self.check_if_element_exists(parent_element.id, filepath)
+            if not exists:
                 question = Question(DOES_NOT_EXIST_TITLE, DOES_NOT_EXIST_TEXT.format(str(parent_element)))
-                a1 = Answer(IGNORE, [self.ignore])
-                a2 = Answer(RECREATE, [self.recreate, self.subelement_add])
+                assignment_set_a1 = AssignmentSet(Assignment(self.ignore))
+                assignment_set_a1.setup_context(diff=diff, filepath=filepath)
+                a1 = Answer(IGNORE, assignment_set_a1)
+
+                assignment_set_a2 = AssignmentSet(Assignment(self.recreate), Assignment(self.subelement_add))
+                assignment_set_a2.setup_context(diff=diff, filepath=filepath)
+                a2 = Answer(RECREATE, assignment_set_a2)
                 question.answers = [a1, a2]
-            method = self.subelement_add
+                questions.append(question)
+
+            new_element = diff.new_value
+            exists, element = self.check_if_element_exists(new_element.id, filepath)
+            if exists:
+                question = Question(ALREADY_EXISTS_TITLE, ALREADY_EXISTS_TITLE.format(str(new_element)))
+                question.element_xpath = self.generator.get_parser(filepath).get_element_xpath(element)
+                assignment_set_a1 = AssignmentSet(Assignment(self.ignore))
+                assignment_set_a1.setup_context(diff=diff, filepath=filepath)
+                a1 = Answer(IGNORE, assignment_set_a1)
+
+                assignment_set_a2 = AssignmentSet(Assignment(self.subelement_add))
+                assignment_set_a2.setup_context(diff=diff, filepath=filepath)
+                a2 = Answer(ADD, assignment_set_a2)
+                question.answers = [a1, a2]
+                questions.append(question)
+            else:
+                method = self.subelement_add
 
         elif diff.operation_type == OperationType.SUBELEMENT_REMOVE:
             parent_element = diff.old_object_ref
-            if not self.check_if_element_exists(parent_element.id, filepath):
+            exists, element = self.check_if_element_exists(parent_element.id, filepath)
+            if not exists:
                 question = Question(DOES_NOT_EXIST_TITLE, DOES_NOT_EXIST_TEXT.format(str(parent_element)))
+                assignment_set_a1 = AssignmentSet(Assignment(self.ignore))
+                assignment_set_a1.setup_context(diff=diff, filepath=filepath)
                 a1 = Answer(IGNORE, [self.ignore])
-                a2 = Answer(RECREATE, [self.recreate, self.subelement_remove])
+
+                assignment_set_a2 = AssignmentSet(Assignment(self.recreate), Assignment(self.subelement_remove))
+                assignment_set_a2.setup_context(diff=diff, filepath=filepath)
+                a2 = Answer(RECREATE, assignment_set_a2)
                 question.answers = [a1, a2]
-            method = self.subelement_remove
+                questions.append(question)
+            else:
+                method = self.subelement_remove
 
         elif diff.operation_type == OperationType.SUBELEMENT_CHANGE:
             parent_element = diff.old_object_ref
-            if not self.check_if_element_exists(parent_element.id, filepath):
+            exists, element = self.check_if_element_exists(parent_element.id, filepath)
+            if not exists:
                 question = Question(DOES_NOT_EXIST_TITLE, DOES_NOT_EXIST_TEXT.format(str(parent_element)))
-                a1 = Answer(IGNORE, [self.ignore])
-                a2 = Answer(RECREATE, [self.recreate])
-                question.answers = [a1, a2]
-            method = self.subelement_change
+                question.element_xpath = self.generator.get_parser(filepath).get_element_xpath(element)
+                assignment_set_a1 = AssignmentSet(Assignment(self.ignore))
+                assignment_set_a1.setup_context(diff=diff, filepath=filepath)
+                a1 = Answer(IGNORE, assignment_set_a1)
 
-        return method, question, diff
+                assignment_set_a2 = AssignmentSet(Assignment(self.recreate))
+                assignment_set_a2.setup_context(diff=diff, filepath=filepath)
+                a2 = Answer(RECREATE, assignment_set_a2)
+                question.answers = [a1, a2]
+                questions.append(question)
+            else:
+                method = self.subelement_change
+
+        assignment_set = AssignmentSet(Assignment(method))
+        assignment_set.setup_context(diff=diff, filepath=filepath, task=self)
+        return assignment_set, questions
 
     def evaluate_single_element_template(self, diff):
         folder_name = class_name_to_underscore_format(type(self))
@@ -281,7 +339,12 @@ class DiffDemoManualTracingTask(BaseDiffTask, IManualTracing):
         return element
 
     def insert_traces(self, diff):
+
         element = self.get_element(diff)
+
+        if self._generator.tracer.has_traces(element.id, self._generator.id):
+            return
+
         if diff.operation_type in [OperationType.SUBELEMENT_ADD,
                                    OperationType.ADD]:
             trace_type = TraceType.INSERTION

@@ -10,6 +10,8 @@ class Question(object):
         self._text = text
         self._answers = []
         self._chosen_answer_id = None
+        self._element_xpath = ""
+        self._task = None
 
     @property
     def id(self):
@@ -51,6 +53,34 @@ class Question(object):
     def chosen_answer_id(self, chosen_answer_id):
         self._chosen_answer_id = chosen_answer_id
 
+    @property
+    def chosen_answer(self):
+        if not self.is_answered():
+            return None
+        for answer in self.answers:
+            if answer.id == self._chosen_answer_id:
+                return answer
+        return None
+
+    @property
+    def element_xpath(self):
+        return self._element_xpath
+
+    @element_xpath.setter
+    def element_xpath(self, value):
+        self._element_xpath = value
+
+    @property
+    def task(self):
+        return self._task
+
+    @task.setter
+    def task(self, value):
+        self._task = value
+
+    def is_answered(self):
+        return self._chosen_answer_id is not None
+
     def to_json(self):
         return json.dumps(self, cls=QuestionJSONEncoder)
 
@@ -64,10 +94,36 @@ class Question(object):
         new_object._id = int(data["_id"])
         new_object._answers = [Answer.from_json(answer) for answer in data["_answers"]]
         new_object._chosen_answer_id = int(data["_chosen_answer_id"])
+        new_object._element_xpath = data["_element_xpath"]
         return new_object
 
     def to_dict(self):
         return QuestionJSONEncoder().default(self)
+
+    def is_the_same(self, other):
+        if self._text != other.text:
+            return False
+
+        if self._title != other.title:
+            return False
+
+        if self._element_xpath != other.element_xpath:
+            return False
+
+        if len(self._answers) != len(other.answers):
+            return False
+
+        for answer in self.answers:
+            for other_answer in other.answers:
+                if answer.is_the_same(other_answer):
+                    break
+            else:
+                return False
+
+        if self._task != other.task:
+            return False
+
+        return True
 
     def __eq__(self, other):
         if self._id != other.id:
@@ -80,6 +136,9 @@ class Question(object):
             return False
 
         if self._chosen_answer_id != other.chosen_answer_id:
+            return False
+
+        if self._element_xpath != other.element_xpath:
             return False
 
         if len(self._answers) != len(other.answers):

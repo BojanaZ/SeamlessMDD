@@ -1,14 +1,12 @@
 import json
-import os
-from utilities.utilities import get_project_root
 
 
 class Answer(object):
 
-    def __init__(self, text, executable_set=None):
+    def __init__(self, text, assignment_set=None):
         self._id = None
         self._text = text
-        self._executable_set = executable_set
+        self._assignment_set = assignment_set
 
     @property
     def id(self):
@@ -27,12 +25,12 @@ class Answer(object):
         self._text = text
 
     @property
-    def executable_set(self):
-        return self._executable_set
+    def assignment_set(self):
+        return self._assignment_set
 
-    @executable_set.setter
-    def executable_set(self, executable_set):
-        self._executable_set = executable_set
+    @assignment_set.setter
+    def assignment_set(self, assignment_set):
+        self._assignment_set = assignment_set
 
     def to_json(self):
         return json.dumps(self, cls=AnswerJSONEncoder)
@@ -51,6 +49,14 @@ class Answer(object):
     def to_dict(self):
         return AnswerJSONEncoder().default(self)
 
+    def is_the_same(self, other):
+        if self._text != other.text:
+            return False
+
+        if len(self._assignment_set) != len(other.assignment_set):
+            return False
+        return True
+
     def __eq__(self, other):
         if self._id != other.id:
             return False
@@ -58,12 +64,12 @@ class Answer(object):
         if self._text != other.text:
             return False
 
-        if len(self._executable_set) != len(other.executable_set):
+        if len(self._assignment_set) != len(other.assignment_set):
             return False
 
-        for executable in self._executable_set:
-            for other_executable in other.executable_set:
-                if executable == other_executable:
+        for assignment in self._assignment_set:
+            for other_assignment in other.assignment_set:
+                if assignment == other_assignment:
                     break
             else:
                 return False
@@ -80,12 +86,7 @@ class AnswerJSONEncoder(json.JSONEncoder):
         if isinstance(object_, Answer):
 
             object_dict = {key: value for (key, value) in object_.__dict__.items() if
-                           key not in ['_tasks']}
-
-            if object_.tasks is not None:
-                object_dict["_tasks"] = object_.tasks.id
-            else:
-                object_dict["_tasks"] = None
+                           key not in ['_assignment_set']}
 
             return object_dict
 

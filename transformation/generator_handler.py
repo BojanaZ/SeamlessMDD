@@ -4,9 +4,11 @@ import dill
 
 from metamodel.element_generator_table import ElementGeneratorTable
 from transformation.generators.generator_register import GeneratorRegister
+from transformation.conflict_resolution.question_registry import QuestionRegistry
 from transformation.tasks.task_heap import Heap
 from utilities.utilities import get_project_root
 from diff.diff_store import DiffStore
+
 
 from preview.preview import Preview
 
@@ -16,11 +18,13 @@ class GeneratorHandler(object):
     def __init__(self, loading_path=None):
         self._element_generator_table = ElementGeneratorTable()
         self._generators = GeneratorRegister()
+        self._question_registry = QuestionRegistry()
 
         if loading_path is None:
             self._data_loading_path = os.path.join(get_project_root(), 'files')
         else:
             self._data_loading_path = loading_path
+
 
     @property
     def data_loading_path(self):
@@ -39,6 +43,14 @@ class GeneratorHandler(object):
         self._generators = value
 
     @property
+    def question_registry(self):
+        return self._question_registry
+
+    @question_registry.setter
+    def question_registry(self, value):
+        self._question_registry = value
+
+    @property
     def element_generator_table(self):
         return self._element_generator_table
 
@@ -55,11 +67,13 @@ class GeneratorHandler(object):
     def to_json(self):
         table = self.element_generator_table.to_dict()
         generators = self._generators.to_dict()
+        question_registry = self._question_registry.to_dict()
 
         return json.dumps({
             '_data_loading_path': self._data_loading_path,
             'element_generator_table': table,
-            '_generators': generators
+            '_generators': generators,
+            "_question_registry": question_registry
         }, indent=4)
 
     def save_to_json(self, path=None):
@@ -98,6 +112,7 @@ class GeneratorHandler(object):
         self.data_loading_path = content['_data_loading_path']
         self.generators = self._generators.from_json(content['_generators'])
         self.element_generator_table.register_from_json(content['element_generator_table'])
+        self._question_registry = QuestionRegistry.from_json(content['_question_registry'])
         return self
 
     def load_from_dill(self, path=None):
@@ -151,7 +166,7 @@ class GeneratorHandler(object):
                 task.run(element, outfolder)
             #task.invoke()
 
-    def generate_by_diff_generator(self, data_manipulation, other_version, outfolder=None):
+    def generate_by_diff_generator(self, data_manipulation, other_version, outfolder=None, write_to_files=True):
 
         generator_list = self.get_active_generators()
 
@@ -164,9 +179,14 @@ class GeneratorHandler(object):
 
         task_heap.sort()
         sorted_tasks = task_heap.get_items()
+        generator_element_table_update_pairs = []
 
         for task in sorted_tasks:
+            generator_id = task.generator.id
             elements = task.filtered_elements(model)
+            for element in elements:
+                generator_element_table_update_pairs.append((element.id, generator_id))
+
             old_and_new_element_pairs = data_manipulation.generate_old_and_new_pairs(other_version, elements)
             diffs = DiffStore.get_diffs_for_model_elements(old_and_new_element_pairs)
 
@@ -174,10 +194,15 @@ class GeneratorHandler(object):
                 for property_diff in property_diffs:
                     question = task.run(property_diff, outfolder)
                     if question is not None:
+                        #self._element_generator_table()
                         yield question, outfolder
 
-        for generator in generator_list:
-            generator.flush()
+        if write_to_files:
+            for generator in generator_list:
+                generator.flush()
+        else:
+            for generator in generator_list:
+                generator.reload()
 
     def generate_by_generator(self, model_, outfolder=None):
 
@@ -218,6 +243,9 @@ class GeneratorHandler(object):
                 task.run(element, outfolder)
 
     def generate_single_element(self, element, data_manipulation, outfolder=None, write_to_files=True):
+
+        self.generate_answered_questions()
+
         generator_ids = self.element_generator_table.get_generator_ids(element.id)
         generator_list = []
         task_heap = Heap()
@@ -247,14 +275,20 @@ class GeneratorHandler(object):
                         for property_diff in property_diffs:
                             preview = Preview(last_generated_version, data_manipulation.get_latest_version_number())
                             task.preview = preview
-                            question = task.run(property_diff, outfolder)
-                            yield question, outfolder, preview
-                            # if question is not None:
-                            #     yield question, outfolder
+                            questions = task.run(property_diff, outfolder)
+                            yield questions, outfolder, preview
 
         if write_to_files:
             for generator in generator_list:
                 generator.flush()
+        else:
+            for generator in generator_list:
+                generator.reload()
+
+    def generate_answered_questions(self):
+        for question in self._question_registry.questions.values():
+            if question.is_answered():
+                question.chosen_answer.assignment_set.execute_set()
 
 
 if __name__ == '__main__':

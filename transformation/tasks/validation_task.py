@@ -1,3 +1,5 @@
+from abc import ABC
+
 from multigen.jinja import TemplateFileTask
 import logging
 import os
@@ -5,7 +7,7 @@ import os
 _logger = logging.getLogger(__name__)
 
 
-class ValidationTask(TemplateFileTask):
+class ValidationTask(TemplateFileTask, ABC):
 
     def __init__(self,  generator):
         super().__init__()
@@ -57,10 +59,13 @@ class ValidationTask(TemplateFileTask):
         self.ensure_folder(filepath)
         self.preview.old_view = str(self.generator.get_parser(filepath))
         self.preview.filepath = filepath
-        method, question, diff = self.generate_file(element, filepath)
+        assignment_set, questions = self.generate_file(element, filepath)
 
-        if question is None:
-            method(diff, filepath)
+        if len(questions) == 0:
+            assignment_set.execute_set()
+            assignment_set.preview = self._preview
             self.preview.new_view = str(self.generator.get_parser(filepath))
         else:
-            return question
+            for question in questions:
+                question.task = self
+            return questions

@@ -23,6 +23,12 @@ class QuestionRegistry(object):
             if id_ not in self._questions:
                 return id_
 
+    def already_exists(self, question):
+        for existing_question in self._questions.values():
+            if question.is_the_same(existing_question):
+                return True
+        return False
+
     def register_question(self, question):
         question_id = self.generate_new_question_id()
         self._questions[question_id] = question
