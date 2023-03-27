@@ -6,10 +6,8 @@ from metamodel.field import Field
 from utilities.utilities import class_name_to_underscore_format
 from jinja2 import Template
 import os
-from tracing.trace import Trace
 from diff.operation_type import OperationType
 from tracing.manual_tracing import IManualTracing
-from tracing.trace_type import TraceType
 from transformation.conflict_resolution.question import Question
 from transformation.conflict_resolution.answer import Answer
 from messages.question_text import *
@@ -223,7 +221,7 @@ class DiffDemoManualTracingTask(BaseDiffTask, IManualTracing):
                 assignment_set_a1.setup_context(diff=diff, filepath=filepath)
                 a1 = Answer(IGNORE, assignment_set_a1)
 
-                assignment_set_a2 = AssignmentSet(Assignment(self.recreate), Assignment(self.subelement_add))
+                assignment_set_a2 = AssignmentSet(Assignment(self.recreate_parent), Assignment(self.subelement_add))
                 assignment_set_a2.setup_context(diff=diff, filepath=filepath)
                 a2 = Answer(RECREATE, assignment_set_a2)
                 question.answers = [a1, a2]
@@ -324,34 +322,3 @@ class DiffDemoManualTracingTask(BaseDiffTask, IManualTracing):
                                   str(element.id) + "\"]"]
 
         return properties
-
-    def get_element(self, diff):
-        element = diff.new_object_ref
-
-        if diff.operation_type == OperationType.REMOVE:
-            element = diff.old_object_ref
-        elif diff.operation_type == OperationType.SUBELEMENT_ADD:
-            element = diff.new_value
-        elif diff.operation_type == OperationType.SUBELEMENT_CHANGE:
-            element = diff.new_object_ref.elements[diff.key]
-        elif diff.operation_type == OperationType.SUBELEMENT_REMOVE:
-            element = diff.old_value
-        return element
-
-    def insert_traces(self, diff):
-
-        element = self.get_element(diff)
-
-        if self._generator.tracer.has_traces(element.id, self._generator.id):
-            return
-
-        if diff.operation_type in [OperationType.SUBELEMENT_ADD,
-                                   OperationType.ADD]:
-            trace_type = TraceType.INSERTION
-            trace_path = self.get_insertion_trace(element)
-        else:
-            trace_type = TraceType.SELECTION
-            trace_path = self.get_selection_trace(element)
-
-        trace = Trace(trace_type, trace_path)
-        self._generator.tracer.add_element_trace(element.id, self._generator.id, trace)

@@ -2,7 +2,6 @@ import difflib
 from pathlib import Path
 import os
 import AdvancedHTMLParser
-from parsers.my_html_parser import MyHTMLParser
 
 
 class Preview(object):
@@ -58,8 +57,6 @@ class Preview(object):
         return Path(self._filepath).stem + "_" + str(hash(self._old_view)) + "_" + str(hash(self._new_view)) + ".html"
 
     def generate_diff_view(self):
-
-        return self.generate_question_view_from_diff("//*[@_id='111']", MyHTMLParser(), False)
         f1_content = self._old_view.strip().splitlines()
         if self._new_view:
             f2_content = self._new_view.strip().splitlines()
@@ -91,7 +88,7 @@ class Preview(object):
         parser.delete_elements_by_path(xpath)
         f2_content = str(parser).strip().splitlines()
 
-        diff = difflib.HtmlDiff().make_file(f1_content, f2_content, self.filepath, self.filepath)
+        diff = difflib.HtmlDiff().make_file(f2_content, f1_content, self.filepath, self.filepath)
         parser = AdvancedHTMLParser.AdvancedHTMLParser()
         parser.parseStr(diff)
         tables = parser.getElementsByXPath("""//body/table""")
@@ -111,9 +108,9 @@ class Preview(object):
         trs = table.getElementsByXPathExpression("""//tbody/tr""")
         for tr in trs:
             if len(tr.childNodes) == 6:
-                child_node1 = tr.childNodes[5]
-                child_node2 = tr.childNodes[4]
-                child_node3 = tr.childNodes[3]
+                child_node1 = tr.childNodes[0]
+                child_node2 = tr.childNodes[1]
+                child_node3 = tr.childNodes[2]
                 child_node1.remove()
                 child_node2.remove()
                 child_node3.remove()

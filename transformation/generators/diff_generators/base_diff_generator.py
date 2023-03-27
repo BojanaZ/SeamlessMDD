@@ -98,7 +98,7 @@ class BaseDiffGenerator(TemplateGenerator):
             self.parsers[file_path] = self.parser_type(file_path)
 
     def to_json(self):
-        return json.dumps(self, cls=BaseGeneratorJSONEncoder)
+        return json.dumps(self.to_dict(), indent=4)
 
     @classmethod
     def from_json(cls, data):
@@ -115,6 +115,9 @@ class BaseDiffGenerator(TemplateGenerator):
                 new_object.tasks.append(_type.from_json(task))
 
         return new_object
+
+    def to_dict(self):
+        return BaseGeneratorJSONEncoder().default(self)
 
     def __str__(self):
         return str(type(self).__name__)

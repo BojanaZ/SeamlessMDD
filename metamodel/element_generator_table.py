@@ -207,6 +207,7 @@ class ElementGeneratorTable(object):
             for element_id, value_pair in self._by_generator[generator_id].items():
                 if value_pair["value"]:
                     yield generator_id
+                    break
 
     def check_generator_status(self, generator):
         return any(self._by_generator[generator].values())
@@ -252,6 +253,9 @@ class ElementGeneratorTable(object):
 
     def has_element_by_id(self, element_id):
         return element_id in self._by_element
+
+    def has_generator_by_id(self, generator_id):
+        return generator_id in self._by_generator
 
     def update_last_generated_versions(self, element_id, generator_id, last_generated_version):
         self._by_element[element_id][generator_id] = {"value": True, "last_generated_version": last_generated_version}

@@ -140,125 +140,131 @@ class GeneratorHandler(object):
     def __ne__(self, other):
         return not self == other
 
+    def update_element_generator_table(self, generator_element_table_update_pairs, version_id):
+        for element_id, generator_id in generator_element_table_update_pairs:
+            self._element_generator_table.update_last_generated_versions(element_id, generator_id, version_id)
+
     def get_active_generators(self):
         generator_list = []
         for gen_id in self.element_generator_table.get_active_generators():
             generator_list.append(self._generators[gen_id])
         return generator_list
 
-    def generate_by_element(self, model_, outfolder=None):
+    def initialize(self):
+        self.generate_answered_questions()
 
+    def build_task_heap(self, generator_list):
         task_heap = Heap()
-
-        for model_element in model_:
-            generator_list = self.element_generator_table.get_generators(model_element.id)
-
-            for generator_id in generator_list:
-                generator = self._generators[generator_id]
-                generator.create_environment()
-                for task in generator.tasks:
-                    task_heap.add(task)
-
-        task_heap.sort()
-        sorted_tasks = task_heap.get_items()
-        for task in sorted_tasks:
-            for element in task.filtered_elements(model_):
-                task.run(element, outfolder)
-            #task.invoke()
-
-    def generate_by_diff_generator(self, data_manipulation, other_version, outfolder=None, write_to_files=True):
-
-        generator_list = self.get_active_generators()
-
-        task_heap = Heap()
-
-        model = data_manipulation.get_latest_model()
-
+        sorted_tasks = []
         for generator in generator_list:
             task_heap.extend(generator.tasks)
+            task_heap.sort()
+            sorted_tasks = task_heap.get_items()
+        return sorted_tasks
 
-        task_heap.sort()
-        sorted_tasks = task_heap.get_items()
+    def finalize(self, generator_list, table_update_pairs, data_manipulation, model_version_number,
+                 write_to_files=True):
+        if write_to_files:
+            for generator in generator_list:
+                generator.flush()
+                self.update_element_generator_table(table_update_pairs,
+                                                    model_version_number)
+                data_manipulation.update_model_after_generation()
+        else:
+            for generator in generator_list:
+                generator.reload()
+
+    def generate_diffs(self, diffs, task, last_generated_version, latest_model_version, outfolder):
+        for property_diffs in diffs.values():
+            for property_diff in property_diffs:
+                preview = Preview(last_generated_version, latest_model_version)
+                task.preview = preview
+                questions = task.run(property_diff, outfolder)
+                yield questions, outfolder, preview
+
+    def generate_all_generators(self, data_manipulation, outfolder=None, write_to_files=True):
+
+        self.initialize()
+
+        generator_list = self.get_active_generators()
+        sorted_tasks = self.build_task_heap(generator_list)
+
+        model = data_manipulation.get_latest_model()
+        latest_model_version = data_manipulation.get_latest_version_number()
+
         generator_element_table_update_pairs = []
 
         for task in sorted_tasks:
             generator_id = task.generator.id
             elements = task.filtered_elements(model)
             for element in elements:
+                connection_data = self.element_generator_table.get_connection_data(element.id, generator_id)
+                last_generated_version = 0
+                if connection_data["value"]:
+                    last_generated_version = connection_data["last_generated_version"]
+
                 generator_element_table_update_pairs.append((element.id, generator_id))
+                old_and_new_element_pairs = data_manipulation.generate_old_and_new_pairs(last_generated_version,
+                                                                                         [element])
+                diffs = DiffStore.get_diffs_for_model_elements(old_and_new_element_pairs)
+                for property_diffs in diffs.values():
+                    for property_diff in property_diffs:
+                        preview = Preview(last_generated_version, latest_model_version)
+                        task.preview = preview
+                        questions = task.run(property_diff, outfolder)
+                        yield questions, outfolder, preview
 
-            old_and_new_element_pairs = data_manipulation.generate_old_and_new_pairs(other_version, elements)
-            diffs = DiffStore.get_diffs_for_model_elements(old_and_new_element_pairs)
+        self.finalize(generator_list, generator_element_table_update_pairs, data_manipulation,
+                      latest_model_version, write_to_files)
 
-            for property_diffs in diffs.values():
-                for property_diff in property_diffs:
-                    question = task.run(property_diff, outfolder)
-                    if question is not None:
-                        #self._element_generator_table()
-                        yield question, outfolder
+    def generate_single_generator(self, data_manipulation, generator_id, outfolder=None, write_to_files=True):
 
-        if write_to_files:
-            for generator in generator_list:
-                generator.flush()
-        else:
-            for generator in generator_list:
-                generator.reload()
+        self.initialize()
+        generator = self._generators[generator_id]
 
-    def generate_by_generator(self, model_, outfolder=None):
+        sorted_tasks = self.build_task_heap([generator])
+        latest_model_version = data_manipulation.get_latest_version_number()
 
-        generator_id_list = self.element_generator_table.get_active_generators()
-
-        task_heap = Heap()
-
-        for generator_id in generator_id_list:
-
-            generator = self._generators.get_generator_by_id(generator_id)
-
-            for model_element in model_:
-                for task in generator.tasks:
-                    task_heap.add(task)
-
-        task_heap.sort()
-        sorted_tasks = task_heap.get_items()
+        generator_element_table_update_pairs = []
 
         for task in sorted_tasks:
-            for element in task.filtered_elements(model_):
-                task.run(element, outfolder)
+            for element in task.filtered_elements(data_manipulation):
+                connection_data = self.element_generator_table.get_connection_data(element.id, generator_id)
+                if connection_data["value"]:
+                    last_generated_version = connection_data["last_generated_version"]
+                    generator_element_table_update_pairs.append((element.id, generator_id))
 
-                #task.invoke()
+                    old_and_new_element_pairs = data_manipulation.generate_old_and_new_pairs(last_generated_version,
+                                                                                             [element])
+                    diffs = DiffStore.get_diffs_for_model_elements(old_and_new_element_pairs)
 
-    def generate_single_generator(self, data_manipulation_, generator, outfolder=None):
+                    for property_diffs in diffs.values():
+                        for property_diff in property_diffs:
+                            preview = Preview(last_generated_version, latest_model_version)
+                            task.preview = preview
+                            questions = task.run(property_diff, outfolder)
+                            yield questions, outfolder, preview
 
-        element_ids = self.element_generator_table.get_element_ids(generator)
-
-        task_heap = Heap()
-
-        task_heap.extend(generator.tasks)
-
-        task_heap.sort()
-        sorted_tasks = task_heap.get_items()
-
-        for task in sorted_tasks:
-            for element in task.filtered_elements(data_manipulation_):
-                task.run(element, outfolder)
+            self.finalize([generator], generator_element_table_update_pairs,
+                          data_manipulation, latest_model_version, write_to_files)
+            data_manipulation.update_model()
 
     def generate_single_element(self, element, data_manipulation, outfolder=None, write_to_files=True):
 
-        self.generate_answered_questions()
+        self.initialize()
 
         generator_ids = self.element_generator_table.get_generator_ids(element.id)
         generator_list = []
-        task_heap = Heap()
 
         for generator_id in generator_ids:
             generator = self._generators.get_generator_by_id(generator_id)
             generator_list.append(generator)
-            task_heap.extend(generator.tasks)
 
-        task_heap.sort()
-        sorted_tasks = task_heap.get_items()
+        sorted_tasks = self.build_task_heap(generator_list)
 
+        generator_element_table_update_pairs = []
         model = data_manipulation.get_latest_model()
+        latest_model_version = data_manipulation.get_latest_version_number()
 
         for task in sorted_tasks:
             for model_element in task.filtered_elements(model):
@@ -266,24 +272,20 @@ class GeneratorHandler(object):
                 connection_data = self.element_generator_table.get_connection_data(model_element.id, task.generator.id)
                 if connection_data["value"]:
                     last_generated_version = connection_data["last_generated_version"]
+                    generator_element_table_update_pairs.append((element.id, task.generator.id))
 
                     old_and_new_element_pairs = data_manipulation.generate_old_and_new_pairs(last_generated_version,
                                                                                              [model_element])
                     diffs = DiffStore.get_diffs_for_model_elements(old_and_new_element_pairs)
-
                     for property_diffs in diffs.values():
                         for property_diff in property_diffs:
-                            preview = Preview(last_generated_version, data_manipulation.get_latest_version_number())
+                            preview = Preview(last_generated_version, latest_model_version)
                             task.preview = preview
                             questions = task.run(property_diff, outfolder)
                             yield questions, outfolder, preview
 
-        if write_to_files:
-            for generator in generator_list:
-                generator.flush()
-        else:
-            for generator in generator_list:
-                generator.reload()
+        self.finalize(generator_list, generator_element_table_update_pairs,
+                      data_manipulation, latest_model_version, write_to_files)
 
     def generate_answered_questions(self):
         for question in self._question_registry.questions.values():

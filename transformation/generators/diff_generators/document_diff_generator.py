@@ -35,18 +35,6 @@ class DocumentDiffGenerator(BaseDiffGenerator):
     #     for task in self.tasks:
     #         task.environment = self.environment
 
-    def to_json(self):
-        return json.dumps(self, cls=BaseGeneratorJSONEncoder)
-
-    def to_dict(self):
-        return BaseGeneratorJSONEncoder().default(self)
-
-    def __str__(self):
-        return str(type(self).__name__)
-
-    def __hash__(self):
-        return id(self)
-
     def __eq__(self, other):
         if not super(BaseDiffGenerator, self).__eq__(other):
             return False
@@ -59,6 +47,3 @@ class DocumentDiffGenerator(BaseDiffGenerator):
                 return False
 
         return True
-
-    def __ne__(self, other):
-        return not self == other

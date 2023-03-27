@@ -5,6 +5,8 @@
             "_title": "Test question 1",
             "_text": "What?",
             "_chosen_answer_id": 2,
+            "_element_xpath": "",
+            "_task": null,
             "_answers": [
                 {
                     "_id": 0,
@@ -25,6 +27,8 @@
             "_title": "Test question 2",
             "_text": "Why?",
             "_chosen_answer_id": 4,
+            "_element_xpath": "",
+            "_task": null,
             "_answers": [
                 {
                     "_id": 3,

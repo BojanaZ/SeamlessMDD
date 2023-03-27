@@ -3,6 +3,9 @@ from transformation.tasks.priority_mixin import PriorityMixin
 from transformation.tasks.base_task_json_encoder import BaseTaskJSONEncoder
 import json
 from transformation.tasks.validation_task import ValidationTask
+from diff.operation_type import OperationType
+from tracing.trace_type import TraceType
+from tracing.trace import Trace
 
 
 class BaseDiffTask(ValidationTask, PriorityMixin):
@@ -57,3 +60,34 @@ class BaseDiffTask(ValidationTask, PriorityMixin):
 
     def __ne__(self, other):
         return not self == other
+
+    def get_element(self, diff):
+        element = diff.new_object_ref
+
+        if diff.operation_type == OperationType.REMOVE:
+            element = diff.old_object_ref
+        elif diff.operation_type == OperationType.SUBELEMENT_ADD:
+            element = diff.new_value
+        elif diff.operation_type == OperationType.SUBELEMENT_CHANGE:
+            element = diff.new_object_ref.elements[diff.key]
+        elif diff.operation_type == OperationType.SUBELEMENT_REMOVE:
+            element = diff.old_value
+        return element
+
+    def insert_traces(self, diff):
+
+        element = self.get_element(diff)
+
+        if self._generator.tracer.has_traces(element.id, self._generator.id):
+            return
+
+        if diff.operation_type in [OperationType.SUBELEMENT_ADD,
+                                   OperationType.ADD]:
+            trace_type = TraceType.INSERTION
+            trace_path = self.get_insertion_trace(element)
+        else:
+            trace_type = TraceType.SELECTION
+            trace_path = self.get_selection_trace(element)
+
+        trace = Trace(trace_type, trace_path)
+        self._generator.tracer.add_element_trace(element.id, self._generator.id, trace)

@@ -52,6 +52,18 @@ class DataManipulation(object):
         except:
             raise VersionUnavailableError("Requested model version is unavailable.")
 
+    def update_model_after_generation(self):
+        last_model = self.get_latest_model()
+        next_version = self.get_next_version_number()
+        new_model = last_model.deepcopy()
+        new_model.version = next_version
+        self._versions[next_version] = new_model
+
+    def update_model(self, model):
+        last_model = self.get_latest_model()
+        next_version = self.get_next_version_number()
+        self._versions[next_version] = model
+
     def get_element_by_id(self, _id, version=None):
         model = self.get_model_by_version(version)
         if _id in model:
@@ -113,15 +125,6 @@ class DataManipulation(object):
                 json.dump(content, file, default=lambda o:o.to_dict(), indent=4)
         except OSError:
             print("Unable to load model.")
-
-    def get_old_and_new_model_for_element(self, element):
-        old_version = element.model.version
-        return self._versions[old_version], self._versions[self._latest_version_number]
-
-    def update_model(self, model):
-        version = self.get_next_version_number()
-        self._versions[version] = model
-        model.version = version
 
     def to_json(self):
         return json.dumps(self, cls=DataManipulationJSONEncoder)

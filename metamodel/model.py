@@ -104,6 +104,10 @@ class Model(object):
 
         return new_object
 
+    def deepcopy(self):
+        json = self.to_json()
+        return Model.from_json(json)
+
     def to_dict(self):
         return ModelJSONEncoder().default(self)
 
