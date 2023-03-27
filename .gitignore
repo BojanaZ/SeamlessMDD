@@ -112,3 +112,4 @@ venv.bak/
 # Project folders
 out/
 AdvancedHTMLParser/
+app/api/templates/temp_diff/
