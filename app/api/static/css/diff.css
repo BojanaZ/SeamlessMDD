@@ -1,8 +1,37 @@
-table.diff {font-family:Courier; border:medium; font-size: small;}
-.diff_header {background-color:#e0e0e0}
-td.diff_header {text-align:right}
+table.diff {
+    font-family:Courier;
+    border:medium;
+    font-size: small;
+    table-layout: fixed;
+    width:100%;
+}
+
+table.diff > colgroup:first-of-type, table.diff > colgroup:first-of-type + colgroup + colgroup + colgroup  {
+    width: 10px;
+}
+table.diff > colgroup:first-of-type + colgroup, table.diff > colgroup:first-of-type + colgroup + colgroup +
+ colgroup + colgroup  {
+    width: 20px;
+}
+
+table.diff > colgroup {
+    width: auto;
+}
+.diff_header {background-color:#e0e0e0;}
+td.diff_header {text-align:right; vertical-align: top; }
+td.diff_header + td {
+    word-wrap:break-word;
+    white-space:break-spaces;
+    padding-left: 3px;
+    padding-right: 2px;
+ }
 .diff_next {background-color:#f8f9fc}
 .diff_add {background-color:#1cc88a}
 .diff_chg {background-color:#f6c23e}
 .diff_sub {background-color:#e74a3b}
-table.td { word-wrap: break-word; overflow-wrap !important: break-word !important; max-width: 40% !important;}
+
+.my_selected {
+  color: #fff !important;
+  background-color: #2653d4 !important;
+  border-color: #244ec9 !important;
+ }

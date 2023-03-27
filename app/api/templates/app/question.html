@@ -14,9 +14,11 @@
             {% else: %}
                 {% include preview.generate_question_view(question) %}
             <div class="py-2 h5"><b>{{ question.text }}</b></div>
-            <div class="btn-group btn-group-toggle" id="question{{ question.id }}" data-toggle="buttons">
+            <div class="btn-group btn-group-toggle" id="question{{ question.id }}"
+                 chosen_answer_id="{{question.chosen_answer_id}}" data-toggle="buttons">
                 {% for answer in question.answers: %}
-                <label class="btn btn-primary {% if answer.id == question.chosen_answer_id: %}active{% endif %}" id="{{ answer.id }}">
+                <label class="btn btn-primary {% if answer.id == question.chosen_answer_id %} my_selected {% endif %}"
+                       id="{{ answer.id }}">
                   <input type="radio" name="options" autocomplete="off"> {{ answer.text }}
                 </label>
                 {% endfor %}
