@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from flask import Flask, request, jsonify, make_response, render_template, redirect
+from flask import Flask, request, jsonify, make_response, render_template, redirect, url_for
 from transformation.generator_handler import GeneratorHandler
 from transformation.generators.generator_register import GeneratorRegister
 from tracing.tracer import Tracer
@@ -26,7 +26,7 @@ def create_app(data_manipulation=None, handler=None, tracer=None ):
     @app.route('/', methods=['GET'])
     @app.route('/home', methods=['GET'])
     def home():
-        return render_template('app/index.html')
+        return redirect(url_for('model'))
 
     @app.route('/model', methods=['GET', 'POST'])
     def model():
@@ -55,31 +55,24 @@ def create_app(data_manipulation=None, handler=None, tracer=None ):
                 return make_response(render_template('app/404.html'), 404)
 
     @app.route('/generators', methods=['GET', 'POST'])
-    def generators():
+    @app.route('/generators/<generator_id>', methods=['GET', 'POST'])
+    def generators(generator_id=None):
         if request.method == 'GET':
             try:
-                content_json = handler.generators.to_json()
-                return render_template('app/generator.html', generator=content_json)
-            except:
+                if generator_id:
+                    content_json = handler.get_generator(int(generator_id)).to_json()
+                else:
+                    content_json = handler.generators.to_json()
+                return render_template('app/generator.html', generators=content_json, generator_id=generator_id)
+            except KeyError:
                 return make_response(render_template('app/404.html'), 404)
 
         if request.method == 'POST':
             """modify/update generator"""
+
             content = request.get_json()
             handler.generators = GeneratorRegister.from_json(content)
             return make_response("CREATED", 201)
-
-    @app.route('/generators/<generator_id>', methods=['GET', 'POST'])
-    def generator_by_id(generator_id):
-        if request.method == 'GET':
-            try:
-                content_json = handler.get_generator(int(generator_id)).to_json()
-                return render_template('app/generator.html', generator=content_json, generator_id=generator_id)
-            except KeyError:
-                return make_response(render_template('app/404.html'), 404)
-
-        elif request.method == 'POST':
-            return make_response(jsonify({'error': 'Not implemented'}), 501)
 
     @app.route('/table', methods=['GET', 'POST'])
     def element_generator_table():
@@ -119,21 +112,36 @@ def create_app(data_manipulation=None, handler=None, tracer=None ):
     def get_generation_results():
         return render_template("app/generation_results.html", question_preview_pairs=question_preview_pairs)
 
-    @app.route('/generation/<element_id>', methods=['GET'])
+    @app.route('/generate/all', methods=['GET'])
+    def generate_all_elements():
+        generate_preview_all_elements(True)
+        return redirect(url_for('get_generation_results'))
+
+    @app.route('/generate/<element_id>', methods=['GET'])
     def generate_single_element(element_id):
-        return generate_preview_single_element(element_id, True)
+        #try:
+        generate_preview_single_element(element_id, True)
+        return redirect(url_for('get_generation_results'))
+        #except ValueError:
+        #    return make_response(jsonify({'error': 'Bad request'}), 400)
+
+    @app.route('/generate-by-generator/<generator_id>', methods=['GET'])
+    def generate_by_generator(generator_id):
+        try:
+            generate_preview_by_generator(generator_id, True)
+            return redirect(url_for('get_generation_results'))
+        except ValueError:
+            return make_response(jsonify({'error': 'Bad request'}), 400)
 
     @app.route('/preview/all', methods=['GET'])
     def preview_all_elements():
-        return generate_preview_all_elements(False)
+        generate_preview_all_elements(False)
+        return redirect(url_for('get_generation_results'))
 
     @app.route('/preview/<element_id>', methods=['GET'])
     def preview_single_element(element_id):
-        return generate_preview_single_element(element_id, False)
-
-    @app.route('/diff_generation/all', methods=['GET'])
-    def generate_all_elements():
-        return generate_preview_all_elements(True)
+        generate_preview_single_element(element_id, False)
+        return redirect(url_for('get_generation_results'))
 
     @app.route('/questions', methods=['GET'])
     @app.route('/questions/<question_id>', methods=['GET', 'POST'])
@@ -170,33 +178,49 @@ def create_app(data_manipulation=None, handler=None, tracer=None ):
             return make_response("OK", 200)
 
     def generate_preview_single_element(element_id, generate=True):
-        try:
-            element_id = int(element_id)
-            question_preview_pairs.clear()
-            if handler.element_generator_table.has_element_by_id(element_id):
-                element = data_manipulation.get_element_by_id(element_id)
-                for questions, outfolder, preview in handler.generate_single_element(element,
-                                                                                    data_manipulation,
+        element_id = int(element_id)
+        question_preview_pairs.clear()
+        if handler.element_generator_table.has_element_by_id(element_id):
+            element = data_manipulation.get_element_by_id(element_id)
+            for questions, outfolder, preview in handler.generate_single_element(element,
+                                                                                data_manipulation,
+                                                                                "../../files/",
+                                                                                generate):
+                if questions is None or len(questions) == 0:
+                    question_preview_pairs.append((None, preview))
+                else:
+                    for question in questions:
+                        if not handler.question_registry.already_exists(question):
+                            handler.question_registry.register_question(question)
+                            question_preview_pairs.append((question, preview))
+
+    def generate_preview_by_generator(generator_id, generate=True):
+        generator_id = int(generator_id)
+        question_preview_pairs.clear()
+        if handler.element_generator_table.has_generator_by_id(generator_id):
+            for questions, outfolder, preview in handler.generate_single_generator(data_manipulation,
+                                                                                   generator_id,
                                                                                     "../../files/",
                                                                                     generate):
-                    if questions is None or len(questions) == 0:
-                        question_preview_pairs.append((None, preview))
-                    else:
-                        for question in questions:
-                            if not handler.question_registry.already_exists(question):
-                                handler.question_registry.register_question(question)
-                                question_preview_pairs.append((question, preview))
-
-                return render_template("app/generation_results.html", question_preview_pairs=question_preview_pairs)
-        except ValueError:
-            return make_response(jsonify({'error': 'Bad request'}), 400)
+                if questions is None or len(questions) == 0:
+                    question_preview_pairs.append((None, preview))
+                else:
+                    for question in questions:
+                        if not handler.question_registry.already_exists(question):
+                            handler.question_registry.register_question(question)
+                            question_preview_pairs.append((question, preview))
 
     def generate_preview_all_elements(generate=True):
-        try:
-            handler.generate_by_diff_generator(data_manipulation, 0, "../../files/", generate)
-            return make_response("OK", 200)
-        except ValueError:
-            return make_response(jsonify({'error': 'Bad request'}), 400)
+        question_preview_pairs.clear()
+        for questions, outfolder, preview in handler.generate_all_generators(data_manipulation,
+                                                                             "../../files/", generate):
+            if questions is None or len(questions) == 0:
+                question_preview_pairs.append((None, preview))
+            else:
+                for question in questions:
+                    if not handler.question_registry.already_exists(question):
+                        handler.question_registry.register_question(question)
+                        question_preview_pairs.append((question, preview))
 
     return app
 
