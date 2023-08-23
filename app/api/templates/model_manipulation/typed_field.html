@@ -1,0 +1,38 @@
+{% if element.id == -1 %}
+<form id="form-editor" parent_id="{{ parent_id }}" element_type="{{ element_type }}"
+      action="{{ url_for('add_element', parent_id=parent_id, element_type=element_type ) }}" method="POST"
+      onsubmit="return send_ajax(event)"
+      class="user">
+{% else %}
+    <form id="form-editor" element_id="{{ element.id }}"
+      action="{{ url_for('form_editor', element_id=element.id, version_id=element.model.version ) }}" method="POST"
+      onsubmit="return send_ajax(event)"
+      class="user">
+{% endif %}
+
+    <div class="form-group row">
+        <label for="name" class="col-lg-2" style="display: flex;align-items: center;">Name:</label>
+        <input {% if disabled %} disabled="disabled" {% endif %} type="text" id="name" class="form-control form-control-user col-lg-10" name="name"
+               value="{{ element.name }}">
+    </div>
+    <div class="form-group row">
+        <label for="label" class="col-lg-2" style="display: flex;align-items: center;">Label:</label>
+        <input {% if disabled %} disabled="disabled" {% endif %} type="text" id="label" name="label" class="form-control form-control-user col-lg-10"
+               {% if element.label is not none %} value=" {{ element.label }}" {% endif %}>
+    </div>
+    <div class="form-group row">
+        <label for="field-type" class="col-lg-2" style="display: flex;align-items: center;">Field type:</label>
+        <select {% if disabled %} disabled="disabled" {% endif %} name="field-type" id="field-type" class="form-control form-control-user col-lg-10">
+            <option value="string" {% if element.type=='string' %} selected {% endif %}>string
+            </option>
+            <option value="integer" {% if element.type=='integer' %} selected {% endif %}>integer
+            </option>
+            <option value="float" {% if element.type=='float' %} selected {% endif %}>float</option>
+            <option value="boolean" {% if element.type=='boolean' %} selected {% endif %}>boolean
+            </option>
+        </select>
+    </div>
+{% if not disabled %}
+    <input type="submit" id="submit" value="Submit" class="btn btn-primary btn-user btn-block">
+{% endif %}
+</form>

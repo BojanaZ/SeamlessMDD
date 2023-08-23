@@ -11,8 +11,16 @@
 
     {% block title %}<title>SeamlessMDD</title>{% endblock %}
 
+    <link rel="stylesheet" href="{{ url_for('static',filename='vendor/jstree/themes/default/style.min.css') }}" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/tree_view.js') }}"></script>
+    <!-- jsTree JS -->
+    <!--<script src="{{ url_for('static', filename='vendor/jstree/jstree.min.js') }}"></script> -->
+
+
+
     <!-- Custom fonts for this template-->
-    <link href="{{ url_for('static',filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
@@ -63,6 +71,9 @@
             }
         }
     </script>
+    <style>
+        .no-arrow::after {display: none !important;}
+</style>
 </head>
 
 <body id="page-top">
@@ -313,12 +324,156 @@
     <!-- Custom scripts for all pages-->
     <script src="{{ url_for('static',filename='js/sb-admin-2.min.js') }}"></script>
 
+    <!-- Custom jstree script-->
+    <script src="{{ url_for('static',filename='js/tree_view.js') }}"></script>
+
     <!-- Page level plugins -->
     <script src="{{ url_for('static',filename='vendor/chart.js/Chart.min.js') }}"></script>
 
     <!-- Page level custom scripts -->
     <script src="{{ url_for('static',filename='js/demo/chart-area-demo.js') }}"></script>
+
+
     <script src="{{ url_for('static',filename='js/demo/chart-pie-demo.js') }}"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+    <script>
+        function load_tree() {
+            $("#tree-view-from-json").jstree(JSON.parse($("#tree-view-from-json").text()));
+         }
+
+         $("#tree-view-from-json").on(
+        "select_node.jstree", function(evt, data){
+            var nodeType = data.node.type;
+            var possibleChildren = data.instance.settings.types[nodeType];
+            if (possibleChildren.hasOwnProperty("valid_children") && possibleChildren.valid_children.length > 0) {
+                document.getElementById("add-btn").classList.remove("disabled");
+                var newInnerHTML = "";
+                for (let i=0; i < possibleChildren.valid_children.length; i++) {
+                        var possibleType = possibleChildren.valid_children[i];
+                        newInnerHTML += "<a class=\"dropdown-item\" href=\"#\" value=\"" + possibleType + "\" onclick=\"return add_subelement()\">"
+                                        + possibleType + "</a>";
+                };
+
+                document.getElementById("add-menu").innerHTML = newInnerHTML;
+
+            } else {
+                document.getElementById("add-btn").classList.add("disabled");
+            }
+
+            var version = $("#version").text();
+
+            fetch('http://127.0.0.1:5000/form-editor/' + data.node.id + '/' + version, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                            }
+                    }).then(function (response) {
+                        var text = response.text();
+	                    return text;
+
+                    }).then(function(html) {
+                          document.getElementById('form-editor').outerHTML = html;
+                    });
+            });
+
+        function getFormData($form){
+            var unindexed_array = $form.serializeArray();
+            var indexed_array = {};
+
+            $.map(unindexed_array, function(n, i){
+                indexed_array[n['name']] = n['value'];
+            });
+
+            return indexed_array;
+        }
+
+        function send_ajax(e) {
+              e.preventDefault();
+              var url = document.getElementById("form-editor").getAttribute("action");
+              console.log(url);
+              data = getFormData($("#form-editor"));
+
+              promise = Promise.resolve($.ajax({
+                        url: url,
+                        type: 'post',
+                        data: JSON.stringify(data),
+                        dataType: 'json',
+                        contentType: 'application/json;charset=UTF-8',
+                        success: function(e) {
+                              console.log(e.core.data);
+                              $("#tree-view-from-json").jstree(true).settings.core.data = e.core.data;
+                              $("#tree-view-from-json").jstree(true).refresh();
+                        }
+              })
+              );
+              console.log(promise);
+
+              return false;
+       };
+
+        function add_subelement(e) {
+
+             e = e || window.event;
+            var targ = e.target || e.srcElement || e;
+            if (targ.nodeType == 3) targ = targ.parentNode;
+
+            var value = targ.getAttribute("value");
+            console.log(value);
+            if (value == null) {
+                return;
+            }
+            var node_id = $("#tree-view-from-json").jstree("get_selected")[0];
+
+            var url = 'http://127.0.0.1:5000/add-subelement/' + node_id + '/' + value;
+
+            fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+            }).then(function (response) {
+                var text = response.text();
+                return text;
+
+            }).then(function(html) {
+                  document.getElementById('form-editor-container').innerHTML = html;
+            });
+
+        return false;
+        }
+
+        function delete_subelement(e) {
+            e = e || window.event;
+            var targ = e.target || e.srcElement || e;
+            if (targ.nodeType == 3) targ = targ.parentNode;
+
+            var node_id = $("#tree-view-from-json").jstree("get_selected")[0];
+
+            var url = 'http://127.0.0.1:5000/delete-subelement/' + node_id;
+
+            fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+            }).then(function (response) {
+                var text = response.text();
+                return text;
+
+            }).then(function(html) {
+                  console.log($("#tree-view-from-json").jstree(true).settings.core.data);
+                  $("#tree-view-from-json").jstree(true).settings.core.data = JSON.parse(html).core.data;
+                  $("#tree-view-from-json").jstree(true).refresh();
+            });
+
+        return false;
+        }
+
+        window.onload = load_tree();
+    </script>
+
 
 </body>
 

@@ -1,0 +1,9 @@
+<div class="form-group row">
+    <label for="type" class="col-lg-2" style="display: flex;align-items: center;">Element type:</label>
+    <select name="type" id="type" class="form-control form-control-user col-lg-10">
+        {% for possible_type in possible_types: %}
+            <option value="{{ possible_type }}" type-url="{{  }}">{{ possible_type }}</option>
+        {% endfor %}
+    </select>
+
+</div>
