@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 
 from flask import Flask, request, jsonify, make_response, render_template, redirect, url_for
 from transformation.generator_handler import GeneratorHandler
@@ -8,6 +9,9 @@ from tracing.tracer import Tracer
 from metamodel.model import Model
 from transformation.data_manipulation import DataManipulation, VersionUnavailableError
 from transformation.conflict_resolution.question import Question
+from view.tree_view import prepare_model_for_tree_view
+from exceptions import ElementNotFoundError
+from utilities.utilities import class_object_to_underscore_format, class_name_to_underscore_format
 
 
 def create_app(data_manipulation=None, handler=None, tracer=None ):
@@ -28,31 +32,110 @@ def create_app(data_manipulation=None, handler=None, tracer=None ):
     def home():
         return redirect(url_for('model'))
 
+    @app.route('/models/<version_id>', methods=['GET'])
+    def model_by_version(version_id):
+        if request.method == 'GET':
+            try:
+                model = data_manipulation.get_model_by_version(version_id)
+                content_json = prepare_model_for_tree_view(model)
+
+                latest_version = data_manipulation.get_latest_version_number()
+
+                disabled = False
+                if version_id != latest_version:
+                    disabled = True
+                return render_template('model_manipulation/model_tree_view.html', tree_view_model=content_json,
+                                       version_id=version_id, disabled=disabled)
+            except VersionUnavailableError:
+                return make_response(render_template('app/404.html'), 404)
+
     @app.route('/model', methods=['GET', 'POST'])
     def model():
         if request.method == 'GET':
             try:
-                content_json = data_manipulation.get_latest_model().to_json()
-                return render_template('app/model.html', model=content_json)
-
-            except VersionUnavailableError as version_error:
+                content_json = prepare_model_for_tree_view(data_manipulation.get_latest_model())
+                version_id = data_manipulation.get_latest_version_number()
+                return render_template('model_manipulation/model_tree_view.html', tree_view_model=content_json,
+                                       version_id=version_id)
+            except VersionUnavailableError:
                 return make_response(render_template('app/404.html'), 404)
-
-        if request.method == 'POST':
+        elif request.method == 'POST':
             """modify/update model"""
             content = request.get_json()
             model_ = Model.from_json(content)
             data_manipulation.update_model(model_)
             return make_response("CREATED", 201)
 
-    @app.route('/models/<version_id>', methods=['GET'])
-    def model_by_version(version_id):
+    @app.route('/form-editor/<element_id>/<version_id>', methods=['GET', 'POST'])
+    def form_editor(element_id, version_id):
         if request.method == 'GET':
             try:
-                content_json = data_manipulation.get_model_by_version(version_id).to_json()
-                return render_template('app/model.html', model=content_json, version_id=version_id)
-            except VersionUnavailableError:
+                element_id = int(element_id)
+
+                has_version = data_manipulation.has_version(version_id)
+                if not has_version:
+                    version_id = data_manipulation.get_latest_version_number()
+                else:
+                    version_id = int(version_id)
+
+                if element_id == -1:
+                    element = data_manipulation.get_model_by_version(version_id)
+                else:
+                    element = data_manipulation.get_model_by_version(version_id).get_element(element_id)
+
+                disabled = version_id != data_manipulation.get_latest_version_number()
+
+                file_name = class_object_to_underscore_format(type(element))
+
+                return render_template('model_manipulation/'+file_name+'.html', element=element, disabled=disabled)
+            except ElementNotFoundError:
                 return make_response(render_template('app/404.html'), 404)
+        elif request.method == 'POST':
+            element_id = int(element_id)
+            element_dict = request.get_json()
+            element = data_manipulation.get_latest_model().get_element(element_id)
+            element.update(**element_dict)
+            return prepare_model_for_tree_view(data_manipulation.get_latest_model())
+
+    @app.route('/add-subelement/<parent_id>/<element_type>', methods=['GET', 'POST'])
+    def add_element(parent_id, element_type):
+        if element_type != 'null':
+            module_name = class_name_to_underscore_format(element_type)
+            parent_module = getattr(sys.modules[__name__], "metamodel")
+            new_element_module = getattr(parent_module, module_name)
+            element = getattr(new_element_module, element_type)()
+
+            if request.method == 'GET':
+                return render_template('model_manipulation/' + module_name + '.html', element=element,
+                                       parent_id=parent_id, element_type=element_type)
+
+            elif request.method == 'POST':
+                parent_id = int(parent_id)
+                parent_element = data_manipulation.get_latest_model().get_element(parent_id)
+
+                element_dict = request.get_json()
+                element.id = data_manipulation.generate_new_element_id()
+                element.update(**element_dict)
+                parent_element.add(element)
+                return prepare_model_for_tree_view(data_manipulation.get_latest_model())
+
+    @app.route('/delete-subelement/<element_id>', methods=['POST'])
+    def delete_element(element_id):
+        if request.method == 'POST':
+            try:
+                element_id = int(element_id)
+                # If element is model
+                if element_id == -1:
+                    return make_response("Method Not Allowed", 405)
+                else:
+                    element = data_manipulation.get_latest_model().get_element(element_id)
+                    data_manipulation.get_latest_model().remove_element(element)
+                    return prepare_model_for_tree_view(data_manipulation.get_latest_model())
+            except ValueError:
+                return make_response("Method Not Allowed", 405)
+            except ElementNotFoundError:
+                return make_response(render_template('app/404.html'), 404)
+
 
     @app.route('/generators', methods=['GET', 'POST'])
     @app.route('/generators/<generator_id>', methods=['GET', 'POST'])

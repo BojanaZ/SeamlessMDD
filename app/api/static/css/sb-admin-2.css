@@ -265,6 +265,8 @@ select {
 
 select {
   word-wrap: normal;
+  padding-right: 20px;
+  border-right-width: 10px
 }
 
 button,
@@ -10126,8 +10128,8 @@ a:focus {
   color: #b7b9cc;
 }
 
-.dropdown.no-arrow .dropdown-toggle::after {
-  display: none;
+.dropdown.no-arrow::after .dropdown-toggle::after {
+  display: none !important
 }
 
 .sidebar .nav-item.dropdown .dropdown-toggle::after,

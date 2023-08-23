@@ -35,3 +35,8 @@ td.diff_header + td {
   background-color: #2653d4 !important;
   border-color: #244ec9 !important;
  }
+
+ .label-text {
+   display: flex !important;
+  align-items: center;
+  }
