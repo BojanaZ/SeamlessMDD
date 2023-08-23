@@ -1,9 +1,10 @@
 from metamodel.element import Element
+from view.tree_view_mixin import TreeViewMixin
 
 
-class NamedElement(Element):
+class NamedElement(Element, TreeViewMixin):
 
-    def __init__(self, _id, name, deleted=False, label=None, model=None):
+    def __init__(self, _id=-1, name="", deleted=False, label=None, model=None):
         super().__init__(_id, deleted, model)
         self._name = name
         self._label = label
@@ -41,3 +42,20 @@ class NamedElement(Element):
             return False
 
         return True
+
+    def convert_to_tree_view_dict(self):
+        parent_dict = super().convert_to_tree_view_dict()
+        text = self._label
+        if self._label is None:
+            text = self._name
+        parent_dict["text"] = text
+        parent_dict["name"] = self._name
+        parent_dict["label"] = self._label
+        return parent_dict
+
+    def update(self, **kwargs):
+        if "name" in kwargs:
+            self._name = kwargs["name"]
+
+        if "label" in kwargs:
+            self._label = kwargs["label"]

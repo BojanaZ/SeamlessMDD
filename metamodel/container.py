@@ -6,7 +6,7 @@ from json import JSONEncoder
 
 class Container(NamedElement):
 
-    def __init__(self, _id, name, deleted=False, label=None, model=None):
+    def __init__(self, _id=-1, name="", deleted=False, label=None, model=None):
         super().__init__(_id, name, deleted, label, model)
         self._elements = {}
 
@@ -30,10 +30,10 @@ class Container(NamedElement):
         element.container = self
 
         if self._model and element.id not in self.model:
-            self.model[id] = element
+            self.model[element.id] = element
 
     def __iter__(self):
-        for element in self._elements:
+        for element in self._elements.values():
             yield element
 
     def to_json(self):
@@ -90,6 +90,11 @@ class Container(NamedElement):
     
     def to_dict(self):
         return ContainerJSONEncoder().default(self)
+
+    def convert_to_tree_view_dict(self):
+        parent_dict = super().convert_to_tree_view_dict()
+        parent_dict["children"] = [child_dict.convert_to_tree_view_dict() for child_dict in self._elements.values()]
+        return parent_dict
 
 
 class ContainerJSONEncoder(JSONEncoder):

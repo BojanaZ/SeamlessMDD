@@ -1,6 +1,8 @@
 from utilities.exceptions import ElementNotFoundError
 from utilities.utilities import iterable, get_class_from_parent_module
 
+from metamodel.project import Project
+
 import json
 from json import JSONEncoder
 
@@ -12,7 +14,6 @@ class Model(object):
         # access to model elements
         self._elements = {}
         self._root_element = root_element
-
 
     @property
     def version(self):
@@ -47,12 +48,14 @@ class Model(object):
         try:
             return self._elements[element_id]
         except KeyError:
-            raise ElementNotFoundError("Element with id " + str(id) + " is not part of the current model.")
+            raise ElementNotFoundError("Element with id " + str(element_id) + " is not part of the current model.")
 
     def check_element(self, element_id):
         return element_id in self._elements
 
     def remove_element(self, element):
+        if element.container:
+            del element.container.elements[element.id]
         del self._elements[element.id]
 
     def __contains__(self, item):
@@ -147,6 +150,17 @@ class Model(object):
 
     def __str__(self):
         return "Model[{} {}]".format(self._version, self._root_element)
+
+    def convert_to_tree_view_dict(self):
+        model_dict = {"text": "Model",
+                      "id": -1,
+                      "type": self.__class__.__name__,
+                      "state": {"opened": True},
+                      "version": self._version,
+                      "children": [child_element.convert_to_tree_view_dict() for child_element
+                                   in self._elements.values()
+                                   if isinstance(child_element, Project)]}
+        return model_dict
 
 
 class ModelJSONEncoder(JSONEncoder):

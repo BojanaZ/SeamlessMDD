@@ -4,7 +4,7 @@ from json import JSONEncoder
 
 class Element(object):
 
-    def __init__(self, _id, deleted=False, model=None, container=None):
+    def __init__(self, _id=-1, deleted=False, model=None, container=None):
         self._id = _id
         self._container = container
 
@@ -20,7 +20,7 @@ class Element(object):
         return self._id
 
     @id.setter
-    def element_id(self, id_):
+    def id(self, id_):
         self._id = id_
 
     @property
@@ -89,6 +89,12 @@ class Element(object):
 
     def get_first_level_dict(self):
         return {key: value for (key, value) in self.__dict__.items()}
+
+    def convert_to_tree_view_dict(self):
+        return {"id": self._id, "state": {"opened": True}, "type": self.__class__.__name__}
+
+    def update(self, **kwargs):
+        raise NotImplemented()
 
 
 class ElementJSONEncoder(JSONEncoder):
