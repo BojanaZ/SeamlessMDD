@@ -9,13 +9,13 @@
                     "_id": 1,
                     "_deleted": false,
                     "_name": "MyProject",
-                    "_label": null,
+                    "_label": "MyProject",
                     "_elements": {
                         "11": {
                             "_id": 11,
                             "_deleted": false,
                             "_name": "Document1",
-                            "_label": null,
+                            "_label": "Document1",
                             "_elements": {},
                             "class": "Document"
                         }
@@ -26,7 +26,7 @@
                     "_id": 11,
                     "_deleted": false,
                     "_name": "Document1",
-                    "_label": null,
+                    "_label": "Document1",
                     "_elements": {},
                     "class": "Document"
                 }
@@ -35,13 +35,13 @@
                 "_id": 1,
                 "_deleted": false,
                 "_name": "MyProject",
-                "_label": null,
+                "_label": "MyProject",
                 "_elements": {
                     "11": {
                         "_id": 11,
                         "_deleted": false,
                         "_name": "Document1",
-                        "_label": null,
+                        "_label": "Document1",
                         "_elements": {},
                         "class": "Document"
                     }
@@ -57,19 +57,19 @@
                     "_id": 1,
                     "_deleted": false,
                     "_name": "MyProject",
-                    "_label": null,
+                    "_label": "MyProject",
                     "_elements": {
                         "11": {
                             "_id": 11,
                             "_deleted": false,
                             "_name": "Document1",
-                            "_label": null,
+                            "_label": "Document1",
                             "_elements": {
                                 "111": {
                                     "_id": 111,
                                     "_deleted": false,
                                     "_name": "Fifi1",
-                                    "_label": null,
+                                    "_label": "Fifi1",
                                     "_type": "string",
                                     "class": "TypedField"
                                 },
@@ -77,8 +77,8 @@
                                     "_id": 112,
                                     "_deleted": false,
                                     "_name": "Fifi2",
-                                    "_label": null,
-                                    "_type": "String",
+                                    "_label": "Fifi2",
+                                    "_type": "boolean",
                                     "class": "TypedField"
                                 }
                             },
@@ -91,13 +91,13 @@
                     "_id": 11,
                     "_deleted": false,
                     "_name": "Document1",
-                    "_label": null,
+                    "_label": "Document1",
                     "_elements": {
                         "111": {
                             "_id": 111,
                             "_deleted": false,
                             "_name": "Fifi1",
-                            "_label": null,
+                            "_label": "Fifi1",
                             "_type": "string",
                             "class": "TypedField"
                         },
@@ -105,8 +105,8 @@
                             "_id": 112,
                             "_deleted": false,
                             "_name": "Fifi2",
-                            "_label": null,
-                            "_type": "String",
+                            "_label": "Fifi2",
+                            "_type": "boolean",
                             "class": "TypedField"
                         }
                     },
@@ -116,7 +116,7 @@
                     "_id": 111,
                     "_deleted": false,
                     "_name": "Fifi1",
-                    "_label": null,
+                    "_label": "Fifi1",
                     "_type": "string",
                     "class": "TypedField"
                 },
@@ -124,8 +124,8 @@
                     "_id": 112,
                     "_deleted": false,
                     "_name": "Fifi2",
-                    "_label": null,
-                    "_type": "String",
+                    "_label": "Fifi2",
+                    "_type": "boolean",
                     "class": "TypedField"
                 }
             },
@@ -133,19 +133,19 @@
                 "_id": 1,
                 "_deleted": false,
                 "_name": "MyProject",
-                "_label": null,
+                "_label": "MyProject",
                 "_elements": {
                     "11": {
                         "_id": 11,
                         "_deleted": false,
                         "_name": "Document1",
-                        "_label": null,
+                        "_label": "Document1",
                         "_elements": {
                             "111": {
                                 "_id": 111,
                                 "_deleted": false,
                                 "_name": "Fifi1",
-                                "_label": null,
+                                "_label": "Fifi1",
                                 "_type": "string",
                                 "class": "TypedField"
                             },
@@ -153,8 +153,8 @@
                                 "_id": 112,
                                 "_deleted": false,
                                 "_name": "Fifi2",
-                                "_label": null,
-                                "_type": "String",
+                                "_label": "Fifi2",
+                                "_type": "boolean",
                                 "class": "TypedField"
                             }
                         },

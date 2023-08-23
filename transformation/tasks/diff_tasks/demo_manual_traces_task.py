@@ -3,7 +3,7 @@ from transformation.assignment.assignment import Assignment
 from transformation.assignment.assignment_set import AssignmentSet
 from metamodel.document import Document
 from metamodel.field import Field
-from utilities.utilities import class_name_to_underscore_format
+from utilities.utilities import class_object_to_underscore_format
 from jinja2 import Template
 import os
 from diff.operation_type import OperationType
@@ -284,7 +284,7 @@ class DiffDemoManualTracingTask(BaseDiffTask, IManualTracing):
         return assignment_set, questions
 
     def evaluate_single_element_template(self, diff):
-        folder_name = class_name_to_underscore_format(type(self))
+        folder_name = class_object_to_underscore_format(type(self))
         path = os.path.join(self._generator.templates_path, folder_name)
 
     def get_traces(self, diff):

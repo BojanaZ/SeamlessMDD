@@ -57,8 +57,7 @@ def get_file_path_for_format(type_name, formats, use_root=True):
     return paths
 
 
-def class_name_to_underscore_format(type_):
-    class_name = type_.__name__
+def class_name_to_underscore_format(class_name):
     underscore_format_name = class_name[0].lower()
     for character in class_name[1:]:
         if character.isupper():
@@ -68,3 +67,8 @@ def class_name_to_underscore_format(type_):
         underscore_format_name += character
 
     return underscore_format_name
+
+
+def class_object_to_underscore_format(type_):
+    class_name = type_.__name__
+    return class_name_to_underscore_format(class_name)

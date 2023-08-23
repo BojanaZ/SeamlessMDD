@@ -52,23 +52,43 @@ class DataManipulation(object):
         except:
             raise VersionUnavailableError("Requested model version is unavailable.")
 
+    def has_version(self, version=None):
+        if version is None:
+            return False
+        try:
+            version_int = int(version)
+            if version_int in self._versions:
+                return True
+        except:
+            return False
+
     def update_model_after_generation(self):
         last_model = self.get_latest_model()
         next_version = self.get_next_version_number()
         new_model = last_model.deepcopy()
         new_model.version = next_version
         self._versions[next_version] = new_model
+        new_model.version = next_version
 
     def update_model(self, model):
-        last_model = self.get_latest_model()
         next_version = self.get_next_version_number()
         self._versions[next_version] = model
+        model.version = next_version
 
     def get_element_by_id(self, _id, version=None):
         model = self.get_model_by_version(version)
         if _id in model:
             return model[_id]
         return None
+
+    def generate_new_element_id(self):
+        while True:
+            from random import randint
+            id_candidate = randint(0, 10 ^ 5)
+            for model_element in self.get_latest_model():
+                if id_candidate == model_element.id:
+                    continue
+            return id_candidate
 
     def get_old_and_new_model_for_element(self, element):
         old_version = element.model.version
@@ -105,7 +125,7 @@ class DataManipulation(object):
     @staticmethod
     def load_from_json(path=None):
         if not path:
-            path = join(get_project_root(),"files", "model.json")
+            path = join(get_project_root(), "files", "model.json")
 
         try:
             with open(path, "r") as file:

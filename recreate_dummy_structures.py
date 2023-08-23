@@ -74,9 +74,9 @@ def recreate_dummy_data_manipulation():
 def recreate_super_simple_dummy_data_manipulation(write_to_file=False):
     model = Model()
 
-    project = Project(1, "MyProject", False, None, model)
+    project = Project(1, "MyProject", False, "MyProject", model)
     model.root = project
-    document1 = Document(11, "Document1", False, None, model)
+    document1 = Document(11, "Document1", False, "Document1", model)
     #field1 = TypedField(111, "Fifi1", "string", False, None, model)
     #field2 = TypedField(112, "Fifi2", "string", False, None, model)
     #document1.add(field1)
@@ -92,12 +92,12 @@ def recreate_super_simple_dummy_data_manipulation(write_to_file=False):
     data_manipulation.update_model(model)
 
     new_model = Model()
-    project = Project(1, "MyProject", False, None, new_model)
+    project = Project(1, "MyProject", False, "MyProject", new_model)
     new_model.root = project
-    document1 = Document(11, "Document1", False, None, new_model)
+    document1 = Document(11, "Document1", False, "Document1", new_model)
     project.add(document1)
-    field1 = TypedField(111, "Fifi1", "string", False, None, new_model)
-    field2 = TypedField(112, "Fifi2", "String", False, None, new_model)
+    field1 = TypedField(111, "Fifi1", "string", False, "Fifi1", new_model)
+    field2 = TypedField(112, "Fifi2", "boolean", False, "Fifi2", new_model)
     document1.add(field1)
     document1.add(field2)
 

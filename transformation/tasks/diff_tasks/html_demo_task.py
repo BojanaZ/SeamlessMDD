@@ -1,6 +1,6 @@
 from transformation.tasks.diff_tasks.base_diff_task import BaseDiffTask
 from metamodel.document import Document
-from utilities.utilities import class_name_to_underscore_format
+from utilities.utilities import class_object_to_underscore_format
 from utilities.exceptions import ParsingError
 from jinja2 import Template
 import os
@@ -156,7 +156,7 @@ class DiffDemoTask(BaseDiffTask):
             parser.update_element_by_id(diff.key, diff.property_name, diff.new_value)
 
     def evaluate_single_element_template(self, diff):
-        folder_name = class_name_to_underscore_format(type(self))
+        folder_name = class_object_to_underscore_format(type(self))
         path = os.path.join(self._generator.templates_path, folder_name)
 
     def get_traces(self, diff):
