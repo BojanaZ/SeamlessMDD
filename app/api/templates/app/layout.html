@@ -466,6 +466,7 @@
                   console.log($("#tree-view-from-json").jstree(true).settings.core.data);
                   $("#tree-view-from-json").jstree(true).settings.core.data = JSON.parse(html).core.data;
                   $("#tree-view-from-json").jstree(true).refresh();
+                  document.getElementById('form-editor').innerHTML = "";
             });
 
         return false;

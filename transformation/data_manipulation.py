@@ -87,8 +87,9 @@ class DataManipulation(object):
             id_candidate = randint(0, 10 ^ 5)
             for model_element in self.get_latest_model():
                 if id_candidate == model_element.id:
-                    continue
-            return id_candidate
+                    break
+            else:
+                return id_candidate
 
     def get_old_and_new_model_for_element(self, element):
         old_version = element.model.version

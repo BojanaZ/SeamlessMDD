@@ -101,7 +101,7 @@ def create_app(data_manipulation=None, handler=None, tracer=None ):
     def add_element(parent_id, element_type):
         if element_type != 'null':
             module_name = class_name_to_underscore_format(element_type)
-            parent_module = getattr(sys.modules[__name__], "metamodel")
+            parent_module = sys.modules["metamodel"]
             new_element_module = getattr(parent_module, module_name)
             element = getattr(new_element_module, element_type)()
 
@@ -135,7 +135,6 @@ def create_app(data_manipulation=None, handler=None, tracer=None ):
                 return make_response("Method Not Allowed", 405)
             except ElementNotFoundError:
                 return make_response(render_template('app/404.html'), 404)
-
 
     @app.route('/generators', methods=['GET', 'POST'])
     @app.route('/generators/<generator_id>', methods=['GET', 'POST'])

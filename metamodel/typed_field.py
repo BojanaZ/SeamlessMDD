@@ -26,6 +26,6 @@ class TypedField(Field, TypedMixin):
     def update(self, **kwargs):
         super().update(**kwargs)
 
-        if "type" in kwargs:
-            self._type = kwargs["type"]
+        if "field-type" in kwargs:
+            self._type = kwargs["field-type"]
 
