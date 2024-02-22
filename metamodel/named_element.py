@@ -46,7 +46,7 @@ class NamedElement(Element, TreeViewMixin):
     def convert_to_tree_view_dict(self):
         parent_dict = super().convert_to_tree_view_dict()
         text = self._label
-        if self._label is None:
+        if self._label is None or self._label == "":
             text = self._name
         parent_dict["text"] = text
         parent_dict["name"] = self._name
