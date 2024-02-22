@@ -1,28 +1,37 @@
 <!DOCTYPE html>
 <html >
+    <head >
+        <title >Flask Template Example</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" media="screen" />
+    </head>
+    <body >
+        <div _id="11" class="container" >
+          <p >My document name: Document1</p>
 
-<head >
-    <title >Flask Template Example</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" media="screen" />
-    <style type="text/css" >
-        .container {
-            max-width: 500px;
-            padding-top: 100px;
-        }
-    </style>
-</head>
-<body >
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js" _id="1" ></script>
-    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js" ></script>
-
-    <div _id="11" class="container" >
-      <p >My document name: Document1</p>
-
-      <p >Parent project id: 1 </p>
-      <p >Parent project name: MyProject</p>
-      <p >Subelements:</p>
-      <ul ><li _id="111" name="Fifi1" >Field (Fifi1)</li><li _id="112" name="Fifi2" >Field (Fifi2)</li></ul>
-    </div>
-<div ></div></body>
+          <p >Parent project id: 1 </p>
+          <p >Parent project name: MyProject</p>
+          <p >Subelements:</p>
+            <ul >
+                <li _id="111"  name="Field1">
+                <div class="form-row">
+                    <div class="md-form col-md-4 col-sm-5">
+                        <i class="fas"></i>
+                        <input type="text" class="form-control ng-untouched ng-pristine ng-valid">
+                        <label>Field (Field1)</label>
+                    </div>
+                </div>
+                </li>
+                    <li _id="112"  name="Field2">
+                    <div class="form-row">
+                        <div class="md-form col-md-4 col-sm-5">
+                            <i class="fas"></i>
+                            <input type="text" class="form-control ng-untouched ng-pristine ng-valid">
+                            <label>Field (Field2)</label>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </body>
 </html>

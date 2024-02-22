@@ -16,7 +16,24 @@
                             "_deleted": false,
                             "_name": "Document1",
                             "_label": "Document1",
-                            "_elements": {},
+                            "_elements": {
+                                "111": {
+                                    "_id": 111,
+                                    "_deleted": false,
+                                    "_name": "Field1",
+                                    "_label": null,
+                                    "_type": "string",
+                                    "class": "TypedField"
+                                },
+                                "112": {
+                                    "_id": 112,
+                                    "_deleted": false,
+                                    "_name": "Field2",
+                                    "_label": null,
+                                    "_type": "string",
+                                    "class": "TypedField"
+                                }
+                            },
                             "class": "Document"
                         }
                     },
@@ -27,8 +44,41 @@
                     "_deleted": false,
                     "_name": "Document1",
                     "_label": "Document1",
-                    "_elements": {},
+                    "_elements": {
+                        "111": {
+                            "_id": 111,
+                            "_deleted": false,
+                            "_name": "Field1",
+                            "_label": null,
+                            "_type": "string",
+                            "class": "TypedField"
+                        },
+                        "112": {
+                            "_id": 112,
+                            "_deleted": false,
+                            "_name": "Field2",
+                            "_label": null,
+                            "_type": "string",
+                            "class": "TypedField"
+                        }
+                    },
                     "class": "Document"
+                },
+                "111": {
+                    "_id": 111,
+                    "_deleted": false,
+                    "_name": "Field1",
+                    "_label": null,
+                    "_type": "string",
+                    "class": "TypedField"
+                },
+                "112": {
+                    "_id": 112,
+                    "_deleted": false,
+                    "_name": "Field2",
+                    "_label": null,
+                    "_type": "string",
+                    "class": "TypedField"
                 }
             },
             "_root_element": {
@@ -42,7 +92,24 @@
                         "_deleted": false,
                         "_name": "Document1",
                         "_label": "Document1",
-                        "_elements": {},
+                        "_elements": {
+                            "111": {
+                                "_id": 111,
+                                "_deleted": false,
+                                "_name": "Field1",
+                                "_label": null,
+                                "_type": "string",
+                                "class": "TypedField"
+                            },
+                            "112": {
+                                "_id": 112,
+                                "_deleted": false,
+                                "_name": "Field2",
+                                "_label": null,
+                                "_type": "string",
+                                "class": "TypedField"
+                            }
+                        },
                         "class": "Document"
                     }
                 },
@@ -68,17 +135,9 @@
                                 "111": {
                                     "_id": 111,
                                     "_deleted": false,
-                                    "_name": "Fifi1",
-                                    "_label": "Fifi1",
+                                    "_name": "Field1",
+                                    "_label": "Field1",
                                     "_type": "string",
-                                    "class": "TypedField"
-                                },
-                                "112": {
-                                    "_id": 112,
-                                    "_deleted": false,
-                                    "_name": "Fifi2",
-                                    "_label": "Fifi2",
-                                    "_type": "boolean",
                                     "class": "TypedField"
                                 }
                             },
@@ -96,17 +155,9 @@
                         "111": {
                             "_id": 111,
                             "_deleted": false,
-                            "_name": "Fifi1",
-                            "_label": "Fifi1",
+                            "_name": "Field1",
+                            "_label": "Field1",
                             "_type": "string",
-                            "class": "TypedField"
-                        },
-                        "112": {
-                            "_id": 112,
-                            "_deleted": false,
-                            "_name": "Fifi2",
-                            "_label": "Fifi2",
-                            "_type": "boolean",
                             "class": "TypedField"
                         }
                     },
@@ -115,17 +166,9 @@
                 "111": {
                     "_id": 111,
                     "_deleted": false,
-                    "_name": "Fifi1",
-                    "_label": "Fifi1",
+                    "_name": "Field1",
+                    "_label": "Field1",
                     "_type": "string",
-                    "class": "TypedField"
-                },
-                "112": {
-                    "_id": 112,
-                    "_deleted": false,
-                    "_name": "Fifi2",
-                    "_label": "Fifi2",
-                    "_type": "boolean",
                     "class": "TypedField"
                 }
             },
@@ -144,17 +187,9 @@
                             "111": {
                                 "_id": 111,
                                 "_deleted": false,
-                                "_name": "Fifi1",
-                                "_label": "Fifi1",
+                                "_name": "Field1",
+                                "_label": "Field1",
                                 "_type": "string",
-                                "class": "TypedField"
-                            },
-                            "112": {
-                                "_id": 112,
-                                "_deleted": false,
-                                "_name": "Fifi2",
-                                "_label": "Fifi2",
-                                "_type": "boolean",
                                 "class": "TypedField"
                             }
                         },
