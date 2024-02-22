@@ -375,6 +375,7 @@
 
                     }).then(function(html) {
                           document.getElementById('form-editor').outerHTML = html;
+                          document.getElementById('form-editor-container-title').innerHTML = "Change element";
                     });
             });
 
@@ -438,7 +439,8 @@
                 return text;
 
             }).then(function(html) {
-                  document.getElementById('form-editor-container').innerHTML = html;
+                  document.getElementById('form-editor-container-title').innerHTML = "Add element";
+                  document.getElementById('form-editor').innerHTML = html;
             });
 
         return false;
