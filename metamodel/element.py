@@ -3,7 +3,7 @@ from json import JSONEncoder
 from pyecore.ecore import *
 
 
-class ModelElement(EObject, metaclass=MetaEClass):
+class Element(EObject, metaclass=MetaEClass):
 
     _id = EAttribute(eType=EInt, derived=False, changeable=True)
     _deleted = EAttribute(eType=EBoolean, derived=False, changeable=True)
@@ -110,7 +110,7 @@ class ModelElement(EObject, metaclass=MetaEClass):
 class ElementJSONEncoder(JSONEncoder):
     def default(self, object_):
 
-        if isinstance(object_, ModelElement):
+        if isinstance(object_, Element):
 
             object_dict = {key: value for (key, value) in object_.__dict__.items() if key not in ['_model',
                                                                                                   '_container']}

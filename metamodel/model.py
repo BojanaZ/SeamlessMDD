@@ -7,14 +7,14 @@ import json
 from json import JSONEncoder
 
 from pyecore.ecore import *
-from metamodel.model_element import ModelElement
-from metamodel.named_model_element import NamedModelElement
+from metamodel.element import Element
+from metamodel.named_element import NamedElement
 
 
 class Model(EObject, metaclass=MetaEClass):
     _version = EAttribute(eType=EInt)
-    _root = EReference(name='_root', eType=ModelElement, containment=False)
-    _elements = EReference(name='_elements', eType=NamedModelElement, ordered=True, unique=True, changeable=True,
+    _root = EReference(name='_root', eType=Element, containment=False)
+    _elements = EReference(name='_elements', eType=NamedElement, ordered=True, unique=True, changeable=True,
                            containment=True, upper=-1)
 
     def __init__(self, root_element=None, version=None, **kwargs):

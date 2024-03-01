@@ -1,4 +1,7 @@
-from os.path import join
+import os
+from pyecore.resources.xmi import XMIOptions
+from pyecore.resources import ResourceSet, URI
+
 from utilities.utilities import get_project_root
 import dill
 import json
@@ -17,7 +20,7 @@ class DataManipulation(object):
         if initial_file is not None:
             self.path = initial_file
         else:
-            self.path = join(get_project_root(), "files", "model.dill")
+            self.path = os.path.join(get_project_root(), "files", "model.dill")
 
         self._latest_version_number = -1
 
@@ -126,7 +129,7 @@ class DataManipulation(object):
     @staticmethod
     def load_from_json(path=None):
         if not path:
-            path = join(get_project_root(), "files", "model.json")
+            path = os.path.join(get_project_root(), "files", "model.json")
 
         try:
             with open(path, "r") as file:
@@ -138,7 +141,7 @@ class DataManipulation(object):
 
     def save_to_json(self, path=None):
         if not path:
-            path = join(get_project_root(), "files", "model.json")
+            path = os.path.join(get_project_root(), "files", "model.json")
 
         try:
             with open(path, "w") as file:
@@ -146,6 +149,58 @@ class DataManipulation(object):
                 json.dump(content, file, default=lambda o: o.to_dict(), indent=4)
         except OSError:
             print("Unable to load model.")
+
+    def load_from_xmi(self, metamodel, path=None):
+
+        if not path:
+            path = os.path.join(get_project_root(), "files")
+
+        versions_folder_path = os.path.join(path, "versions")
+        if not os.path.exists(versions_folder_path):
+            return
+
+        for file_name in os.listdir(versions_folder_path):
+            file_path = os.path.join(versions_folder_path, file_name)
+            if os.path.isfile(file_path):
+                import re
+                version = int(re.findall(r'\d+',file_name)[0])
+
+                rset = ResourceSet()
+                rset.metamodel_registry[metamodel.nsURI] = metamodel
+                resource = rset.get_resource(URI(file_path))
+                model = resource.contents[0]
+                if version not in self._versions:
+                    self._versions[version] = model
+
+    def save_to_xmi(self, metamodel, path=None):
+        from pyecore.resources.xmi import XMIOptions
+        from pyecore.resources import ResourceSet, URI
+        import os
+
+        if not path:
+            path = os.path.join(get_project_root(), "files")
+
+        versions_folder_path = os.path.join(path, "versions")
+        if not os.path.exists(versions_folder_path):
+            os.makedirs(versions_folder_path)
+
+        for version, model in self._versions.items():
+            model_path = os.path.join(versions_folder_path, "model_version_{}.xmi".format(version))
+
+            with open(model_path, "w") as file:
+                file.write("")
+
+            rset = ResourceSet()
+            resource = rset.create_resource(URI(model_path))
+            resource.use_uuid = True
+            resource.append(model)
+
+            rset.metamodel_registry[metamodel.nsURI] = metamodel  # register the metamodel
+
+            options = {
+                XMIOptions.OPTION_USE_XMI_TYPE: True
+            }
+            resource.save(options=options)
 
     def to_json(self):
         return json.dumps(self, cls=DataManipulationJSONEncoder)

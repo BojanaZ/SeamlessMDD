@@ -1,8 +1,8 @@
-from metamodel.named_model_element import NamedModelElement
+from metamodel.named_element import NamedElement
 from pyecore.ecore import MetaEClass
 
 
-class Field(NamedModelElement, metaclass=MetaEClass):
+class Field(NamedElement, metaclass=MetaEClass):
 
     def __init__(self, _id=-1, name="", deleted=False, label=None, model=None, **kwargs):
         if kwargs:

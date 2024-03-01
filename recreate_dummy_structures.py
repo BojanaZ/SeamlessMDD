@@ -8,8 +8,8 @@ from metamodel.project import Project
 from metamodel.document import Document
 from metamodel.typed_field import TypedField
 from metamodel.field import Field
-from metamodel.named_model_element import NamedModelElement
-from metamodel.model_element import ModelElement
+from metamodel.named_element import NamedElement
+from metamodel.element import Element
 from metamodel.container import Container
 from transformation.data_manipulation import DataManipulation
 from transformation.generator_handler import GeneratorHandler
@@ -37,14 +37,14 @@ getEClassifier = partial(Ecore.getEClassifier, searchspace=eClassifiers)
 # Oficijalno objašnjenje, dato u inline komentaru u jednom od primera:
 # As the relation is reflexive, it must be set AFTER the metaclass creation
 def additional_changes():
-    ModelElement.model = EReference('model', Model, eOpposite=Model.elements)
-    ModelElement.container = EReference('container', Container, eOpposite=Container.elements)
+    Element.model = EReference('model', Model, eOpposite=Model.elements)
+    Element.container = EReference('container', Container, eOpposite=Container.elements)
 
 
 def make():
     eClass.eClassifiers.extend([Model.eClass,
-                                ModelElement.eClass,
-                                NamedModelElement.eClass,
+                                Element.eClass,
+                                NamedElement.eClass,
                                 Container.eClass,
                                 Project.eClass,
                                 Document.eClass,
@@ -55,8 +55,8 @@ def make():
 
 
 def additional_changes():
-    ModelElement._model = EReference(name='_model', eType=Model, containment=False, eOpposite=Model.elements)
-    ModelElement._container = EReference(name='_container', eType=Container, containment=True, eOpposite=Container.elements)
+    Element._model = EReference(name='_model', eType=Model, containment=False, eOpposite=Model._elements)
+    Element._container = EReference(name='_container', eType=Container, containment=True, eOpposite=Container._elements)
 
 
 def dummy_table():
@@ -114,7 +114,7 @@ def recreate_dummy_data_manipulation():
     return data_manipulation
 
 
-def recreate_super_simple_dummy_data_manipulation(write_to_file=False):
+def recreate_super_simple_dummy_data_manipulation(metamodel, write_to_file=False):
     project = Project(1, "MyProject", False, "MyProject")
 
     model = Model(root_element=project)
@@ -158,8 +158,9 @@ def recreate_super_simple_dummy_data_manipulation(write_to_file=False):
     data_manipulation.update_model(new_model)
     tracer = Tracer()
 
-    # if write_to_file:
-    #     data_manipulation.save_to_json()
+    if write_to_file:
+        #data_manipulation.save_to_json()
+        data_manipulation.save_to_xmi(metamodel)
 
     return data_manipulation, tracer
 
@@ -212,8 +213,11 @@ def recreate_question_registry(write_to_file=False):
 
 
 if __name__ == "__main__":
-    make()
+    metamodel = make()
     #additional_changes()
-    dm, tracer = recreate_super_simple_dummy_data_manipulation(True)
+    dm, tracer = recreate_super_simple_dummy_data_manipulation(metamodel, True)
     handler = recreate_dummy_diff_generator_handler(dm, tracer, True)
     question_registry = recreate_question_registry(True)
+
+    dm.load_from_xmi(metamodel)
+    print(dm)

@@ -1,5 +1,5 @@
 from exceptions import ElementNotFoundError
-from metamodel.named_model_element import NamedModelElement
+from metamodel.named_element import NamedElement
 from utilities.utilities import get_class_from_parent_module
 import json
 from json import JSONEncoder
@@ -7,9 +7,9 @@ from json import JSONEncoder
 from pyecore.ecore import MetaEClass, EReference, EOrderedSet, EMetaclass
 
 
-class Container(NamedModelElement, metaclass=MetaEClass):
+class Container(NamedElement, metaclass=MetaEClass):
 
-    _elements = EReference('_elements', NamedModelElement, ordered=True, unique=True, changeable=True, containment=True,
+    _elements = EReference('_elements', NamedElement, ordered=True, unique=True, changeable=True, containment=True,
                            upper=-1)
 
     def __init__(self, _id=-1, name="", deleted=False, label=None, model=None, **kwargs):
