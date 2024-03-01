@@ -1,10 +1,19 @@
-from metamodel.element import Element
+from metamodel.model_element import ModelElement
 from view.tree_view_mixin import TreeViewMixin
 
+from pyecore.ecore import MetaEClass, EAttribute, EString
 
-class NamedElement(Element, TreeViewMixin):
 
-    def __init__(self, _id=-1, name="", deleted=False, label=None, model=None):
+#class NamedElement(Element, TreeViewMixin, metaclass=MetaEClass):
+class NamedModelElement(ModelElement, metaclass=MetaEClass):
+
+    _name = EAttribute(eType=EString, derived=False, changeable=True)
+    _label = EAttribute(eType=EString, derived=False, changeable=True)
+
+    def __init__(self, _id=-1, name="", deleted=False, label=None, model=None, **kwargs):
+        if kwargs:
+            raise AttributeError('unexpected arguments: {}'.format(kwargs))
+
         super().__init__(_id, deleted, model)
         self._name = name
         self._label = label
@@ -32,7 +41,7 @@ class NamedElement(Element, TreeViewMixin):
         return id(self)
 
     def __eq__(self, other):
-        if not super(NamedElement, self).__eq__(other):
+        if not super(NamedModelElement, self).__eq__(other):
             return False
 
         if self._name != other.name:

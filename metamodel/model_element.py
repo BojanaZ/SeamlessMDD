@@ -1,10 +1,20 @@
 import json
 from json import JSONEncoder
+from pyecore.ecore import *
 
 
-class Element(object):
+class ModelElement(EObject, metaclass=MetaEClass):
 
-    def __init__(self, _id=-1, deleted=False, model=None, container=None):
+    _id = EAttribute(eType=EInt, derived=False, changeable=True)
+    _deleted = EAttribute(eType=EBoolean, derived=False, changeable=True)
+
+    def __init__(self, _id=-1, deleted=False, model=None, container=None, **kwargs):
+
+        if kwargs:
+            raise AttributeError('unexpected arguments: {}'.format(kwargs))
+
+        super().__init__()
+
         self._id = _id
         self._container = container
 
@@ -100,7 +110,7 @@ class Element(object):
 class ElementJSONEncoder(JSONEncoder):
     def default(self, object_):
 
-        if isinstance(object_, Element):
+        if isinstance(object_, ModelElement):
 
             object_dict = {key: value for (key, value) in object_.__dict__.items() if key not in ['_model',
                                                                                                   '_container']}

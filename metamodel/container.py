@@ -1,14 +1,19 @@
-from metamodel.named_element import NamedElement
+from exceptions import ElementNotFoundError
+from metamodel.named_model_element import NamedModelElement
 from utilities.utilities import get_class_from_parent_module
 import json
 from json import JSONEncoder
 
+from pyecore.ecore import MetaEClass, EReference, EOrderedSet, EMetaclass
 
-class Container(NamedElement):
 
-    def __init__(self, _id=-1, name="", deleted=False, label=None, model=None):
+class Container(NamedModelElement, metaclass=MetaEClass):
+
+    _elements = EReference('_elements', NamedModelElement, ordered=True, unique=True, changeable=True, containment=True,
+                           upper=-1)
+
+    def __init__(self, _id=-1, name="", deleted=False, label=None, model=None, **kwargs):
         super().__init__(_id, name, deleted, label, model)
-        self._elements = {}
 
     @property
     def elements(self):
@@ -16,25 +21,38 @@ class Container(NamedElement):
 
     @elements.setter
     def elements(self, elements):
-        self._elements = {}
+        self._elements = EOrderedSet()
         for _id, element in elements.items():
-            self._elements[_id] = element
+            self._elements.append(element)
 
     def get_element(self, id_):
         return self._elements[id_]
 
     def add(self, element):
         if element.id not in self._elements:
-            self._elements[element.id] = element
+            self._elements.append(element)
 
         element.container = self
 
-        if self._model and element.id not in self.model:
-            self.model[element.id] = element
+        if self._model and element not in self.model:
+            self.model.add_element(element)
 
     def __iter__(self):
-        for element in self._elements.values():
+        for element in self._elements:
             yield element
+
+    def find_element_by_index(self, element_id):
+        for index in range(len(self._elements)):
+            if self._elements[index].id == element_id:
+                return index
+        return -1
+
+    def get(self, element_id):
+        index = self.find_element_by_index(element_id)
+        if index != -1:
+            return self._elements[index]
+        else:
+            raise ElementNotFoundError("Element with id " + str(element_id) + " is not part of the current model.")
 
     def to_json(self):
         return json.dumps(self, cls=ContainerJSONEncoder)
@@ -58,7 +76,7 @@ class Container(NamedElement):
 
     def get_all_subelements(self):
         element_list = []
-        for element in self._elements.values():
+        for element in self._elements:
             element_list.append(element)
             if isinstance(element, Container):
                 element_list.extend(element.get_all_subelements())
@@ -75,11 +93,11 @@ class Container(NamedElement):
         if len(self._elements) != len(other.elements):
             return False
 
-        for element_id, element in self._elements.items():
-            if element_id not in other.elements:
+        for element in self._elements:
+            if element.id not in other.elements:
                 return False
 
-            other_element = other.elements[element_id]
+            other_element = other.elements.get(element.id)
             if element != other_element:
                 return False
 
@@ -93,7 +111,7 @@ class Container(NamedElement):
 
     def convert_to_tree_view_dict(self):
         parent_dict = super().convert_to_tree_view_dict()
-        parent_dict["children"] = [child_dict.convert_to_tree_view_dict() for child_dict in self._elements.values()]
+        parent_dict["children"] = [child_dict.convert_to_tree_view_dict() for child_dict in self._elements]
         return parent_dict
 
 
@@ -105,7 +123,7 @@ class ContainerJSONEncoder(JSONEncoder):
 
             object_dict = {key: value for (key, value) in object_.__dict__.items() if key not in ['_model', '_elements',
                                                                                                   '_container']}
-            elements = {key: value.to_dict() for (key, value) in object_.elements.items()}
+            elements = {element.id: element.to_dict() for element in object_.elements}
 
             object_dict['_elements'] = elements
             object_dict["class"] = type(object_).__name__

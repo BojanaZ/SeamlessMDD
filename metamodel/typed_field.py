@@ -1,8 +1,10 @@
 from metamodel.typed_mixin import TypedMixin
 from metamodel.field import Field
+from pyecore.ecore import *
 
 
-class TypedField(Field, TypedMixin):
+#class TypedField(Field, metaclass=MetaEClass, TypedMixin):
+class TypedField(Field, metaclass=MetaEClass):
     def __init__(self, _id=-1, name="", type_="", deleted=False, label=None, model=None):
         super().__init__(_id, name, deleted, label, model)
         if type_ == "":

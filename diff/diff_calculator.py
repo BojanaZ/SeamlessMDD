@@ -1,7 +1,7 @@
 from utilities.dictionary_utility import DictionaryUtility
 from diff.diff import Diff
 from diff.operation_type import OperationType
-from metamodel.element import Element
+from metamodel.element import ModelElement
 from metamodel.model import Model
 
 
@@ -86,7 +86,7 @@ def compare_items(old_item, new_item, object_ref, property_name):
     elif old_item is not None and new_item is None:
         diffs.append(Diff(property_name, old_item, None, object_ref, OperationType.REMOVE_PROPERTY))
 
-    elif issubclass(type(old_item), Element):
+    elif issubclass(type(old_item), ModelElement):
         diffs.extend(get_full_model_diff(old_item, new_item))
 
     elif hasattr(old_item, '__iter__'):

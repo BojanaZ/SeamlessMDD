@@ -138,12 +138,12 @@ class DataManipulation(object):
 
     def save_to_json(self, path=None):
         if not path:
-            path = join(get_project_root(),"files", "model.json")
+            path = join(get_project_root(), "files", "model.json")
 
         try:
             with open(path, "w") as file:
                 content = self.to_dict()
-                json.dump(content, file, default=lambda o:o.to_dict(), indent=4)
+                json.dump(content, file, default=lambda o: o.to_dict(), indent=4)
         except OSError:
             print("Unable to load model.")
 

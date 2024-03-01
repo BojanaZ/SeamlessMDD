@@ -6,14 +6,27 @@ from metamodel.project import Project
 import json
 from json import JSONEncoder
 
+from pyecore.ecore import *
+from metamodel.model_element import ModelElement
+from metamodel.named_model_element import NamedModelElement
 
-class Model(object):
 
-    def __init__(self, root_element=None, version=None):
+class Model(EObject, metaclass=MetaEClass):
+    _version = EAttribute(eType=EInt)
+    _root = EReference(name='_root', eType=ModelElement, containment=False)
+    _elements = EReference(name='_elements', eType=NamedModelElement, ordered=True, unique=True, changeable=True,
+                           containment=True, upper=-1)
+
+    def __init__(self, root_element=None, version=None, **kwargs):
+        if kwargs:
+            raise AttributeError('unexpected arguments: {}'.format(kwargs))
+
+        super().__init__(**kwargs)
+
+        #if version is not None:
         self._version = version
-        # access to model elements
-        self._elements = {}
-        self._root_element = root_element
+        if root_element is not None:
+            self._root = root_element
 
     @property
     def version(self):
@@ -25,13 +38,13 @@ class Model(object):
 
     @property
     def root(self):
-        return self._root_element
+        return self._root
 
     @root.setter
     def root(self, root):
-        self._root_element = root
-        if root.id not in self._elements:
-            self._elements[root.id] = root
+        self._root = root
+        if root not in self._elements:
+            self._elements.append(root)
 
     @property
     def elements(self):
@@ -39,36 +52,45 @@ class Model(object):
 
     @elements.setter
     def elements(self, elements):
-        self._elements = elements
+        self._elements = EOrderedSet()
+        for _id, element in elements.items():
+            self._elements.append(element)
 
     def add_element(self, element):
-        self._elements[element.id] = element
+        if element in self:
+            self._elements.append(element)
+            element.model = self
+
+    def find_element_by_index(self, element_id):
+        for index in range(len(self._elements)):
+            if self._elements[index].id == element_id:
+                return index
+        return -1
 
     def get_element(self, element_id):
-        try:
-            return self._elements[element_id]
-        except KeyError:
+        index = self.find_element_by_index(element_id)
+        if index != -1:
+            return self._elements[index]
+        else:
             raise ElementNotFoundError("Element with id " + str(element_id) + " is not part of the current model.")
-
-    def check_element(self, element_id):
-        return element_id in self._elements
 
     def remove_element(self, element):
         if element.container:
-            del element.container.elements[element.id]
-        del self._elements[element.id]
+            element.container.elements.remove(element)
+        self._elements.remove(element)
 
     def __contains__(self, item):
-        return self.check_element(item)
+        return self.find_element_by_index(item.id) != -1
 
     def __getitem__(self, item):
         return self.get_element(item)
 
     def __setitem__(self, key, value):
-        self._elements[key] = value
+        index = self.find_element_by_index(key)
+        self._elements[index] = value
 
     def __iter__(self):
-        for element in self._elements.values():
+        for element in self._elements:
             yield element
 
             if iterable(element):
@@ -135,11 +157,11 @@ class Model(object):
         if len(self._elements) != len(other.elements):
             return False
 
-        for element_id, element in self._elements.items():
-            if element_id not in other.elements:
+        for element in self._elements:
+            if element.id not in other.elements:
                 return False
 
-            other_element = other.elements[element_id]
+            other_element = other.elements.find_element(element.id)
             if element != other_element:
                 return False
 
@@ -158,7 +180,7 @@ class Model(object):
                       "state": {"opened": True},
                       "version": self._version,
                       "children": [child_element.convert_to_tree_view_dict() for child_element
-                                   in self._elements.values()
+                                   in self._elements
                                    if isinstance(child_element, Project)]}
         return model_dict
 
@@ -172,8 +194,8 @@ class ModelJSONEncoder(JSONEncoder):
             object_dict = {key: value for (key, value) in object_.__dict__.items() if key not in ['_elements', '_root_element']}
             elements = {}
 
-            for key, value in object_.elements.items():
-                elements[key] = value.to_dict()
+            for element in object_.elements:
+                elements[element.id] = element.to_dict()
 
             object_dict['_elements'] = elements
             object_dict['_root_element'] = object_.root.to_dict()

@@ -1,8 +1,16 @@
+from functools import partial
+import pyecore.ecore as Ecore
+from pyecore.ecore import *
+
 from metamodel.element_generator_table import ElementGeneratorTable
 from metamodel.model import Model
 from metamodel.project import Project
 from metamodel.document import Document
 from metamodel.typed_field import TypedField
+from metamodel.field import Field
+from metamodel.named_model_element import NamedModelElement
+from metamodel.model_element import ModelElement
+from metamodel.container import Container
 from transformation.data_manipulation import DataManipulation
 from transformation.generator_handler import GeneratorHandler
 from transformation.generators.diff_generators.document_diff_generator import DocumentDiffGenerator
@@ -14,6 +22,41 @@ from transformation.generators.jinja_generators.documents_output_generator impor
 from os.path import join
 from utilities.utilities import get_project_root
 from tests.dummy_structures import dummy_data
+
+name = 'document'
+nsURI = 'http://www.example.org/document'
+nsPrefix = 'document'
+
+eClass = EPackage(name=name, nsURI=nsURI, nsPrefix=nsPrefix)
+
+eClassifiers = {}
+getEClassifier = partial(Ecore.getEClassifier, searchspace=eClassifiers)
+
+
+# Mora naknadno
+# Oficijalno objašnjenje, dato u inline komentaru u jednom od primera:
+# As the relation is reflexive, it must be set AFTER the metaclass creation
+def additional_changes():
+    ModelElement.model = EReference('model', Model, eOpposite=Model.elements)
+    ModelElement.container = EReference('container', Container, eOpposite=Container.elements)
+
+
+def make():
+    eClass.eClassifiers.extend([Model.eClass,
+                                ModelElement.eClass,
+                                NamedModelElement.eClass,
+                                Container.eClass,
+                                Project.eClass,
+                                Document.eClass,
+                                Field.eClass,
+                                TypedField.eClass])
+
+    return eClass
+
+
+def additional_changes():
+    ModelElement._model = EReference(name='_model', eType=Model, containment=False, eOpposite=Model.elements)
+    ModelElement._container = EReference(name='_container', eType=Container, containment=True, eOpposite=Container.elements)
 
 
 def dummy_table():
@@ -72,17 +115,23 @@ def recreate_dummy_data_manipulation():
 
 
 def recreate_super_simple_dummy_data_manipulation(write_to_file=False):
-    model = Model()
+    project = Project(1, "MyProject", False, "MyProject")
 
-    project = Project(1, "MyProject", False, "MyProject", model)
-    model.root = project
+    model = Model(root_element=project)
+
+    project.model = model
+
     document1 = Document(11, "Document1", False, "Document1", model)
+
     field1 = TypedField(111, "Field1", "string", False, None, model)
     field2 = TypedField(112, "Field2", "string", False, None, model)
+
     document1.add(field1)
     document1.add(field2)
+
     project.add(document1)
 
+    #model.root = project
     # document2 = Document(12, "Document2", False, None, model)
     # field3 = TypedField(113, "Field3", "string", False, None, model)
     # document2.add(field3)
@@ -109,8 +158,8 @@ def recreate_super_simple_dummy_data_manipulation(write_to_file=False):
     data_manipulation.update_model(new_model)
     tracer = Tracer()
 
-    if write_to_file:
-        data_manipulation.save_to_json()
+    # if write_to_file:
+    #     data_manipulation.save_to_json()
 
     return data_manipulation, tracer
 
@@ -127,8 +176,8 @@ def recreate_dummy_diff_generator_handler(data_manipulation=None, tracer_=None, 
     handler_.register(generator)
 
     elements = data_manipulation.get_latest_model().elements
-    for element_id, element in elements.items():
-        handler_.element_generator_table.load_pair(element_id, generator.id,
+    for element in elements:
+        handler_.element_generator_table.load_pair(element.id, generator.id,
                                                    {"value": True, "last_generated_version": 0})
     handler_.question_registry = QuestionRegistry()
     if write_to_file:
@@ -163,6 +212,8 @@ def recreate_question_registry(write_to_file=False):
 
 
 if __name__ == "__main__":
+    make()
+    #additional_changes()
     dm, tracer = recreate_super_simple_dummy_data_manipulation(True)
     handler = recreate_dummy_diff_generator_handler(dm, tracer, True)
     question_registry = recreate_question_registry(True)

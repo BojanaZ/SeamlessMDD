@@ -21,7 +21,7 @@ pluggy==0.13.1
 py==1.10.0
 pycodestyle==2.6.0
 pycparser==2.19
-pyecore==0.11.6
+pyecore==0.14.0
 pyecoregen==0.4.3
 pymultigen==0.2.0
 pyOpenSSL==19.0.0
