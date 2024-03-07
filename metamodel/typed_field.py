@@ -3,14 +3,15 @@ from metamodel.field import Field
 from pyecore.ecore import *
 
 
-#class TypedField(Field, metaclass=MetaEClass, TypedMixin):
-class TypedField(Field, metaclass=MetaEClass):
-    def __init__(self, _id=-1, name="", type_="", deleted=False, label=None, model=None):
-        super().__init__(_id, name, deleted, label, model)
+class TypedField(Field, TypedMixin, metaclass=MetaEClass):
+    def __init__(self, _id=-1, name="", type_="", deleted=False, label=None, model=None, container=None):
+        super().__init__(_id, name, deleted, label, model, container)
         if type_ == "":
             self._type = "string"
         else:
             self._type = type_
+
+        self.attributes_for_dict.extend(['_type'])
 
     @property
     def type(self):

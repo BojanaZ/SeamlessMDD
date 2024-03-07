@@ -9,11 +9,11 @@ from pyecore.ecore import MetaEClass, EReference, EOrderedSet, EMetaclass
 
 class Container(NamedElement, metaclass=MetaEClass):
 
-    _elements = EReference('_elements', NamedElement, ordered=True, unique=True, changeable=True, containment=True,
+    _elements = EReference('_elements', NamedElement, ordered=True, unique=True, containment=True, changeable=True,
                            upper=-1)
 
-    def __init__(self, _id=-1, name="", deleted=False, label=None, model=None, **kwargs):
-        super().__init__(_id, name, deleted, label, model)
+    def __init__(self, _id=-1, name="", deleted=False, label=None, model=None, container=None, **kwargs):
+        super().__init__(_id, name, deleted, label, model, container)
 
     @property
     def elements(self):
@@ -29,13 +29,13 @@ class Container(NamedElement, metaclass=MetaEClass):
         return self._elements[id_]
 
     def add(self, element):
-        if element.id not in self._elements:
+        if element not in self:
             self._elements.append(element)
 
-        element.container = self
+        element.parent_container = self
 
-        if self._model and element not in self.model:
-            self.model.add_element(element)
+    def __contains__(self, element):
+        return self.find_element_by_index(element.id) != -1
 
     def __iter__(self):
         for element in self._elements:
@@ -121,8 +121,10 @@ class ContainerJSONEncoder(JSONEncoder):
 
         if isinstance(object_, Container):
 
-            object_dict = {key: value for (key, value) in object_.__dict__.items() if key not in ['_model', '_elements',
-                                                                                                  '_container']}
+            object_dict = {}
+            for attr in object_.attributes_for_dict:
+                object_dict[attr] = getattr(object_, attr)
+
             elements = {element.id: element.to_dict() for element in object_.elements}
 
             object_dict['_elements'] = elements

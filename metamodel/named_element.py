@@ -9,13 +9,15 @@ class NamedElement(Element, TreeViewMixin, metaclass=MetaEClass):
     _name = EAttribute(eType=EString, derived=False, changeable=True)
     _label = EAttribute(eType=EString, derived=False, changeable=True)
 
-    def __init__(self, _id=-1, name="", deleted=False, label=None, model=None, **kwargs):
+    def __init__(self, _id=-1, name="", deleted=False, label=None, model=None, container=None, **kwargs):
         if kwargs:
             raise AttributeError('unexpected arguments: {}'.format(kwargs))
 
-        super().__init__(_id, deleted, model)
+        super().__init__(_id, deleted, model, container)
         self._name = name
         self._label = label
+
+        self.attributes_for_dict.extend(['_name', '_label'])
 
     @property
     def name(self):

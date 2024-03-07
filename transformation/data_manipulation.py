@@ -5,7 +5,7 @@ from pyecore.resources import ResourceSet, URI
 from utilities.utilities import get_project_root
 import dill
 import json
-from metamodel.model import Model
+from metamodel.model import Model, ElementNotFoundError
 
 
 class VersionUnavailableError(Exception):
@@ -80,9 +80,10 @@ class DataManipulation(object):
 
     def get_element_by_id(self, _id, version=None):
         model = self.get_model_by_version(version)
-        if _id in model:
-            return model[_id]
-        return None
+        try:
+            return model.get_element(_id)
+        except ElementNotFoundError:
+            return None
 
     def generate_new_element_id(self):
         while True:
@@ -157,20 +158,29 @@ class DataManipulation(object):
 
         versions_folder_path = os.path.join(path, "versions")
         if not os.path.exists(versions_folder_path):
-            return
+            raise FileNotFoundError("File %s was not found. Loading skipped.".format(versions_folder_path))
+
+        new_versions = {}
 
         for file_name in os.listdir(versions_folder_path):
             file_path = os.path.join(versions_folder_path, file_name)
             if os.path.isfile(file_path):
                 import re
-                version = int(re.findall(r'\d+',file_name)[0])
+                version = int(re.findall(r'\d+', file_name)[0])
 
                 rset = ResourceSet()
                 rset.metamodel_registry[metamodel.nsURI] = metamodel
                 resource = rset.get_resource(URI(file_path))
                 model = resource.contents[0]
-                if version not in self._versions:
-                    self._versions[version] = model
+
+                if version not in new_versions:
+                    new_versions[version] = model
+                model.version = version
+
+        self._versions = new_versions
+
+        if len(self._versions) > 0:
+            self._latest_version_number = max(self._versions.keys())
 
     def save_to_xmi(self, metamodel, path=None):
         from pyecore.resources.xmi import XMIOptions
@@ -274,9 +284,3 @@ class DataManipulationJSONEncoder(json.JSONEncoder):
             # raising exceptions for unsupported types
 
             return json.JSONEncoder.default(self, object_)
-
-
-
-
-
-

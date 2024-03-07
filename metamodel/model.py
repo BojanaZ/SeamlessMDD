@@ -1,5 +1,5 @@
 from utilities.exceptions import ElementNotFoundError
-from utilities.utilities import iterable, get_class_from_parent_module
+from utilities.utilities import get_class_from_parent_module
 
 from metamodel.project import Project
 
@@ -8,14 +8,11 @@ from json import JSONEncoder
 
 from pyecore.ecore import *
 from metamodel.element import Element
-from metamodel.named_element import NamedElement
 
 
 class Model(EObject, metaclass=MetaEClass):
     _version = EAttribute(eType=EInt)
-    _root = EReference(name='_root', eType=Element, containment=False)
-    _elements = EReference(name='_elements', eType=NamedElement, ordered=True, unique=True, changeable=True,
-                           containment=True, upper=-1)
+    _root = EReference(name='_root', eType=Element, containment=True)
 
     def __init__(self, root_element=None, version=None, **kwargs):
         if kwargs:
@@ -23,7 +20,6 @@ class Model(EObject, metaclass=MetaEClass):
 
         super().__init__(**kwargs)
 
-        #if version is not None:
         self._version = version
         if root_element is not None:
             self._root = root_element
@@ -43,59 +39,64 @@ class Model(EObject, metaclass=MetaEClass):
     @root.setter
     def root(self, root):
         self._root = root
-        if root not in self._elements:
-            self._elements.append(root)
+
+    def iter_recursively(self, node=None):
+        if node is None:
+            node = self._root
+        list = [node]
+        if hasattr(node, '__iter__'):
+            for subnode in node:
+                list.extend(self.iter_recursively(subnode))
+        return list
 
     @property
     def elements(self):
-        return self._elements
+        for element in self:
+            yield element
 
-    @elements.setter
-    def elements(self, elements):
-        self._elements = EOrderedSet()
-        for _id, element in elements.items():
-            self._elements.append(element)
+    # @elements.setter
+    # def elements(self, elements):
+    #     self._elements = EOrderedSet()
+    #     for _id, element in elements.items():
+    #         self._elements.append(element)
+    #
+    # def add_element(self, element):
+    #     if element not in self:
+    #         self._elements.append(element)
+    #         element.model = self
 
-    def add_element(self, element):
-        if element in self:
-            self._elements.append(element)
-            element.model = self
-
-    def find_element_by_index(self, element_id):
-        for index in range(len(self._elements)):
-            if self._elements[index].id == element_id:
-                return index
-        return -1
+    def find_element(self, element_id):
+        for element in self.elements:
+            if element.id == element_id:
+                return element
+        return None
 
     def get_element(self, element_id):
-        index = self.find_element_by_index(element_id)
-        if index != -1:
-            return self._elements[index]
+        element = self.find_element(element_id)
+        if element is not None:
+            return element
         else:
             raise ElementNotFoundError("Element with id " + str(element_id) + " is not part of the current model.")
 
     def remove_element(self, element):
-        if element.container:
-            element.container.elements.remove(element)
-        self._elements.remove(element)
+        if hasattr(element, 'parent_container'):
+            element.parent_container.elements.remove(element)
 
     def __contains__(self, item):
-        return self.find_element_by_index(item.id) != -1
+        return self.find_element(item.id) != -1
 
     def __getitem__(self, item):
         return self.get_element(item)
 
-    def __setitem__(self, key, value):
-        index = self.find_element_by_index(key)
-        self._elements[index] = value
-
     def __iter__(self):
-        for element in self._elements:
+        for element in self.iter_recursively(self._root):
             yield element
 
-            if iterable(element):
-                for subelement in iter(element):
-                 yield subelement
+    def __len__(self):
+        i = 0
+        for _ in self:
+            i += 1
+        return i
 
     def to_json(self):
         return json.dumps(self, cls=ModelJSONEncoder, default=lambda o:o.to_dict(), indent=4)
@@ -122,8 +123,6 @@ class Model(EObject, metaclass=MetaEClass):
         for subelement in root_element_object.get_all_subelements():
             elements[subelement.id] = subelement
 
-        new_object.elements = elements
-
         for element in elements.values():
             element.model = new_object
 
@@ -147,17 +146,17 @@ class Model(EObject, metaclass=MetaEClass):
         if type(self) != type(other):
             return False
 
-        if self._root_element is not None and other.root is not None:
-            if self._root_element.id != other.root.id:
+        if self._root is not None and other.root is not None:
+            if self._root.id != other.root.id:
                 return False
         else:
-            if self._root_element != other.root:
+            if self._root != other.root:
                 return False
 
-        if len(self._elements) != len(other.elements):
+        if len(self) != len(other.elements):
             return False
 
-        for element in self._elements:
+        for element in self:
             if element.id not in other.elements:
                 return False
 
@@ -171,7 +170,7 @@ class Model(EObject, metaclass=MetaEClass):
         return not self == other
 
     def __str__(self):
-        return "Model[{} {}]".format(self._version, self._root_element)
+        return "Model[{} {}]".format(self._version, self._root)
 
     def convert_to_tree_view_dict(self):
         model_dict = {"text": "Model",
@@ -180,7 +179,7 @@ class Model(EObject, metaclass=MetaEClass):
                       "state": {"opened": True},
                       "version": self._version,
                       "children": [child_element.convert_to_tree_view_dict() for child_element
-                                   in self._elements
+                                   in self
                                    if isinstance(child_element, Project)]}
         return model_dict
 
@@ -191,7 +190,8 @@ class ModelJSONEncoder(JSONEncoder):
 
         if isinstance(object_, Model):
 
-            object_dict = {key: value for (key, value) in object_.__dict__.items() if key not in ['_elements', '_root_element']}
+            object_dict = {key: value for (key, value) in object_.__dict__.items() if key not in ['_elements',
+                                                                                                  '_root_element']}
             elements = {}
 
             for element in object_.elements:

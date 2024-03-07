@@ -16,14 +16,12 @@ class Element(EObject, metaclass=MetaEClass):
         super().__init__()
 
         self._id = _id
-        self._container = container
-
+        self.parent_container = container
         self._model = model
 
-        if model:
-            model.add_element(self)
-
         self._deleted = deleted
+
+        self.attributes_for_dict = ['_deleted', '_id']
 
     @property
     def id(self):
@@ -34,12 +32,12 @@ class Element(EObject, metaclass=MetaEClass):
         self._id = id_
 
     @property
-    def container(self):
-        return self._container
+    def parent_container(self):
+        return self._parent_container
 
-    @container.setter
-    def container(self, container):
-        self._container = container
+    @parent_container.setter
+    def parent_container(self, container):
+        self._parent_container = container
 
     @property
     def model(self):
@@ -47,10 +45,7 @@ class Element(EObject, metaclass=MetaEClass):
 
     @model.setter
     def model(self, model):
-        if self._model:
-            self._model.remove_element(self)
         self._model = model
-        model.add_element(self)
 
     @property
     def deleted(self):
@@ -82,11 +77,11 @@ class Element(EObject, metaclass=MetaEClass):
         if self._deleted != other.deleted:
             return False
 
-        if self._container is not None and other.container is not None:
-            if self._container.id != other.container.id:
+        if self._parent_container is not None and other.parent_container is not None:
+            if self._parent_container.id != other.parent_container.id:
                 return False
         else:
-            if self._container != other.container:
+            if self._parent_container != other.parent_container:
                 return False
 
         return True
@@ -112,8 +107,10 @@ class ElementJSONEncoder(JSONEncoder):
 
         if isinstance(object_, Element):
 
-            object_dict = {key: value for (key, value) in object_.__dict__.items() if key not in ['_model',
-                                                                                                  '_container']}
+            object_dict = {}
+            for attr in object_.attributes_for_dict:
+                object_dict[attr] = getattr(object_, attr)
+
             object_dict["class"] = type(object_).__name__
             return object_dict
 

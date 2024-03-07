@@ -33,15 +33,9 @@ eClassifiers = {}
 getEClassifier = partial(Ecore.getEClassifier, searchspace=eClassifiers)
 
 
-# Mora naknadno
-# Oficijalno objašnjenje, dato u inline komentaru u jednom od primera:
-# As the relation is reflexive, it must be set AFTER the metaclass creation
-def additional_changes():
-    Element.model = EReference('model', Model, eOpposite=Model.elements)
-    Element.container = EReference('container', Container, eOpposite=Container.elements)
-
-
 def make():
+    additional_changes()
+
     eClass.eClassifiers.extend([Model.eClass,
                                 Element.eClass,
                                 NamedElement.eClass,
@@ -54,9 +48,18 @@ def make():
     return eClass
 
 
+# Mora naknadno
+# Oficijalno objašnjenje, dato u inline komentaru u jednom od primera:
+# As the relation is reflexive, it must be set AFTER the metaclass creation
 def additional_changes():
-    Element._model = EReference(name='_model', eType=Model, containment=False, eOpposite=Model._elements)
-    Element._container = EReference(name='_container', eType=Container, containment=True, eOpposite=Container._elements)
+    Element.eClass.eStructuralFeatures.append(EReference(name='_model', eType=Model, containment=False))
+    Element._model = EReference(name='_model', eType=Model, containment=False)
+    Element.eClass.eStructuralFeatures.append(EReference(name='_parent_container',
+                                                         eType=Container,
+                                                         eOpposite=Container._elements, containment=False))
+    Element._parent_container = EReference(name='_parent_container',
+                                                         eType=Container,
+                                                         eOpposite=Container._elements, containment=False)
 
 
 def dummy_table():
@@ -121,15 +124,19 @@ def recreate_super_simple_dummy_data_manipulation(metamodel, write_to_file=False
 
     project.model = model
 
-    document1 = Document(11, "Document1", False, "Document1", model)
+    document1 = Document(11, "Document1", False, "Document1", model, project)
 
-    field1 = TypedField(111, "Field1", "string", False, None, model)
-    field2 = TypedField(112, "Field2", "string", False, None, model)
+    field1 = TypedField(_id=111, name="Field1", type_="string", deleted=False, label=None, model=model,
+                        container=document1)
+    field2 = TypedField(112, "Field2", "string", False, None, model, container=document1)
 
-    document1.add(field1)
-    document1.add(field2)
+    # document1.add(field1)
+    # document1.add(field2)
+    #
+    # project.add(document1)
 
-    project.add(document1)
+    # for element in model:
+    #     element.model = model
 
     #model.root = project
     # document2 = Document(12, "Document2", False, None, model)
@@ -143,9 +150,9 @@ def recreate_super_simple_dummy_data_manipulation(metamodel, write_to_file=False
     new_model = Model()
     project = Project(1, "MyProject", False, "MyProject", new_model)
     new_model.root = project
-    document1 = Document(11, "Document1", False, "Document1", new_model)
+    document1 = Document(11, "Document1", False, "Document1", new_model, project)
     project.add(document1)
-    field1 = TypedField(111, "Field1", "string", False, "Field1", new_model)
+    field1 = TypedField(111, "Field1", "string", False, "Field1", new_model, document1)
     #field2 = TypedField(112, "Field2", "boolean", False, "Field2", new_model)
     document1.add(field1)
     #document1.add(field2)
@@ -154,6 +161,9 @@ def recreate_super_simple_dummy_data_manipulation(metamodel, write_to_file=False
     #project.add(document2)
     #field3 = TypedField(113, "Field3", "string", False, None, new_model)
     #document2.add(field3)
+
+    for element in new_model:
+        element.model = new_model
 
     data_manipulation.update_model(new_model)
     tracer = Tracer()
@@ -214,10 +224,10 @@ def recreate_question_registry(write_to_file=False):
 
 if __name__ == "__main__":
     metamodel = make()
-    #additional_changes()
     dm, tracer = recreate_super_simple_dummy_data_manipulation(metamodel, True)
     handler = recreate_dummy_diff_generator_handler(dm, tracer, True)
     question_registry = recreate_question_registry(True)
 
     dm.load_from_xmi(metamodel)
-    print(dm)
+    for item in dm.versions[0]:
+        print(item)
