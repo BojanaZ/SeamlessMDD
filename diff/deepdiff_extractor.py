@@ -97,6 +97,7 @@ def diffs_from_deepdiff(old_element, new_element, **kwargs):
         return {"": [Diff(None, None, new_element, None, None, old_element, new_element, operation_type, "",
                           new_element.id)]}
 
+    operation_type = OperationType.CHANGE
     old_element_dict = old_element.to_dict()
 
     if new_element is None:
@@ -155,9 +156,9 @@ def diffs_from_deepdiff(old_element, new_element, **kwargs):
                 key = value['_id']
 
                 if 'added' in change:
-                    new_value = new_element.elements[value['_id']]
+                    new_value = new_element.get(key)
                 elif 'removed' in change:
-                    old_value = old_element.elements[value['_id']]
+                    old_value = old_element.get(key)
             else:
                 old_value = value['old_value']
                 new_value = value['new_value']

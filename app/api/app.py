@@ -13,6 +13,8 @@ from view.tree_view import prepare_model_for_tree_view
 from exceptions import ElementNotFoundError
 from utilities.utilities import class_object_to_underscore_format, class_name_to_underscore_format
 
+from recreate_dummy_structures import make
+
 
 def create_app(data_manipulation=None, handler=None, tracer=None ):
     app = Flask(__name__, template_folder='templates')
@@ -329,8 +331,9 @@ def remove_temp_files():
 
 def main():
     remove_temp_files()
+    metamodel = make()
     data_manipulation = DataManipulation()
-    data_manipulation = data_manipulation.load_from_json()
+    data_manipulation.load_from_xmi(metamodel=metamodel)
     handler = GeneratorHandler().load_from_json()
     tracer = Tracer().load_from_json()
     app = create_app(data_manipulation, handler, tracer)

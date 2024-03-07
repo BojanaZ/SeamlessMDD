@@ -37,7 +37,7 @@ class DiffDemoManualTracingTask(BaseDiffTask, IManualTracing):
 
     def filtered_elements(self, model):
         """Return iterator over elements in model that are passed to the above template."""
-        documents = (document for document in model.elements.values() if type(document) == Document)
+        documents = (document for document in model.elements if type(document) == Document)
         for document in documents:
             yield document
 
@@ -294,13 +294,13 @@ class DiffDemoManualTracingTask(BaseDiffTask, IManualTracing):
         if type(element) is Document:
             return "//body/div[@_id=\"" + str(element.id) + "\"]"
         if issubclass(type(element), Field):
-            return "//body/div[@_id=\"" + str(element.container.id) + "\"]/ul/li[@_id=\"" + str(element.id) + "\"]"
+            return "//body/div[@_id=\"" + str(element.parent_container.id) + "\"]/ul/li[@_id=\"" + str(element.id) + "\"]"
 
     def get_insertion_trace(self, element):
         if type(element) is Document:
             return "//body"
         if issubclass(type(element), Field):
-            return "//body/div[@_id=\"" + str(element.container.id) + "\"]/ul"
+            return "//body/div[@_id=\"" + str(element.parent_container.id) + "\"]/ul"
 
     def get_property_traces(self, element):
         properties = {}
@@ -309,16 +309,16 @@ class DiffDemoManualTracingTask(BaseDiffTask, IManualTracing):
             properties["name"] = ["//body/div[@_id=\"" + str(element.id) + "\"]/p[text()=\"My document name: " +
                                   str(element.name) + "\"]"]
             properties["project.id"] = ["//body/div[@_id=\"" + str(element.id) +
-                                        "\"]/p[text()=\"Parent project id:  " + str(element.container.id) + "\"]"]
+                                        "\"]/p[text()=\"Parent project id:  " + str(element.parent_container.id) + "\"]"]
             properties["project.name"] = ["//body/div[@_id=\"" + str(element.id) +
-                                          "\"]/p[text()=\"Parent project name:  " + str(element.container.name) + "\"]"]
+                                          "\"]/p[text()=\"Parent project name:  " + str(element.parent_container.name) + "\"]"]
 
         if issubclass(type(element), Field):
-            properties["id"] = ["//body/div[@_id=\"" + str(element.container.id) + "\"]/ul/li[@_id]"]
-            properties["name"] = ["//body/div[@_id=\"" + str(element.container.id) + "\"]/ul/li[@_id=\"" +
+            properties["id"] = ["//body/div[@_id=\"" + str(element.parent_container.id) + "\"]/ul/li[@_id]"]
+            properties["name"] = ["//body/div[@_id=\"" + str(element.parent_container.id) + "\"]/ul/li[@_id=\"" +
                                   str(element.id) + "\"][text()=\"Field (" + str(element.name) + ")\"]",
 
-                                  "//body/div[@_id=\"" + str(element.container.id) + "\"]/ul/li[@_id=\"" +
+                                  "//body/div[@_id=\"" + str(element.parent_container.id) + "\"]/ul/li[@_id=\"" +
                                   str(element.id) + "\"]"]
 
         return properties
