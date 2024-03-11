@@ -20,7 +20,7 @@ class DocumentDiffGenerator(BaseDiffGenerator):
 
     def initialize(self):
         self.tasks = []
-        task = DiffDemoManualTracingTask(generator=self, template_name_=self._file_template_path)
+        task = DiffDemoManualTracingTask(generator=self, template_name=self._file_template_path)
         self.tasks.append(task)
 
         # # pass Jinja environment to tasks:

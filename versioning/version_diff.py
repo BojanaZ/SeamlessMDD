@@ -1,4 +1,3 @@
-import gettext
 from utilities.dictionary_utility import DictionaryUtility
 
 
@@ -38,10 +37,3 @@ class VersionDiff(object):
             raise TypeError
 
         return DictionaryUtility.get_different_keys(self.previous_element, self.current_element)
-
-
-
-
-
-
-

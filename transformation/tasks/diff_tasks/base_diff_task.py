@@ -1,4 +1,3 @@
-from multigen.jinja import TemplateFileTask
 from transformation.tasks.priority_mixin import PriorityMixin
 from transformation.tasks.base_task_json_encoder import BaseTaskJSONEncoder
 import json

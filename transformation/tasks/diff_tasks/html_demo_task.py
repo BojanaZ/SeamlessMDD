@@ -62,11 +62,9 @@ class DiffDemoTask(BaseDiffTask):
                                    OperationType.SUBELEMENT_REMOVE]:
             leaf = False
 
-        print("###")
         relevant_paths_and_elements = self.insert_traces(diff)
-
         print(relevant_paths_and_elements)
-        print("###")
+
         if diff.operation_type == OperationType.ADD and not os.path.isfile(filepath):
             template_file = open("./templates/" + self._template_name)
             template = template_file.read()
