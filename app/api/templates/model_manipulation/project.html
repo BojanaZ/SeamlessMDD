@@ -17,7 +17,7 @@
 <div class="form-group row">
     <label for="label" class="col-lg-2" style="display: flex;align-items: center;">Label:</label>
     <input {% if disabled %} disabled="disabled" {% endif %}  type="text" id="label" name="label" class="form-control form-control-user col-lg-10"
-           {% if element.label is not none %} value=" {{ element.label }}" {% endif %}>
+           {% if element.label is not none %} value="{{ element.label }}" {% endif %}>
 </div>
 
 {% if not disabled %}

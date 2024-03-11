@@ -440,7 +440,7 @@
 
             }).then(function(html) {
                   document.getElementById('form-editor-container-title').innerHTML = "Add element";
-                  document.getElementById('form-editor').innerHTML = html;
+                  document.getElementById('form-editor').outerHTML = html;
             });
 
         return false;

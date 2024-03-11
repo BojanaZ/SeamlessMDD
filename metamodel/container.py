@@ -33,6 +33,7 @@ class Container(NamedElement, metaclass=MetaEClass):
             self._elements.append(element)
 
         element.parent_container = self
+        element.model = self.model
 
     def __contains__(self, element):
         return self.find_element_by_index(element.id) != -1
