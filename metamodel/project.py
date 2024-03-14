@@ -1,4 +1,4 @@
-from metamodel1.container import Container
+from metamodel.container import Container
 from pyecore.ecore import MetaEClass
 
 

@@ -1,4 +1,4 @@
-from metamodel1.named_element import NamedElement
+from metamodel.named_element import NamedElement
 from pyecore.ecore import MetaEClass
 
 
