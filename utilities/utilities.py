@@ -4,7 +4,6 @@ import os
 
 from pathlib import Path
 from collections.abc import Iterable
-from importlib.util import spec_from_file_location, module_from_spec
 
 
 def iterable(obj):
@@ -71,7 +70,7 @@ def get_file_path_for_format(type_name, formats, project_root):
     paths = {}
     for _format in formats:
         if _format not in paths:
-            paths[_format] = os.path.join(root, "files", type_name + "." + _format)
+            paths[_format] = os.path.join(root, "storage", type_name + "." + _format)
 
     return paths
 

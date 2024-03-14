@@ -113,4 +113,4 @@ venv.bak/
 out/
 AdvancedHTMLParser/
 app/api/templates/temp_diff/
-files/
+projects/**/storage

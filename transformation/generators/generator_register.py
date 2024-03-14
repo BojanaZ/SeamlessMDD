@@ -111,8 +111,7 @@ class GeneratorRegister(dict):
     def to_dict(self):
         return GeneratorsJSONEncoder().default(self)
 
-    @staticmethod
-    def from_json(loaded_content):
+    def from_json(self, loaded_content):
 
         if type(loaded_content) == str:
             loaded_content = json.loads(loaded_content)

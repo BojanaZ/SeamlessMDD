@@ -12,7 +12,7 @@ class Tracer(object):
         if project_path is None:
             project_path = get_project_root()
 
-        self._data_loading_path = os.path.join(project_path, 'files')
+        self._data_loading_path = os.path.join(project_path, 'storage')
 
     @staticmethod
     def new_trace_id(last_no=0):

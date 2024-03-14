@@ -91,7 +91,7 @@ class QuestionRegistry(object):
     @staticmethod
     def load_from_json(path=None):
         if not path:
-            path = os.path.join(get_project_root(), "files", "question_registry.json")
+            path = os.path.join(get_project_root(), "storage", "question_registry.json")
 
         try:
             with open(path, "r") as file:
@@ -103,7 +103,7 @@ class QuestionRegistry(object):
 
     def save_to_json(self, path=None):
         if not path:
-            path = os.path.join(get_project_root(), "files", "question_registry.json")
+            path = os.path.join(get_project_root(), "storage", "question_registry.json")
 
         try:
             with open(path, "w") as file:

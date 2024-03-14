@@ -123,21 +123,21 @@ class DataManipulation(object):
 
     def save_to_dill(self, path=None):
         if path is None:
-            path = os.path.join(self._project_path, "files", "model.dill")
+            path = os.path.join(self._project_path, "storage", "model.dill")
 
         with open(path, "wb") as file:
             dill.dump(self, file)
 
     def load_from_dill(self, path=None):
         if not path:
-            path = os.path.join(self._project_path, "files", "model.dill")
+            path = os.path.join(self._project_path, "storage", "model.dill")
 
         with open(path, "rb") as file:
             return dill.load(file)
 
     def load_from_json(self, path=None):
         if not path:
-            path = os.path.join(self._project_path, "files", "model.json")
+            path = os.path.join(self._project_path, "storage", "model.json")
 
         try:
             with open(path, "r") as file:
@@ -149,7 +149,7 @@ class DataManipulation(object):
 
     def save_to_json(self, path=None):
         if not path:
-            path = os.path.join(self._project_path, "files", "model.json")
+            path = os.path.join(self._project_path, "storage", "model.json")
 
         try:
             with open(path, "w") as file:
@@ -165,7 +165,7 @@ class DataManipulation(object):
         else:
             project_path = self._project_path
 
-        path = os.path.join(project_path, "files")
+        path = os.path.join(project_path, "storage")
 
         if not os.path.exists(path):
             raise FileNotFoundError("File %s was not found. Loading skipped.".format(path))
@@ -203,7 +203,7 @@ class DataManipulation(object):
         else:
             project_path = self._project_path
 
-        path = os.path.join(project_path, "files")
+        path = os.path.join(project_path, "storage")
 
         versions_folder_path = os.path.join(path, "versions")
         if not os.path.exists(versions_folder_path):

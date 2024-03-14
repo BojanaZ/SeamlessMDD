@@ -22,7 +22,7 @@ class GeneratorHandler(object):
         if project_path is None:
             project_path = get_project_root()
 
-        self._data_loading_path = os.path.join(project_path, 'files')
+        self._data_loading_path = os.path.join(project_path, 'storage')
 
     @property
     def data_loading_path(self):
@@ -161,8 +161,8 @@ class GeneratorHandler(object):
         return sorted_tasks
 
     def finalize(self, generator_list, table_update_pairs, data_manipulation, model_version_number,
-                 write_to_files=True):
-        if write_to_files:
+                 write_to_storage=True):
+        if write_to_storage:
             for generator in generator_list:
                 generator.flush()
                 self.update_element_generator_table(table_update_pairs,
@@ -180,7 +180,7 @@ class GeneratorHandler(object):
                 questions = task.run(property_diff, outfolder)
                 yield questions, outfolder, preview
 
-    def generate_all_generators(self, data_manipulation, outfolder=None, write_to_files=True):
+    def generate_all_generators(self, data_manipulation, outfolder=None, write_to_storage=True):
 
         self.initialize()
 
@@ -213,9 +213,9 @@ class GeneratorHandler(object):
                         yield questions, outfolder, preview
 
         self.finalize(generator_list, generator_element_table_update_pairs, data_manipulation,
-                      latest_model_version, write_to_files)
+                      latest_model_version, write_to_storage)
 
-    def generate_single_generator(self, data_manipulation, generator_id, outfolder=None, write_to_files=True):
+    def generate_single_generator(self, data_manipulation, generator_id, outfolder=None, write_to_storage=True):
 
         self.initialize()
         generator = self._generators[generator_id]
@@ -244,10 +244,10 @@ class GeneratorHandler(object):
                             yield questions, outfolder, preview
 
             self.finalize([generator], generator_element_table_update_pairs,
-                          data_manipulation, latest_model_version, write_to_files)
+                          data_manipulation, latest_model_version, write_to_storage)
             data_manipulation.update_model()
 
-    def generate_single_element(self, element, data_manipulation, outfolder=None, write_to_files=True):
+    def generate_single_element(self, element, data_manipulation, outfolder=None, write_to_storage=True):
 
         self.initialize()
 
@@ -283,7 +283,7 @@ class GeneratorHandler(object):
                             yield questions, outfolder, preview
 
         self.finalize(generator_list, generator_element_table_update_pairs,
-                      data_manipulation, latest_model_version, write_to_files)
+                      data_manipulation, latest_model_version, write_to_storage)
 
     def generate_answered_questions(self):
         for question in self._question_registry.questions.values():
@@ -293,5 +293,5 @@ class GeneratorHandler(object):
 
 if __name__ == '__main__':
     handler = GeneratorHandler()
-    handler = handler.load_from_json('../files/handler.json')
+    handler = handler.load_from_json('../storage/handler.json')
     table = handler.element_generator_table

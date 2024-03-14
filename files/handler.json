@@ -10,6 +10,24 @@
                         "last_generated_version": 0
                     }
                 ]
+            ],
+            "11": [
+                [
+                    0,
+                    {
+                        "value": true,
+                        "last_generated_version": 0
+                    }
+                ]
+            ],
+            "111": [
+                [
+                    0,
+                    {
+                        "value": true,
+                        "last_generated_version": 0
+                    }
+                ]
             ]
         }
     },
@@ -30,7 +48,7 @@
                             "fields": "fields_template.tpl",
                             "document": "document_template.tpl"
                         },
-                        "_template_folder_path": "../../generator_templates/",
+                        "_template_folder_path": ".",
                         "_methods": [],
                         "_questions": [],
                         "_preview": null,
