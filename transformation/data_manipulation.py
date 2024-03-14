@@ -14,13 +14,13 @@ class VersionUnavailableError(Exception):
 
 class DataManipulation(object):
 
-    def __init__(self, initial_file=None):
+    def __init__(self, project_path=None):
         self._versions = {}
 
-        if initial_file is not None:
-            self.path = initial_file
+        if project_path is None:
+            self._project_path = get_project_root()
         else:
-            self.path = os.path.join(get_project_root(), "files", "model.dill")
+            self._project_path = project_path
 
         self._latest_version_number = -1
 
@@ -31,6 +31,14 @@ class DataManipulation(object):
     @versions.setter
     def versions(self, new_versions):
         self._versions = new_versions
+
+    @property
+    def project_path(self):
+        return self._project_path
+
+    @project_path.setter
+    def project_path(self, value):
+        self._project_path = value
 
     def get_next_version_number(self):
         self._latest_version_number += 1
@@ -115,22 +123,21 @@ class DataManipulation(object):
 
     def save_to_dill(self, path=None):
         if path is None:
-            path = self.path
+            path = os.path.join(self._project_path, "files", "model.dill")
 
         with open(path, "wb") as file:
             dill.dump(self, file)
 
     def load_from_dill(self, path=None):
         if not path:
-            path = self.path
+            path = os.path.join(self._project_path, "files", "model.dill")
 
         with open(path, "rb") as file:
             return dill.load(file)
 
-    @staticmethod
-    def load_from_json(path=None):
+    def load_from_json(self, path=None):
         if not path:
-            path = os.path.join(get_project_root(), "files", "model.json")
+            path = os.path.join(self._project_path, "files", "model.json")
 
         try:
             with open(path, "r") as file:
@@ -142,7 +149,7 @@ class DataManipulation(object):
 
     def save_to_json(self, path=None):
         if not path:
-            path = os.path.join(get_project_root(), "files", "model.json")
+            path = os.path.join(self._project_path, "files", "model.json")
 
         try:
             with open(path, "w") as file:
@@ -151,10 +158,17 @@ class DataManipulation(object):
         except OSError:
             print("Unable to load model.")
 
-    def load_from_xmi(self, metamodel, path=None):
+    def load_from_xmi(self, metamodel):
 
-        if not path:
-            path = os.path.join(get_project_root(), "files")
+        if not self._project_path:
+            project_path = get_project_root()
+        else:
+            project_path = self._project_path
+
+        path = os.path.join(project_path, "files")
+
+        if not os.path.exists(path):
+            raise FileNotFoundError("File %s was not found. Loading skipped.".format(path))
 
         versions_folder_path = os.path.join(path, "versions")
         if not os.path.exists(versions_folder_path):
@@ -182,13 +196,14 @@ class DataManipulation(object):
         if len(self._versions) > 0:
             self._latest_version_number = max(self._versions.keys())
 
-    def save_to_xmi(self, metamodel, path=None):
-        from pyecore.resources.xmi import XMIOptions
-        from pyecore.resources import ResourceSet, URI
-        import os
+    def save_to_xmi(self, metamodel):
 
-        if not path:
-            path = os.path.join(get_project_root(), "files")
+        if not self._project_path:
+            project_path = get_project_root()
+        else:
+            project_path = self._project_path
+
+        path = os.path.join(project_path, "files")
 
         versions_folder_path = os.path.join(path, "versions")
         if not os.path.exists(versions_folder_path):
@@ -221,10 +236,10 @@ class DataManipulation(object):
         if type(data) == str:
             data = json.loads(data)
 
-        if "path" not in data:
+        if "project_path" not in data:
             path = None
         else:
-            path = data["path"]
+            path = data["project_path"]
 
         new_object = cls(path)
 
@@ -242,7 +257,7 @@ class DataManipulation(object):
         return version_no in self._versions
 
     def __eq__(self, other):
-        if self.path != other.path:
+        if self.project_path != other.project_path:
             return False
 
         if self._latest_version_number != self.get_latest_version_number():

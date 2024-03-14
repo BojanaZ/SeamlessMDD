@@ -1,27 +1,26 @@
 import dill
 import json
 from utilities.utilities import get_file_path_for_format, get_class_from_parent_module
+from utilities.utilities import get_project_root
 
 
 class GeneratorRegister(dict):
 
-    def __init__(self, loading_path_dill=None, loading_path_json=None):
+    def __init__(self, project_path=None):
         super(GeneratorRegister, self).__init__()
 
-        file_paths = get_file_path_for_format("generators", ["json", "dill"])
+        file_paths = get_file_path_for_format("generators", ["json", "dill"], project_path)
 
-        if loading_path_dill is None:
-            loading_path_dill = file_paths["dill"]
+        if project_path is None:
+            self._project_path = get_project_root()
+        else:
+            self._project_path = project_path
 
-        self._data_path_dill = loading_path_dill
+        self._data_path_dill = file_paths["dill"]
+        self._data_path_json = file_paths["json"]
 
-        if loading_path_json is None:
-            loading_path_json = file_paths["json"]
-
-        self._data_path_json = loading_path_json
-
-    def get_generator_by_id(self, id):
-        return self[id]
+    def get_generator_by_id(self, id_):
+        return self[id_]
 
     @property
     def data_path_dill(self):
@@ -38,6 +37,14 @@ class GeneratorRegister(dict):
     @data_path_json.setter
     def data_path_json(self, value):
         self._data_path_json = value
+
+    @property
+    def project_path(self):
+        return self._project_path
+
+    @project_path.setter
+    def project_path(self, value):
+        self._project_path = value
 
     @staticmethod
     def new_id_generator():
@@ -115,7 +122,7 @@ class GeneratorRegister(dict):
         new_register.data_path_dill = loaded_content["data_path_dill"]
 
         for generator_id, generator_dict in loaded_content["generator_register"].items():
-            gen_type = get_class_from_parent_module(generator_dict['class'], "transformation.generators")
+            gen_type = get_class_from_parent_module(self._project_path, "transformation.generators")
             generator = gen_type.from_json(generator_dict)
             generator_id = int(generator_id)
             generator.id = generator_id

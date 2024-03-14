@@ -2,29 +2,27 @@ import json
 import os
 import dill
 
-from metamodel.element_generator_table import ElementGeneratorTable
+from element_generator_table import ElementGeneratorTable
 from transformation.generators.generator_register import GeneratorRegister
 from transformation.conflict_resolution.question_registry import QuestionRegistry
 from transformation.tasks.task_heap import Heap
 from utilities.utilities import get_project_root
 from diff.diff_store import DiffStore
 
-
 from preview.preview import Preview
 
 
 class GeneratorHandler(object):
 
-    def __init__(self, loading_path=None):
-        self._element_generator_table = ElementGeneratorTable()
-        self._generators = GeneratorRegister()
+    def __init__(self, project_path=None):
+        self._element_generator_table = ElementGeneratorTable(project_path=project_path)
+        self._generators = GeneratorRegister(project_path=project_path)
         self._question_registry = QuestionRegistry()
 
-        if loading_path is None:
-            self._data_loading_path = os.path.join(get_project_root(), 'files')
-        else:
-            self._data_loading_path = loading_path
+        if project_path is None:
+            project_path = get_project_root()
 
+        self._data_loading_path = os.path.join(project_path, 'files')
 
     @property
     def data_loading_path(self):

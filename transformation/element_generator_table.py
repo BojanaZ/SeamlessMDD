@@ -1,26 +1,44 @@
 import dill
 import json
-from utilities.exceptions import ElementNotFoundError, GeneratorNotFoundError
 import os
+
+from utilities.exceptions import ElementNotFoundError, GeneratorNotFoundError
+from utilities.utilities import get_project_root
 
 
 class ElementGeneratorTable(object):
 
-    def __init__(self):
+    def __init__(self, project_path):
         self._by_element = {}
         self._by_generator = {}
 
-    def save_to_dill(self, path=None):
-        if path is None:
-            path = "../files/table.dill"
+        if project_path is None:
+            project_path = get_project_root()
+
+        self._data_loading_path = os.path.join(project_path, 'files')
+
+    @property
+    def data_loading_path(self):
+        return self._data_loading_path
+
+    @data_loading_path.setter
+    def data_loading_path(self, value):
+        self._data_loading_path = value
+
+    def save_to_dill(self, filename=None):
+        if filename is None:
+            filename = "table.dill"
+        path = os.path.join(self._data_loading_path, filename)
 
         with open(path, "wb") as file:
             dill.dump(self, file)
 
     @staticmethod
-    def load_from_dill(path=None):
-        if path is None:
-            path = "../files/table.dill"
+    def load_from_dill(self, filename=None):
+        if filename is None:
+            if filename is None:
+                filename = "table.dill"
+        path = os.path.join(self._data_loading_path, filename)
 
         with open(path, "rb") as file:
             return dill.load(file)
@@ -333,12 +351,13 @@ class ElementGeneratorTable(object):
 
         return True
 
-    def save_to_json(self, path=None):
+    def save_to_json(self, filename=None):
         content = self.to_json()
 
-        file_path = "table.json"
-        if path is not None:
-            file_path = os.path.join(path, file_path)
+        if filename is None:
+            filename = "table.json"
+
+        file_path = os.path.join(self._data_loading_path, filename)
 
         with open(file_path, "w") as file:
             file.write(content)
