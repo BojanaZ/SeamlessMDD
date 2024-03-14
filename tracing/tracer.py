@@ -6,13 +6,13 @@ import os
 
 class Tracer(object):
 
-    def __init__(self, loading_path=None):
+    def __init__(self, project_path=None):
         self._element_traces = {}
         self._last_trace_id = 0
-        if loading_path is None:
-            self._data_loading_path = os.path.join(get_project_root(), 'files')
-        else:
-            self._data_loading_path = loading_path
+        if project_path is None:
+            project_path = get_project_root()
+
+        self._data_loading_path = os.path.join(project_path, 'files')
 
     @staticmethod
     def new_trace_id(last_no=0):
