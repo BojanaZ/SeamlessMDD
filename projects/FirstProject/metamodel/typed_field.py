@@ -1,5 +1,5 @@
-from metamodel1.typed_mixin import TypedMixin
-from metamodel1.field import Field
+from .typed_mixin import TypedMixin
+from .field import Field
 from pyecore.ecore import *
 
 

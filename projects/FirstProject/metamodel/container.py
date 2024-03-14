@@ -1,5 +1,5 @@
 from exceptions import ElementNotFoundError
-from metamodel1.named_element import NamedElement
+from .named_element import NamedElement
 from utilities.utilities import get_class_from_parent_module
 import json
 from json import JSONEncoder

@@ -1,4 +1,4 @@
-from metamodel1.element import Element
+from .element import Element
 from view.tree_view_mixin import TreeViewMixin
 
 from pyecore.ecore import MetaEClass, EAttribute, EString

@@ -1,13 +1,13 @@
 from utilities.exceptions import ElementNotFoundError
 from utilities.utilities import get_class_from_parent_module
 
-from metamodel1.project import Project
+from .project import Project
+from .element import Element
 
 import json
 from json import JSONEncoder
 
 from pyecore.ecore import *
-from metamodel1.element import Element
 
 
 class Model(EObject, metaclass=MetaEClass):
