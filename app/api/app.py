@@ -1,5 +1,4 @@
 import os
-import shutil
 import sys
 
 from flask import Flask, request, jsonify, make_response, render_template, redirect, url_for
@@ -12,6 +11,7 @@ from transformation.conflict_resolution.question import Question
 from view.tree_view import prepare_model_for_tree_view
 from exceptions import ElementNotFoundError
 from utilities.utilities import class_object_to_underscore_format, class_name_to_underscore_format
+from projects.project_loader import WorkspaceProject
 
 from recreate_dummy_structures import make
 
@@ -315,28 +315,11 @@ def initialize(data_manipulation=None, handler=None, tracer=None):
     return data_manipulation, handler, tracer
 
 
-def remove_temp_files():
-    folder = 'templates/temp_diff'
-    folder_path = os.path.join(os.getcwd(), folder)
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
-
-
 def main():
-    remove_temp_files()
-    metamodel = make()
-    data_manipulation = DataManipulation()
-    data_manipulation.load_from_xmi(metamodel=metamodel)
-    handler = GeneratorHandler().load_from_json()
-    tracer = Tracer().load_from_json()
-    app = create_app(data_manipulation, handler, tracer)
+    project_package = "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/projects/FirstProject"
+
+    project = WorkspaceProject(project_package, "FirstProject")
+    app = create_app(project.data_manipulation, project.generator_handler, project.tracer)
     app.run(use_reloader=False)
 
 

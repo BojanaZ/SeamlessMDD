@@ -1,7 +1,7 @@
 import unittest
 from transformation.generators.jinja_generators.documents_output_generator import DocumentsOutputGenerator
 from transformation.generator_handler import GeneratorHandler
-from metamodel.element_generator_table import ElementGeneratorTable
+from element_generator_table import ElementGeneratorTable
 from utilities.exceptions import ElementNotFoundError, GeneratorNotFoundError
 from tests.dummy_structures import dummy_data
 import os

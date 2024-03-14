@@ -7,7 +7,7 @@ from transformation.generator_handler import GeneratorHandler
 from transformation.generators.generator_register import GeneratorRegister
 from transformation.generators.jinja_generators.base_generator import BaseGenerator
 from metamodel.model import Model
-from metamodel.element_generator_table import ElementGeneratorTable
+from element_generator_table import ElementGeneratorTable
 from tests.dummy_structures import dummy_data
 
 from api.app import create_app

@@ -2,7 +2,7 @@ from functools import partial
 import pyecore.ecore as Ecore
 from pyecore.ecore import *
 
-from metamodel.element_generator_table import ElementGeneratorTable
+from element_generator_table import ElementGeneratorTable
 from metamodel.model import Model
 from metamodel.project import Project
 from metamodel.document import Document
