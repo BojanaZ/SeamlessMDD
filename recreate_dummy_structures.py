@@ -154,11 +154,7 @@ def recreate_super_simple_dummy_data_manipulation(metamodel, project_path, write
     document1 = Document(11, "Document1", False, "Document1", new_model, project)
     project.add(document1)
     field1 = TypedField(111, "Field1", "string", False, "Field1", new_model, document1)
-<<<<<<< Updated upstream
-    field2 = TypedField(112, "Field2", "boolean", False, "Field2", new_model)
-=======
     field2 = TypedField(112, "Field2", "boolean", False, "Field2", new_model, document1)
->>>>>>> Stashed changes
     document1.add(field1)
     document1.add(field2)
 
