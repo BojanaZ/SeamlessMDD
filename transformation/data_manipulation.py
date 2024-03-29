@@ -14,7 +14,7 @@ class VersionUnavailableError(Exception):
 
 class DataManipulation(object):
 
-    def __init__(self, project_path=None):
+    def __init__(self, project_path=None, metamodel=None):
         self._versions = {}
 
         if project_path is None:
@@ -23,6 +23,8 @@ class DataManipulation(object):
             self._project_path = project_path
 
         self._latest_version_number = -1
+
+        self._metamodel = metamodel
 
     @property
     def versions(self):
@@ -39,6 +41,14 @@ class DataManipulation(object):
     @project_path.setter
     def project_path(self, value):
         self._project_path = value
+
+    @property
+    def metamodel(self):
+        return self._metamodel
+
+    @metamodel.setter
+    def metamodel(self, value):
+        self._metamodel = value
 
     def get_next_version_number(self):
         self._latest_version_number += 1
@@ -75,11 +85,16 @@ class DataManipulation(object):
 
     def update_model_after_generation(self):
         last_model = self.get_latest_model()
+        last_model_version = last_model.version
+
         next_version = self.get_next_version_number()
-        new_model = last_model.deepcopy()
-        new_model.version = next_version
-        self._versions[next_version] = new_model
-        new_model.version = next_version
+
+        last_model.version = next_version
+
+        self._save_model_version_to_xmi(last_model, self._prepare_versions_folder())
+        self.load_model_version_from_xmi(next_version)
+
+        last_model.version = last_model_version
 
     def update_model(self, model):
         next_version = self.get_next_version_number()
@@ -158,7 +173,7 @@ class DataManipulation(object):
         except OSError:
             print("Unable to load model.")
 
-    def load_from_xmi(self, metamodel):
+    def load_from_xmi(self):
 
         if not self._project_path:
             project_path = get_project_root()
@@ -183,7 +198,7 @@ class DataManipulation(object):
                 version = int(re.findall(r'\d+', file_name)[0])
 
                 rset = ResourceSet()
-                rset.metamodel_registry[metamodel.nsURI] = metamodel
+                rset.metamodel_registry[self._metamodel.nsURI] = self._metamodel
                 resource = rset.get_resource(URI(file_path))
                 model = resource.contents[0]
 
@@ -196,8 +211,65 @@ class DataManipulation(object):
         if len(self._versions) > 0:
             self._latest_version_number = max(self._versions.keys())
 
-    def save_to_xmi(self, metamodel):
+    def load_model_version_from_xmi(self, model_version):
 
+        if not self._project_path:
+            project_path = get_project_root()
+        else:
+            project_path = self._project_path
+
+        path = os.path.join(project_path, "storage")
+
+        if not os.path.exists(path):
+            raise FileNotFoundError("File %s was not found. Loading skipped.".format(path))
+
+        versions_folder_path = os.path.join(path, "versions")
+        if not os.path.exists(versions_folder_path):
+            raise FileNotFoundError("File %s was not found. Loading skipped.".format(versions_folder_path))
+
+        filepath = os.path.join(versions_folder_path, "model_version_{}.xmi".format(model_version))
+
+        if os.path.isfile(filepath):
+            rset = ResourceSet()
+            rset.metamodel_registry[self._metamodel.nsURI] = self._metamodel
+            resource = rset.get_resource(URI(filepath))
+            model = resource.contents[0]
+
+            self._versions[model_version] = model
+            model.version = model_version
+
+        if len(self._versions) > 0:
+            self._latest_version_number = max(self._versions.keys())
+
+    def save_to_xmi(self):
+        versions_folder_path = self._prepare_versions_folder()
+
+        for model in self._versions.values():
+            self._save_model_version_to_xmi(model, versions_folder_path)
+
+    def save_latest_model_to_xmi(self):
+        versions_folder_path = self._prepare_versions_folder()
+        self._save_model_version_to_xmi(self.get_latest_model(), versions_folder_path)
+
+    def _save_model_version_to_xmi(self, model, versions_folder_path):
+        model_path = os.path.join(versions_folder_path, "model_version_{}.xmi".format(model.version))
+
+        with open(model_path, "w") as file:
+            file.write("")
+
+        rset = ResourceSet()
+        resource = rset.create_resource(URI(model_path))
+        resource.use_uuid = True
+        resource.append(model)
+
+        rset.metamodel_registry[self._metamodel.nsURI] = self._metamodel  # register the metamodel
+
+        options = {
+            XMIOptions.OPTION_USE_XMI_TYPE: True
+        }
+        resource.save(options=options)
+
+    def _prepare_versions_folder(self):
         if not self._project_path:
             project_path = get_project_root()
         else:
@@ -209,23 +281,7 @@ class DataManipulation(object):
         if not os.path.exists(versions_folder_path):
             os.makedirs(versions_folder_path)
 
-        for version, model in self._versions.items():
-            model_path = os.path.join(versions_folder_path, "model_version_{}.xmi".format(version))
-
-            with open(model_path, "w") as file:
-                file.write("")
-
-            rset = ResourceSet()
-            resource = rset.create_resource(URI(model_path))
-            resource.use_uuid = True
-            resource.append(model)
-
-            rset.metamodel_registry[metamodel.nsURI] = metamodel  # register the metamodel
-
-            options = {
-                XMIOptions.OPTION_USE_XMI_TYPE: True
-            }
-            resource.save(options=options)
+        return versions_folder_path
 
     def to_json(self):
         return json.dumps(self, cls=DataManipulationJSONEncoder)
@@ -236,10 +292,10 @@ class DataManipulation(object):
         if type(data) == str:
             data = json.loads(data)
 
-        if "project_path" not in data:
+        if "path" not in data:
             path = None
         else:
-            path = data["project_path"]
+            path = data["path"]
 
         new_object = cls(path)
 
@@ -257,7 +313,7 @@ class DataManipulation(object):
         return version_no in self._versions
 
     def __eq__(self, other):
-        if self.project_path != other.project_path:
+        if self.project_path != other.path:
             return False
 
         if self._latest_version_number != self.get_latest_version_number():

@@ -16,8 +16,9 @@ class WorkspaceProject(object):
         if main_module_name is None:
             self._main_module_name = "bootstrap"
             
-        self._project_path = project_path
-        self._project_name = project_name
+        self._path = project_path
+        self._name = project_name
+        self._templates_path = None
 
         self._metamodel = None
         self._data_manipulation = None
@@ -27,20 +28,28 @@ class WorkspaceProject(object):
         self._init()
     
     @property
-    def project_path(self):
-        return self._project_path
+    def path(self):
+        return self._path
     
-    @project_path.setter
-    def project_path(self, value):
-        self._project_path = value
-        
+    @path.setter
+    def path(self, value):
+        self._path = value
+
     @property
-    def project_name(self):
-        return self._project_name
+    def templates_path(self):
+        return self._templates_path
+
+    @templates_path.setter
+    def templates_path(self, value):
+        self._templates_path = value
+
+    @property
+    def name(self):
+        return self._name
     
-    @project_name.setter
-    def project_name(self, value):
-        self._project_name = value
+    @name.setter
+    def name(self, value):
+        self._name = value
         
     @property
     def config_filename(self):
@@ -95,34 +104,34 @@ class WorkspaceProject(object):
         self.remove_temp_files()
 
         self._metamodel = main_module.make(modules)
-        self._data_manipulation = DataManipulation(self._project_path)
-        self._generator_handler = GeneratorHandler(self._project_path)
-        self._tracer = Tracer(self._project_path)
+        self._data_manipulation = DataManipulation(self._path, self._metamodel)
+        self._generator_handler = GeneratorHandler(self)
+        self._tracer = Tracer(self._path)
 
         try:
-            self._data_manipulation.load_from_xmi(metamodel=self._metamodel)
+            self._data_manipulation.load_from_xmi()
             self._generator_handler.load_from_json()
             self._tracer.load_from_json()
         except FileNotFoundError as e:
-            print("Project %s from %s could not be loaded.".format(self._project_name, self._project_path))
+            print("Project %s from %s could not be loaded.".format(self._name, self._path))
 
     def load_project(self):
-        # project_config_path = os.path.join(project_path, config_filename)
+        # project_config_path = os.path.join(path, config_filename)
         # try:
         #     config_file = open(project_config_path)
         # except:
         #     raise ProjectNotFoundException("Current folder is not a SeamlessMDD project.")
-        modules = import_project_from_absolute_path(self._project_path, self._project_name)
+        modules = import_project_from_absolute_path(self._path, self._name)
 
-        main_module = modules[self._project_name + "." + self._main_module_name]
+        main_module = modules[self._name + "." + self._main_module_name]
         return modules, main_module
 
     def remove_temp_files(self):
         folder = 'templates/temp_diff'
-        if self._project_path is None:
+        if self._path is None:
             project_root_path = os.getcwd()
         else:
-            project_root_path = self._project_path
+            project_root_path = self._path
         folder_path = os.path.join(project_root_path, folder)
 
         if os.path.exists(folder_path):

@@ -14,15 +14,29 @@ from preview.preview import Preview
 
 class GeneratorHandler(object):
 
-    def __init__(self, project_path=None):
-        self._element_generator_table = ElementGeneratorTable(project_path=project_path)
-        self._generators = GeneratorRegister(project_path=project_path)
+    def __init__(self, project=None):
+        project_path = project.path
+        if project_path is None:
+            project_path = get_project_root()
+
+        self._element_generator_table = ElementGeneratorTable(project=project)
+        self._generators = GeneratorRegister(project=project)
         self._question_registry = QuestionRegistry()
 
         if project_path is None:
             project_path = get_project_root()
 
+        self._project = project
+
         self._data_loading_path = os.path.join(project_path, 'storage')
+
+    @property
+    def project(self):
+        return self._project
+
+    @project.setter
+    def project(self, value):
+        self._project = value
 
     @property
     def data_loading_path(self):
@@ -108,7 +122,7 @@ class GeneratorHandler(object):
             content = json.loads(content)
 
         self.data_loading_path = content['_data_loading_path']
-        self.generators = self._generators.from_json(content['_generators'])
+        self.generators = self._generators.from_json(content['_generators'], self.project)
         self.element_generator_table.register_from_json(content['element_generator_table'])
         self._question_registry = QuestionRegistry.from_json(content['_question_registry'])
         return self
@@ -167,7 +181,7 @@ class GeneratorHandler(object):
                 generator.flush()
                 self.update_element_generator_table(table_update_pairs,
                                                     model_version_number)
-                data_manipulation.update_model_after_generation()
+            data_manipulation.update_model_after_generation()
         else:
             for generator in generator_list:
                 generator.reload()
@@ -180,12 +194,14 @@ class GeneratorHandler(object):
                 questions = task.run(property_diff, outfolder)
                 yield questions, outfolder, preview
 
-    def generate_all_generators(self, data_manipulation, outfolder=None, write_to_storage=True):
+    def generate_all_generators(self, data_manipulation, outfolder_name=None, write_to_storage=True):
 
         self.initialize()
 
         generator_list = self.get_active_generators()
         sorted_tasks = self.build_task_heap(generator_list)
+
+        outfolder_full_path = os.path.join(self.project.path, outfolder_name)
 
         model = data_manipulation.get_latest_model()
         latest_model_version = data_manipulation.get_latest_version_number()
@@ -207,10 +223,10 @@ class GeneratorHandler(object):
                 diffs = DiffStore.get_diffs_for_model_elements(old_and_new_element_pairs)
                 for property_diffs in diffs.values():
                     for property_diff in property_diffs:
-                        preview = Preview(last_generated_version, latest_model_version)
+                        preview = Preview(last_generated_version, latest_model_version, self.project)
                         task.preview = preview
-                        questions = task.run(property_diff, outfolder)
-                        yield questions, outfolder, preview
+                        questions = task.run(property_diff, outfolder_full_path)
+                        yield questions, outfolder_full_path, preview
 
         self.finalize(generator_list, generator_element_table_update_pairs, data_manipulation,
                       latest_model_version, write_to_storage)

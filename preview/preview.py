@@ -5,9 +5,10 @@ import AdvancedHTMLParser
 
 
 class Preview(object):
-    def __init__(self, previous_version_no, new_version_no, filepath=None, old_view=None, new_view=None):
+    def __init__(self, previous_version_no, new_version_no, project, filepath=None, old_view=None, new_view=None):
         self._previous_version = previous_version_no
         self._new_version = new_version_no
+        self._project = project
         self._filepath = filepath
         self._old_view = old_view
         self._new_view = new_view
@@ -52,6 +53,14 @@ class Preview(object):
     def new_view(self, new_view):
         self._new_view = new_view
 
+    @property
+    def project(self):
+        return self._project
+
+    @project.setter
+    def project(self, value):
+        self._project = value
+
     def generate_diff_view_filename(self):
 
         return Path(self._filepath).stem + "_" + str(hash(self._old_view)) + "_" + str(hash(self._new_view)) + ".html"
@@ -73,10 +82,10 @@ class Preview(object):
         table = tables[0]
 
         filepath_to_return = os.path.join("temp_diff", self.generate_diff_view_filename())
-        filepath_to_write = os.path.join("templates", filepath_to_return)
-        file = open(filepath_to_write, "w")
-        file.writelines(str(table))
-        file.close()
+        filepath_to_write = os.path.join(self.project.templates_path, filepath_to_return)
+
+        with open(filepath_to_write, "w") as file:
+            file.writelines(str(table))
 
         return filepath_to_return
 
@@ -116,11 +125,10 @@ class Preview(object):
                 child_node3.remove()
 
         filepath_to_return = os.path.join("temp_diff", self.generate_diff_view_filename())
-        filepath_to_write = os.path.join("templates", filepath_to_return)
+        filepath_to_write = os.path.join(self.project.templates_path, filepath_to_return)
 
-        file = open(filepath_to_write, "w")
-        file.writelines(str(table))
-        file.close()
+        with open(filepath_to_write, "w") as file:
+            file.writelines(str(table))
 
         return filepath_to_return
 

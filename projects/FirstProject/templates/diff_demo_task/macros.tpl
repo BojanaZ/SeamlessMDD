@@ -1,3 +1,4 @@
+{% macro field(element) -%}
 <li _id="{{ element.id }}"  name="{{ element.name }}">
     <div class="form-row">
         <div class="md-form col-md-4 col-sm-5">
@@ -7,3 +8,13 @@
         </div>
     </div>
 </li>
+{%- endmacro %}
+
+
+{% macro fields(elements) -%}
+<ul>
+{% for field in elements %}
+    {{ field(element) }}
+{% endfor %}
+</ul>
+{%- endmacro %}

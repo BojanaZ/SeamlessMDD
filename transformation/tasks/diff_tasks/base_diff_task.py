@@ -34,7 +34,7 @@ class BaseDiffTask(ValidationTask, PriorityMixin):
 
     @classmethod
     def from_json(cls, data):
-        return cls(data['_priority'], data['_template_name'])
+        return cls(None, data['_priority'], data['_template_name'])
 
     def to_json(self):
         return json.dumps(self, cls=BaseTaskJSONEncoder)

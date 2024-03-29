@@ -6,8 +6,21 @@ from transformation.conflict_resolution.question import Question
 
 class QuestionRegistry(object):
 
-    def __init__(self):
+    def __init__(self, project_path=None):
         self._questions = {}
+
+        if project_path is None:
+            self._project_path = get_project_root()
+        else:
+            self._project_path = project_path
+
+    @property
+    def project_path(self):
+        return self._project_path
+
+    @project_path.setter
+    def project_path(self, value):
+        self._project_path = value
 
     @staticmethod
     def new_question_id_generator():
@@ -88,10 +101,10 @@ class QuestionRegistry(object):
     def to_dict(self):
         return QuestionRegistryJSONEncoder().default(self)
 
-    @staticmethod
-    def load_from_json(path=None):
-        if not path:
-            path = os.path.join(get_project_root(), "storage", "question_registry.json")
+    def load_from_json(self, path=None):
+
+        if path is None:
+            path = os.path.join(self._project_path, "storage", "question_registry.json")
 
         try:
             with open(path, "r") as file:
@@ -102,8 +115,8 @@ class QuestionRegistry(object):
             print("Unable to load question registry.")
 
     def save_to_json(self, path=None):
-        if not path:
-            path = os.path.join(get_project_root(), "storage", "question_registry.json")
+        if path is None:
+            path = os.path.join(self._project_path, "storage", "question_registry.json")
 
         try:
             with open(path, "w") as file:

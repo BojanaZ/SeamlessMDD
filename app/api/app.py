@@ -2,18 +2,14 @@ import os
 import sys
 
 from flask import Flask, request, jsonify, make_response, render_template, redirect, url_for
-from transformation.generator_handler import GeneratorHandler
 from transformation.generators.generator_register import GeneratorRegister
-from tracing.tracer import Tracer
 from metamodel.model import Model
-from transformation.data_manipulation import DataManipulation, VersionUnavailableError
+from transformation.data_manipulation import VersionUnavailableError
 from transformation.conflict_resolution.question import Question
 from view.tree_view import prepare_model_for_tree_view
 from exceptions import ElementNotFoundError
 from utilities.utilities import class_object_to_underscore_format, class_name_to_underscore_format
 from projects.project_loader import WorkspaceProject
-
-from recreate_dummy_structures import make
 
 
 def create_app(data_manipulation=None, handler=None, tracer=None ):
@@ -297,7 +293,7 @@ def create_app(data_manipulation=None, handler=None, tracer=None ):
     def generate_preview_all_elements(generate=True):
         question_preview_pairs.clear()
         for questions, outfolder, preview in handler.generate_all_generators(data_manipulation,
-                                                                             "../../files/", generate):
+                                                                             "files", generate):
             if questions is None or len(questions) == 0:
                 question_preview_pairs.append((None, preview))
             else:
@@ -320,6 +316,8 @@ def main():
 
     project = WorkspaceProject(project_package, "FirstProject")
     app = create_app(project.data_manipulation, project.generator_handler, project.tracer)
+    project.templates_path = os.path.join(app.root_path, app.template_folder)
+
     app.run(use_reloader=False)
 
 

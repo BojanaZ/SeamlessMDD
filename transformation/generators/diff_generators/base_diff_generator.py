@@ -1,11 +1,12 @@
-from multigen.generator import TemplateGenerator
 import os
 import json
-from utilities.utilities import get_project_root, get_class_from_parent_module
+
+import abc
+from multigen.generator import TemplateGenerator
 from transformation.generators.encoders.generator_json_encoder import BaseGeneratorJSONEncoder
 
 
-class BaseDiffGenerator(TemplateGenerator):
+class BaseDiffGenerator(TemplateGenerator, metaclass=abc.ABCMeta):
 
     def __init__(self, id_=-1, file_path="", file_content="", file_template_path="", parser_type=None):
         self._id = id_
@@ -18,12 +19,13 @@ class BaseDiffGenerator(TemplateGenerator):
 
         super().__init__()
 
-    # Root path where Jinja templates are found.
-    templates_path = os.path.join(
-        get_project_root(),
-        'templates'
-    )
+        # Root path where Jinja templates are found.
+        self.templates_path = os.path.join(
+            self._file_path,
+            'templates'
+        )
 
+    @abc.abstractmethod
     def initialize(self):
         raise NotImplementedError("Generators must implement initialize method.")
 
@@ -101,7 +103,7 @@ class BaseDiffGenerator(TemplateGenerator):
         return json.dumps(self.to_dict(), indent=4)
 
     @classmethod
-    def from_json(cls, data):
+    def from_json(cls, data, project):
 
         if type(data) == str:
             data = json.loads(data)
@@ -110,9 +112,13 @@ class BaseDiffGenerator(TemplateGenerator):
 
         if data['tasks']:
             new_object.tasks = []
+            from utilities.utilities import get_tasks
+            task_dict = get_tasks(project_path=project.path, project_name=project.name)
             for task in data['tasks']:
-                _type = get_class_from_parent_module(task['class'], 'tasks')
-                new_object.tasks.append(_type.from_json(task))
+                _type = task_dict[task['class']]
+                task_object = _type.from_json(task)
+                new_object.tasks.append(task_object)
+                task_object.generator = new_object
 
         return new_object
 

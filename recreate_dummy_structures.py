@@ -1,3 +1,4 @@
+import inspect
 from functools import partial
 import pyecore.ecore as Ecore
 from pyecore.ecore import *
@@ -13,15 +14,15 @@ from metamodel.element import Element
 from metamodel.container import Container
 from transformation.data_manipulation import DataManipulation
 from transformation.generator_handler import GeneratorHandler
-from transformation.generators.diff_generators.document_diff_generator import DocumentDiffGenerator
 from transformation.conflict_resolution.question_registry import QuestionRegistry
 from transformation.conflict_resolution.question import Question
 from transformation.conflict_resolution.answer import Answer
 from tracing.tracer import Tracer
 from transformation.generators.jinja_generators.documents_output_generator import DocumentsOutputGenerator
 from os.path import join
-from utilities.utilities import get_project_root
+from utilities.utilities import get_project_root, get_generators
 from tests.dummy_structures import dummy_data
+from projects.project_loader import WorkspaceProject
 
 name = 'document'
 nsURI = 'http://www.example.org/document'
@@ -58,8 +59,8 @@ def additional_changes():
                                                          eType=Container,
                                                          eOpposite=Container._elements, containment=False))
     Element._parent_container = EReference(name='_parent_container',
-                                                         eType=Container,
-                                                         eOpposite=Container._elements, containment=False)
+                                                eType=Container,
+                                                eOpposite=Container._elements, containment=False)
 
 
 def dummy_table():
@@ -77,11 +78,11 @@ def recreate_dummy_table():
     #TABLE RECREATION FOR FILE
     table = dummy_table()
 
-    path = join(get_project_root(), "files", "table.dill")
+    path = join(get_project_root(), "storage", "table.dill")
     #with open(path, "wb") as file:
         #dill.dump(table, file)
 
-    path = join(get_project_root(), "files", "table.json")
+    path = join(get_project_root(), "storage", "table.json")
     with open(path, "w") as file:
         file.write(table.to_json())
 
@@ -117,7 +118,7 @@ def recreate_dummy_data_manipulation():
     return data_manipulation
 
 
-def recreate_super_simple_dummy_data_manipulation(metamodel, write_to_file=False):
+def recreate_super_simple_dummy_data_manipulation(metamodel, project_path, write_to_file=False):
     project = Project(1, "MyProject", False, "MyProject")
 
     model = Model(root_element=project)
@@ -144,7 +145,7 @@ def recreate_super_simple_dummy_data_manipulation(metamodel, write_to_file=False
     # document2.add(field3)
     # project.add(document2)
 
-    data_manipulation = DataManipulation()
+    data_manipulation = DataManipulation(project_path)
     data_manipulation.update_model(model)
 
     new_model = Model()
@@ -153,7 +154,11 @@ def recreate_super_simple_dummy_data_manipulation(metamodel, write_to_file=False
     document1 = Document(11, "Document1", False, "Document1", new_model, project)
     project.add(document1)
     field1 = TypedField(111, "Field1", "string", False, "Field1", new_model, document1)
+<<<<<<< Updated upstream
     field2 = TypedField(112, "Field2", "boolean", False, "Field2", new_model)
+=======
+    field2 = TypedField(112, "Field2", "boolean", False, "Field2", new_model, document1)
+>>>>>>> Stashed changes
     document1.add(field1)
     document1.add(field2)
 
@@ -166,30 +171,40 @@ def recreate_super_simple_dummy_data_manipulation(metamodel, write_to_file=False
         element.model = new_model
 
     data_manipulation.update_model(new_model)
-    tracer = Tracer()
+    data_manipulation.metamodel = metamodel
+    tracer = Tracer(project_path)
 
     if write_to_file:
         #data_manipulation.save_to_json()
-        data_manipulation.save_to_xmi(metamodel)
+        data_manipulation.save_to_xmi()
 
     return data_manipulation, tracer
 
 
-def recreate_dummy_diff_generator_handler(data_manipulation=None, tracer_=None, write_to_file=False):
-    if data_manipulation is None:
-        data_manipulation = DataManipulation().load_from_json()
+def recreate_dummy_diff_generator_handler(project, data_manipulation=None, tracer_=None, write_to_file=False):
+    if project is None:
+        project_path = get_project_root()
+    else:
+        project_path = project.path
 
-    handler_ = GeneratorHandler()
-    generator = DocumentDiffGenerator()
-    if tracer_:
-        generator.tracer = tracer_
-    generator.initialize()
-    handler_.register(generator)
+    if data_manipulation is None:
+        data_manipulation = DataManipulation(project_path).load_from_json()
 
     elements = data_manipulation.get_latest_model().elements
-    for element in elements:
-        handler_.element_generator_table.load_pair(element.id, generator.id,
-                                                   {"value": True, "last_generated_version": 0})
+    handler_ = GeneratorHandler(project)
+
+    generator_classes = get_generators(project_path, project.name)
+
+    for generator_class in generator_classes.values():
+        generator = generator_class()
+        if tracer_:
+            generator.tracer = tracer_
+        generator.initialize()
+        handler_.register(generator)
+
+        for element in elements:
+            handler_.element_generator_table.load_pair(element.id, generator.id,
+                                                       {"value": True, "last_generated_version": 0})
     handler_.question_registry = QuestionRegistry()
     if write_to_file:
         handler_.save_to_json()
@@ -198,9 +213,9 @@ def recreate_dummy_diff_generator_handler(data_manipulation=None, tracer_=None, 
     return handler_
 
 
-def recreate_question_registry(write_to_file=False):
+def recreate_question_registry(file_path, write_to_file=False):
 
-    question_registry = QuestionRegistry()
+    question_registry = QuestionRegistry(file_path)
     q1 = Question("Test question 1", "What?")
     a11 = Answer("Answer 11")
     a12 = Answer("Answer 12")
@@ -222,12 +237,14 @@ def recreate_question_registry(write_to_file=False):
     return question_registry
 
 
-if __name__ == "__main__":
+def main(project_path, project_name):
     metamodel = make()
-    dm, tracer = recreate_super_simple_dummy_data_manipulation(metamodel, True)
-    handler = recreate_dummy_diff_generator_handler(dm, tracer, True)
-    question_registry = recreate_question_registry(True)
+    ws_project = WorkspaceProject(project_path=project_path, project_name=project_name)
+    dm, tracer = recreate_super_simple_dummy_data_manipulation(metamodel, ws_project.path, True)
+    handler = recreate_dummy_diff_generator_handler(ws_project, dm, tracer, True)
+    question_registry = recreate_question_registry(project_path, True)
 
-    dm.load_from_xmi(metamodel)
-    for item in dm.versions[0]:
-        print(item)
+
+if __name__ == "__main__":
+    project_path = "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/projects/FirstProject"
+    main(project_path, "FirstProject")

@@ -8,14 +8,17 @@ from utilities.utilities import get_project_root
 
 class ElementGeneratorTable(object):
 
-    def __init__(self, project_path):
+    def __init__(self, project):
         self._by_element = {}
         self._by_generator = {}
 
-        if project_path is None:
+        if project is None:
             project_path = get_project_root()
+        else:
+            project_path = project.path
 
         self._data_loading_path = os.path.join(project_path, 'storage')
+        self._project = project
 
     @property
     def data_loading_path(self):

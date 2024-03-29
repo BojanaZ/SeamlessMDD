@@ -1,21 +1,21 @@
 import dill
 import json
-from utilities.utilities import get_file_path_for_format, get_class_from_parent_module
-from utilities.utilities import get_project_root
+from utilities.utilities import get_file_path_for_format, get_project_root, get_generators
 
 
 class GeneratorRegister(dict):
 
-    def __init__(self, project_path=None):
+    def __init__(self, project=None):
         super(GeneratorRegister, self).__init__()
 
-        file_paths = get_file_path_for_format("generators", ["json", "dill"], project_path)
+        file_paths = get_file_path_for_format("generators", ["json", "dill"], project)
 
-        if project_path is None:
+        if project is None:
             self._project_path = get_project_root()
         else:
-            self._project_path = project_path
+            self._project_path = project.path
 
+        self._project = project
         self._data_path_dill = file_paths["dill"]
         self._data_path_json = file_paths["json"]
 
@@ -45,6 +45,14 @@ class GeneratorRegister(dict):
     @project_path.setter
     def project_path(self, value):
         self._project_path = value
+
+    @property
+    def project(self):
+        return self._project
+
+    @project.setter
+    def project(self, value):
+        self._project = value
 
     @staticmethod
     def new_id_generator():
@@ -111,23 +119,23 @@ class GeneratorRegister(dict):
     def to_dict(self):
         return GeneratorsJSONEncoder().default(self)
 
-    def from_json(self, loaded_content):
+    def from_json(self, loaded_content, project):
 
         if type(loaded_content) == str:
             loaded_content = json.loads(loaded_content)
 
-        new_register = GeneratorRegister()
+        new_register = GeneratorRegister(project)
         new_register.data_path_json = loaded_content["data_path_json"]
         new_register.data_path_dill = loaded_content["data_path_dill"]
 
+        generator_classes = get_generators(self._project_path, "FirstProject")
+
         for generator_id, generator_dict in loaded_content["generator_register"].items():
-            gen_type = get_class_from_parent_module(self._project_path, "transformation.generators")
-            generator = gen_type.from_json(generator_dict)
+            gen_type = generator_classes[generator_dict["class"]]
+            generator = gen_type.from_json(generator_dict, new_register.project)
             generator_id = int(generator_id)
             generator.id = generator_id
             new_register[generator_id] = generator
-            for task in generator.tasks:
-                task.generator = generator
 
         return new_register
 

@@ -1,9 +1,11 @@
+import os
+import abc
+
 from transformation.tasks.diff_tasks.base_diff_task import BaseDiffTask
 from transformation.assignment.assignment import Assignment
 from transformation.assignment.assignment_set import AssignmentSet
 from utilities.utilities import class_object_to_underscore_format
-from jinja2 import Template
-import os
+from jinja2 import Environment, PackageLoader,FileSystemLoader
 from diff.operation_type import OperationType
 from tracing.manual_tracing import IManualTracing
 from transformation.conflict_resolution.question import Question
@@ -14,13 +16,13 @@ from messages.answer_text import *
 from utilities.exceptions import GenerationValidationException
 
 
-class BaseManualTracingTask(BaseDiffTask, IManualTracing):
+class BaseManualTracingTask(BaseDiffTask, IManualTracing, metaclass=abc.ABCMeta):
 
     def __init__(self, generator, priority=2, template_name=None):
         if template_name is not None and template_name != "":
             self._template_name = template_name
 
-        self._template_folder_path = "."
+        self._template_folder_path = "templates"
 
         super().__init__(priority=priority, template_name=template_name, generator=generator)
 
@@ -43,9 +45,12 @@ class BaseManualTracingTask(BaseDiffTask, IManualTracing):
         relative_path = self.get_relative_path(filepath, diff.new_object_ref)
 
         template_file = open(os.path.join(self._template_folder_path, relative_path))
-        template = template_file.read()
+        template_str = template_file.read()
         template_file.close()
-        content = Template(template).render(element=diff.new_object_ref)
+
+        env = Environment(loader=PackageLoader(self._template_folder_path))
+        template = env.from_string(template_str)
+        content = template.render(element=diff.new_object_ref)
         parser = self._generator.get_parser(filepath)
 
         if os.path.isfile(filepath):
@@ -60,9 +65,12 @@ class BaseManualTracingTask(BaseDiffTask, IManualTracing):
         relative_path = self.get_relative_path(filepath, diff.new_object_ref)
 
         template_file = open(os.path.join(self._template_folder_path, relative_path))
-        template = template_file.read()
+        template_str = template_file.read()
         template_file.close()
-        content = Template(template).render(element=diff.new_object_ref)
+
+        env = Environment(loader=PackageLoader(self._template_folder_path))
+        template = env.from_string(template_str)
+        content = template.render(element=diff.new_object_ref)
         parser = self._generator.get_parser(filepath)
         parser.parser.parseStr(content)
 
@@ -86,10 +94,12 @@ class BaseManualTracingTask(BaseDiffTask, IManualTracing):
             new_property_xpaths = self.get_property_traces(new_element)[diff.property_name]
             template_file = open(os.path.join("../templates/",
                                               self._template_name))
-            template = template_file.read()
+            template_str = template_file.read()
             template_file.close()
 
-            content = Template(template).render(element=diff.new_object_ref)
+            env = Environment(loader=PackageLoader(self._template_folder_path))
+            template = env.from_string(template_str)
+            content = template.render(element=diff.new_object_ref)
 
             for old_property_xpath, new_property_xpath in zip(old_property_xpaths, new_property_xpaths):
                 parser.update_element_by_path(old_property_xpath, new_property_xpath, content)
@@ -100,9 +110,15 @@ class BaseManualTracingTask(BaseDiffTask, IManualTracing):
         for trace in tracer.get_traces(diff.new_value.id, self._generator.id):
             relative_path = self.get_relative_path(filepath, diff.new_object_ref)
             template_file = open(os.path.join(self._template_folder_path, relative_path))
-            template = template_file.read()
+            template_str = template_file.read()
             template_file.close()
-            content = Template(template).render(element=diff.new_value)
+
+            templateLoader = FileSystemLoader(searchpath=os.path.join(os.getcwd(), self._template_folder_path))
+            env = Environment(loader=templateLoader)
+            #env = Environment(loader=PackageLoader(os.path.join(os.getcwd(), self._template_folder_path)))
+            template = env.from_string(template_str)
+
+            content = template.render(element=diff.new_value)
 
             parser.insert_element_by_path(trace.old_path, content)
 
@@ -285,11 +301,14 @@ class BaseManualTracingTask(BaseDiffTask, IManualTracing):
     def get_traces(self, diff):
         return self._generator.tracer.get_traces(diff.key, self._generator.id)
 
+    @abc.abstractmethod
     def get_selection_trace(self, element):
         raise NotImplementedError("'get_selection_trace' not implemented.")
 
+    @abc.abstractmethod
     def get_insertion_trace(self, element):
         raise NotImplementedError("'get_insertion_trace' not implemented.")
 
+    @abc.abstractmethod
     def get_property_traces(self, element):
         raise NotImplementedError("'get_property_traces' not implemented.")

@@ -1,0 +1,76 @@
+{
+    "_data_loading_path": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/files",
+    "element_generator_table": {
+        "table_by_element": {
+            "1": [
+                [
+                    0,
+                    {
+                        "value": true,
+                        "last_generated_version": 0
+                    }
+                ]
+            ],
+            "11": [
+                [
+                    0,
+                    {
+                        "value": true,
+                        "last_generated_version": 0
+                    }
+                ]
+            ],
+            "111": [
+                [
+                    0,
+                    {
+                        "value": true,
+                        "last_generated_version": 0
+                    }
+                ]
+            ],
+            "112": [
+                [
+                    0,
+                    {
+                        "value": true,
+                        "last_generated_version": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "_generators": {
+        "generator_register": {
+            "0": {
+                "_id": 0,
+                "_file_path": "",
+                "_file_content": "",
+                "_file_template_path": "",
+                "class": "DocumentDiffGenerator",
+                "tasks": [
+                    {
+                        "_template_name": "",
+                        "_additional_templates_path": "diff_demo_task/",
+                        "_additional_templates": {
+                            "field": "field_template.tpl",
+                            "fields": "fields_template.tpl",
+                            "document": "document_template.tpl"
+                        },
+                        "_template_folder_path": ".",
+                        "_methods": [],
+                        "_questions": [],
+                        "_preview": null,
+                        "_priority": 2,
+                        "class": "DiffDemoManualTracingTask"
+                    }
+                ]
+            }
+        },
+        "data_path_dill": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/files/generators.dill",
+        "data_path_json": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/files/generators.json"
+    },
+    "_question_registry": {
+        "_questions": {}
+    }
+}
