@@ -128,10 +128,10 @@ def recreate_super_simple_dummy_data_manipulation(metamodel, write_to_file=False
 
     field1 = TypedField(_id=111, name="Field1", type_="string", deleted=False, label="Field1", model=model,
                         container=document1)
-    field2 = TypedField(112, "Field2", "string", False, None, model, container=document1)
+    #field2 = TypedField(112, "Field2", "string", False, None, model, container=document1)
 
     document1.add(field1)
-    document1.add(field2)
+    #document1.add(field2)
 
     project.add(document1)
 
@@ -153,9 +153,9 @@ def recreate_super_simple_dummy_data_manipulation(metamodel, write_to_file=False
     document1 = Document(11, "Document1", False, "Document1", new_model, project)
     project.add(document1)
     field1 = TypedField(111, "Field1", "string", False, "Field1", new_model, document1)
-    #field2 = TypedField(112, "Field2", "boolean", False, "Field2", new_model)
+    field2 = TypedField(112, "Field2", "boolean", False, "Field2", new_model)
     document1.add(field1)
-    #document1.add(field2)
+    document1.add(field2)
 
     #document2 = Document(12, "Document2", False, None, new_model)
     #project.add(document2)
