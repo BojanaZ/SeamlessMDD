@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<document:Model xmlns:xmi="http://www.omg.org/XMI" xmlns:document="http://www.example.org/document" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmi:id="78a43d34-c9d5-488a-b9da-eebcfe5147d0" xmi:version="2.0">
+  <_root xmi:type="document:Project" xmi:id="932cbf11-4c5d-4ec1-91d8-b312a71c3a94" _model="78a43d34-c9d5-488a-b9da-eebcfe5147d0" _id="1" _label="MyProject" _name="MyProject">
+    <_elements xmi:type="document:Document" xmi:id="04340dea-c741-4a33-8a79-be77bf55f58a" _model="78a43d34-c9d5-488a-b9da-eebcfe5147d0" _id="11" _label="Document1" _name="Document1">
+      <_elements xmi:type="document:TypedField" xmi:id="92bef69d-76ed-4b4d-9d9e-e07d6d09aa9d" _model="78a43d34-c9d5-488a-b9da-eebcfe5147d0" _id="111" _label="Field1" _name="Field1"/>
+    </_elements>
+  </_root>
+</document:Model>

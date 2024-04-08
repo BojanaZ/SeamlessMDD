@@ -1,0 +1,248 @@
+{
+   "_version": 2,
+   "_root_element": {
+      "_id": 1,
+      "_container": null,
+      "_deleted": false,
+      "_name": "MyProject1",
+      "_label": null,
+      "_versions": [],
+      "_elements": {
+         "11": {
+            "_id": 11,
+            "_container": null,
+            "_deleted": false,
+            "_name": "Document1",
+            "_label": null,
+            "_elements": {
+               "89": {
+                  "_id": 89,
+                  "_container": null,
+                  "_deleted": false,
+                  "_name": "Fifi1",
+                  "_label": null,
+                  "class": "Field"
+               },
+               "90": {
+                  "_id": 90,
+                  "_container": null,
+                  "_deleted": false,
+                  "_name": "Fifi2",
+                  "_label": null,
+                  "class": "Field"
+               },
+               "91": {
+                  "_id": 91,
+                  "_container": null,
+                  "_deleted": false,
+                  "_name": "Fifi3",
+                  "_label": null,
+                  "class": "Field"
+               }
+            },
+            "class": "Document"
+         },
+         "12": {
+            "_id": 12,
+            "_container": null,
+            "_deleted": false,
+            "_name": "Document2",
+            "_label": null,
+            "_elements": {
+               "92": {
+                  "_id": 92,
+                  "_container": null,
+                  "_deleted": false,
+                  "_name": "Fifi4",
+                  "_label": null,
+                  "class": "Field"
+               },
+               "93": {
+                  "_id": 93,
+                  "_container": null,
+                  "_deleted": true,
+                  "_name": "Fifi5",
+                  "_label": null,
+                  "class": "Field"
+               }
+            },
+            "class": "Document"
+         }
+      },
+      "class": "Project"
+   },
+   "_elements": {
+      "1": {
+         "_id": 1,
+         "_container": null,
+         "_deleted": false,
+         "_name": "MyProject1",
+         "_label": null,
+         "_versions": [],
+         "_elements": {
+            "11": {
+               "_id": 11,
+               "_container": null,
+               "_deleted": false,
+               "_name": "Document1",
+               "_label": null,
+               "_elements": {
+                  "89": {
+                     "_id": 89,
+                     "_container": null,
+                     "_deleted": false,
+                     "_name": "Fifi1",
+                     "_label": null,
+                     "class": "Field"
+                  },
+                  "90": {
+                     "_id": 90,
+                     "_container": null,
+                     "_deleted": false,
+                     "_name": "Fifi2",
+                     "_label": null,
+                     "class": "Field"
+                  },
+                  "91": {
+                     "_id": 91,
+                     "_container": null,
+                     "_deleted": false,
+                     "_name": "Fifi3",
+                     "_label": null,
+                     "class": "Field"
+                  }
+               },
+               "class": "Document"
+            },
+            "12": {
+               "_id": 12,
+               "_container": null,
+               "_deleted": false,
+               "_name": "Document2",
+               "_label": null,
+               "_elements": {
+                  "92": {
+                     "_id": 92,
+                     "_container": null,
+                     "_deleted": false,
+                     "_name": "Fifi4",
+                     "_label": null,
+                     "class": "Field"
+                  },
+                  "93": {
+                     "_id": 93,
+                     "_container": null,
+                     "_deleted": true,
+                     "_name": "Fifi5",
+                     "_label": null,
+                     "class": "Field"
+                  }
+               },
+               "class": "Document"
+            }
+         },
+         "class": "Project"
+      },
+      "11": {
+         "_id": 11,
+         "_container": null,
+         "_deleted": false,
+         "_name": "Document1",
+         "_label": null,
+         "_elements": {
+            "89": {
+               "_id": 89,
+               "_container": null,
+               "_deleted": false,
+               "_name": "Fifi1",
+               "_label": null,
+               "class": "Field"
+            },
+            "90": {
+               "_id": 90,
+               "_container": null,
+               "_deleted": false,
+               "_name": "Fifi2",
+               "_label": null,
+               "class": "Field"
+            },
+            "91": {
+               "_id": 91,
+               "_container": null,
+               "_deleted": false,
+               "_name": "Fifi3",
+               "_label": null,
+               "class": "Field"
+            }
+         },
+         "class": "Document"
+      },
+      "12": {
+         "_id": 12,
+         "_container": null,
+         "_deleted": false,
+         "_name": "Document2",
+         "_label": null,
+         "_elements": {
+            "92": {
+               "_id": 92,
+               "_container": null,
+               "_deleted": false,
+               "_name": "Fifi4",
+               "_label": null,
+               "class": "Field"
+            },
+            "93": {
+               "_id": 93,
+               "_container": null,
+               "_deleted": true,
+               "_name": "Fifi5",
+               "_label": null,
+               "class": "Field"
+            }
+         },
+         "class": "Document"
+      },
+      "89": {
+         "_id": 89,
+         "_container": null,
+         "_deleted": false,
+         "_name": "Fifi1",
+         "_label": null,
+         "class": "Field"
+      },
+      "90": {
+         "_id": 90,
+         "_container": null,
+         "_deleted": false,
+         "_name": "Fifi2",
+         "_label": null,
+         "class": "Field"
+      },
+      "91": {
+         "_id": 91,
+         "_container": null,
+         "_deleted": false,
+         "_name": "Fifi3",
+         "_label": null,
+         "class": "Field"
+      },
+      "92": {
+         "_id": 92,
+         "_container": null,
+         "_deleted": false,
+         "_name": "Fifi4",
+         "_label": null,
+         "class": "Field"
+      },
+      "93": {
+         "_id": 93,
+         "_container": null,
+         "_deleted": true,
+         "_name": "Fifi5",
+         "_label": null,
+         "class": "Field"
+      }
+   },
+   "class": "Model"
+}

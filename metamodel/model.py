@@ -99,7 +99,7 @@ class Model(EObject, metaclass=MetaEClass):
         return i
 
     def to_json(self):
-        return json.dumps(self, cls=ModelJSONEncoder, default=lambda o:o.to_dict(), indent=4)
+        return json.dumps(self, cls=ModelJSONEncoder, default=lambda o: o.to_dict(), indent=4)
 
     @classmethod
     def from_json(cls, data):

@@ -1,5 +1,5 @@
 {
-    "_data_loading_path": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/files",
+    "_data_loading_path": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/projects/FirstProject/storage",
     "element_generator_table": {
         "table_by_element": {
             "1": [
@@ -28,6 +28,15 @@
                         "last_generated_version": 0
                     }
                 ]
+            ],
+            "112": [
+                [
+                    0,
+                    {
+                        "value": true,
+                        "last_generated_version": 0
+                    }
+                ]
             ]
         }
     },
@@ -38,6 +47,7 @@
                 "_file_path": "",
                 "_file_content": "",
                 "_file_template_path": "",
+                "templates_path": "templates",
                 "class": "DocumentDiffGenerator",
                 "tasks": [
                     {
@@ -48,7 +58,7 @@
                             "fields": "fields_template.tpl",
                             "document": "document_template.tpl"
                         },
-                        "_template_folder_path": ".",
+                        "_template_folder_path": "templates",
                         "_methods": [],
                         "_questions": [],
                         "_preview": null,
@@ -58,8 +68,8 @@
                 ]
             }
         },
-        "data_path_dill": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/files/generators.dill",
-        "data_path_json": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/files/generators.json"
+        "data_path_dill": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/projects/FirstProject/storage/generators.dill",
+        "data_path_json": "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/projects/FirstProject/storage/generators.json"
     },
     "_question_registry": {
         "_questions": {}

@@ -1,2 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<document:Model xmlns:xmi="http://www.omg.org/XMI" xmlns:document="http://www.example.org/document" xmi:id="35fb3a75-8c23-468a-8420-5a0639ab4f19" _root="" xmi:version="2.0"/>
+<document:Model xmlns:xmi="http://www.omg.org/XMI" xmlns:document="http://www.example.org/document" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmi:id="0b9843c8-71cf-4404-b49c-e4c10693ec3e" xmi:version="2.0">
+  <_root xmi:type="document:Project" xmi:id="15b4cc83-a070-4241-8aca-f9205f709248" _id="1" _model="0b9843c8-71cf-4404-b49c-e4c10693ec3e" _label="MyProject" _name="MyProject">
+    <_elements xmi:type="document:Document" xmi:id="c0f7e910-5f92-4329-ab88-997dcb402dfe" _id="11" _model="0b9843c8-71cf-4404-b49c-e4c10693ec3e" _label="Document1" _name="Document1">
+      <_elements xmi:type="document:TypedField" xmi:id="521f6e95-5782-4120-9345-1499f714ceab" _id="111" _model="0b9843c8-71cf-4404-b49c-e4c10693ec3e" _label="Field1" _name="Field1"/>
+      <_elements xmi:type="document:TypedField" xmi:id="a91d1ce0-8394-46c0-8222-1cb44d008272" _id="112" _model="0b9843c8-71cf-4404-b49c-e4c10693ec3e" _name="Field2"/>
+    </_elements>
+  </_root>
+</document:Model>

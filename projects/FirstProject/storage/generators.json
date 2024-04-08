@@ -1,0 +1,20 @@
+{
+    "generator_register": {
+        "0": {
+            "_id": 0,
+            "_file_path": "",
+            "_file_content": "",
+            "_file_template_path": "",
+            "class": "DocumentsOutputGenerator",
+            "tasks": [
+                {
+                    "_template_name": "model_data.tpl",
+                    "_priority": 2,
+                    "class": "MyTask"
+                }
+            ]
+        }
+    },
+    "data_path_dill": "generators.dill",
+    "data_path_json": "generators.json"
+}
