@@ -93,7 +93,11 @@ class Question(object):
         new_object = cls(data["_title"], data["_text"])
         new_object._id = int(data["_id"])
         new_object._answers = [Answer.from_json(answer) for answer in data["_answers"]]
-        new_object._chosen_answer_id = int(data["_chosen_answer_id"])
+        if data["_chosen_answer_id"] is not None:
+            new_object._chosen_answer_id = int(data["_chosen_answer_id"])
+        else:
+            new_object._chosen_answer_id = None
+
         new_object._element_xpath = data["_element_xpath"]
         return new_object
 
@@ -167,8 +171,15 @@ class QuestionJSONEncoder(json.JSONEncoder):
 
         if isinstance(object_, Question):
 
-            object_dict = {key: value for (key, value) in object_.__dict__.items() if key not in ["_answers"]}
+            object_dict = {key: value for (key, value) in object_.__dict__.items() if key not in ["_answers", "_task"]}
             object_dict["_answers"] = [value.to_dict() for value in object_.answers]
+
+            if hasattr(object_, "task"):
+                if object_.task is not None:
+                    object_dict["task"] = object_.task.to_dict()
+                else:
+                    object_dict["task"] = None
+
             return object_dict
 
         else:

@@ -6,10 +6,7 @@ from utilities.utilities import get_project_root
 import dill
 import json
 from metamodel.model import Model, ElementNotFoundError
-
-
-class VersionUnavailableError(Exception):
-    pass
+from utilities.exceptions import VersionUnavailableError
 
 
 class DataManipulation(object):
@@ -100,6 +97,13 @@ class DataManipulation(object):
         next_version = self.get_next_version_number()
         self._versions[next_version] = model
         model.version = next_version
+
+    def save_model(self, model):
+        if model.version == self._latest_version_number:
+            self._save_model_version_to_xmi(model, self._prepare_versions_folder())
+        else:
+            raise VersionUnavailableError("Model version %d does not match lastest model version (%d) " %
+                                          (model.version, self._latest_version_number))
 
     def get_element_by_id(self, _id, version=None):
         model = self.get_model_by_version(version)

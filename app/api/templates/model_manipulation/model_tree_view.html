@@ -1,7 +1,16 @@
 {% extends 'app/layout.html' %}
 
 {% block content %}
-<h2> Model </h2>
+
+<div class="row mb-2">
+    <h2 class="pr-3" style="margin-bottom: 0px;bottom-margin:0px;"> Model </h2>
+    <a href="#" onclick="return save_model()" id="save-btn" class="btn btn-primary btn-icon-split">
+        <span class="icon text-white-50">
+            <i class="fa fa-save"></i>
+        </span>
+        <span class="text">Save</span>
+    </a>
+</div>
 {%if version_id: %} <h4> Version id: <span id="version">{{ version_id }}</span> </h4> {% endif %}
 
 <div class="row">

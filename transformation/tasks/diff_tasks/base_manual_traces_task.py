@@ -44,13 +44,8 @@ class BaseManualTracingTask(BaseDiffTask, IManualTracing, metaclass=abc.ABCMeta)
 
         relative_path = self.get_relative_path(filepath, diff.new_object_ref)
 
-        template_file = open(os.path.join(self._template_folder_path, relative_path))
-        template_str = template_file.read()
-        template_file.close()
+        content = self._load_project_template(relative_path, diff.new_object_ref)
 
-        env = Environment(loader=PackageLoader(self._template_folder_path))
-        template = env.from_string(template_str)
-        content = template.render(element=diff.new_object_ref)
         parser = self._generator.get_parser(filepath)
 
         if os.path.isfile(filepath):
@@ -86,39 +81,37 @@ class BaseManualTracingTask(BaseDiffTask, IManualTracing, metaclass=abc.ABCMeta)
             old_element = diff.old_object_ref
             new_element = diff.new_object_ref
         else:
-            old_element = diff.old_object_ref.elements[diff.key]
-            new_element = diff.new_object_ref.elements[diff.key]
-
-        for trace in tracer.get_traces(diff.key, self._generator.id):
+            old_element = diff.old_object_ref.get_element(diff.key)
+            new_element = diff.new_object_ref.get_element(diff.key)
+        for _ in tracer.get_traces(diff.key, self._generator.id):
             old_property_xpaths = self.get_property_traces(old_element)[diff.property_name]
             new_property_xpaths = self.get_property_traces(new_element)[diff.property_name]
-            template_file = open(os.path.join("../templates/",
-                                              self._template_name))
-            template_str = template_file.read()
-            template_file.close()
 
-            env = Environment(loader=PackageLoader(self._template_folder_path))
-            template = env.from_string(template_str)
-            content = template.render(element=diff.new_object_ref)
+            relative_path = self.get_relative_path(filepath, new_element)
+
+            content = self._load_project_template(relative_path, new_element)
 
             for old_property_xpath, new_property_xpath in zip(old_property_xpaths, new_property_xpaths):
                 parser.update_element_by_path(old_property_xpath, new_property_xpath, content)
+
+    def _load_project_template(self, relative_path, element):
+        template_file = open(os.path.join(self._template_folder_path, relative_path))
+        template_str = template_file.read()
+        template_file.close()
+
+        templateLoader = FileSystemLoader(searchpath=os.path.join(os.getcwd(), self._template_folder_path))
+        env = Environment(loader=templateLoader)
+        template = env.from_string(template_str)
+
+        content = template.render(element=element)
+        return content
 
     def subelement_add(self, diff, filepath):
         parser = self._generator.get_parser(filepath)
         tracer = self._generator.tracer
         for trace in tracer.get_traces(diff.new_value.id, self._generator.id):
-            relative_path = self.get_relative_path(filepath, diff.new_object_ref)
-            template_file = open(os.path.join(self._template_folder_path, relative_path))
-            template_str = template_file.read()
-            template_file.close()
-
-            templateLoader = FileSystemLoader(searchpath=os.path.join(os.getcwd(), self._template_folder_path))
-            env = Environment(loader=templateLoader)
-            #env = Environment(loader=PackageLoader(os.path.join(os.getcwd(), self._template_folder_path)))
-            template = env.from_string(template_str)
-
-            content = template.render(element=diff.new_value)
+            relative_path = self.get_relative_path(filepath, diff.new_value)
+            content = self._load_project_template(relative_path, diff.new_value)
 
             parser.insert_element_by_path(trace.old_path, content)
 

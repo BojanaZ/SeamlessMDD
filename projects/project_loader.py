@@ -113,7 +113,7 @@ class WorkspaceProject(object):
             self._generator_handler.load_from_json()
             self._tracer.load_from_json()
         except FileNotFoundError as e:
-            print("Project %s from %s could not be loaded.".format(self._name, self._path))
+            print("Project {} from {} could not be loaded.".format(self._name, self._path))
 
     def load_project(self):
         # project_config_path = os.path.join(path, config_filename)

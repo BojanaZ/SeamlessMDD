@@ -16,3 +16,7 @@ class ParsingError(Exception):
 
 class DiffError(Exception):
     pass
+
+
+class VersionUnavailableError(Exception):
+    pass

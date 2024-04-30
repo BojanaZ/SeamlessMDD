@@ -68,7 +68,7 @@ class BaseDiffTask(ValidationTask, PriorityMixin):
         elif diff.operation_type == OperationType.SUBELEMENT_ADD:
             element = diff.new_value
         elif diff.operation_type == OperationType.SUBELEMENT_CHANGE:
-            element = diff.new_object_ref.elements[diff.key]
+            element = diff.new_object_ref.get_element(diff.key)
         elif diff.operation_type == OperationType.SUBELEMENT_REMOVE:
             element = diff.old_value
         return element

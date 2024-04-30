@@ -11,7 +11,9 @@ class BaseTaskJSONEncoder(json.JSONEncoder):
             object_dict = {key: value for (key, value) in object_.__dict__.items() if key not in ['environment',
                                                                                                   'formatter',
                                                                                                   '_generator',
-                                                                                                  '__len__']}
+                                                                                                  '__len__',
+                                                                                                  '_preview',
+                                                                                                  '_questions']}
 
             object_dict['class'] = type(object_).__name__
 

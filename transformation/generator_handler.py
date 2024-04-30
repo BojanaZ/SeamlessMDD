@@ -181,6 +181,7 @@ class GeneratorHandler(object):
                 generator.flush()
                 self.update_element_generator_table(table_update_pairs,
                                                     model_version_number)
+                self.save_to_json()
             data_manipulation.update_model_after_generation()
         else:
             for generator in generator_list:

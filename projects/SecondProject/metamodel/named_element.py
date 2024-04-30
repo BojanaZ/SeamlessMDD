@@ -1,4 +1,4 @@
-from metamodel.element import Element
+from .element import Element
 from view.tree_view_mixin import TreeViewMixin
 
 from pyecore.ecore import MetaEClass, EAttribute, EString
@@ -15,10 +15,7 @@ class NamedElement(Element, TreeViewMixin, metaclass=MetaEClass):
 
         super().__init__(_id, deleted, model, container)
         self._name = name
-        if label is None:
-            self._label = self._name
-        else:
-            self._label = label
+        self._label = label
 
         self.attributes_for_dict.extend(['_name', '_label'])
 

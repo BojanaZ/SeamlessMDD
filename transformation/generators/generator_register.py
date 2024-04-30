@@ -128,7 +128,7 @@ class GeneratorRegister(dict):
         new_register.data_path_json = loaded_content["data_path_json"]
         new_register.data_path_dill = loaded_content["data_path_dill"]
 
-        generator_classes = get_generators(self._project_path, "FirstProject")
+        generator_classes = get_generators(self._project_path, project.name)
 
         for generator_id, generator_dict in loaded_content["generator_register"].items():
             gen_type = generator_classes[generator_dict["class"]]
