@@ -2,6 +2,7 @@ import importlib
 import pkgutil
 import os
 import inspect
+import sys
 
 from pathlib import Path
 from collections.abc import Iterable
@@ -148,3 +149,10 @@ def class_name_to_underscore_format(class_name):
 def class_object_to_underscore_format(type_):
     class_name = type_.__name__
     return class_name_to_underscore_format(class_name)
+
+
+def get_os_root():
+    if sys.platform == 'win32':
+        return os.path.splitdrive(os.path.abspath('.'))[0]
+    else:
+        return os.sep

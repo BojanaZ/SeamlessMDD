@@ -119,7 +119,7 @@ def recreate_dummy_data_manipulation():
 
 
 def recreate_super_simple_dummy_data_manipulation(metamodel, project_path, write_to_file=False):
-    project = Project(1, "MyProject", False, "MyProject")
+    project = Project(1, "MyProject2", False, "MyProject2")
 
     model = Model(root_element=project)
 
@@ -149,7 +149,7 @@ def recreate_super_simple_dummy_data_manipulation(metamodel, project_path, write
     data_manipulation.update_model(model)
 
     new_model = Model()
-    project = Project(1, "MyProject", False, "MyProject", new_model)
+    project = Project(1, "MyProject2", False, "MyProject2", new_model)
     new_model.root = project
     document1 = Document(11, "Document1", False, "Document1", new_model, project)
     project.add(document1)
@@ -242,5 +242,5 @@ def main(project_path, project_name):
 
 
 if __name__ == "__main__":
-    project_path = "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/projects/FirstProject"
-    main(project_path, "FirstProject")
+    project_path = "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/projects/SecondProject"
+    main(project_path, "SecondProject")

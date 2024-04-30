@@ -105,6 +105,14 @@
             <!-- Divider -->
             <hr class="sidebar-divider">
 
+             <li class="nav-item">
+                <a class="nav-link" onclick="return open_file()" id="open_nav_link" url="{{ url_for('open') }}">
+                    <i class="fa fa-folder-open"></i>
+                    <span>Open project</span></a>
+            </li>
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
             <!-- Heading -->
             <div class="sidebar-heading">
                 Interface
@@ -339,6 +347,39 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
     <script>
+        function open_file() {
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.seamless';
+
+            input.onchange = e => {
+               var file = e.target.files[0];
+               var reader = new FileReader();
+               var url = document.getElementById('open_nav_link').getAttribute('url');
+
+               reader.onload = function() {
+                  console.log(reader.content);
+                  promise = Promise.resolve($.ajax({
+                        url: url,
+                        type: 'post',
+                        data: JSON.stringify(reader.result),
+                        dataType: 'json',
+                        contentType: 'application/json;charset=UTF-8',
+<!--                        success: function(e) {-->
+<!--                              console.log(e.core.data);-->
+<!--                              $("#tree-view-from-json").jstree(true).settings.core.data = e.core.data;-->
+<!--                              $("#tree-view-from-json").jstree(true).refresh();-->
+<!--                        }-->
+                      })
+                      );
+               }
+
+               reader.readAsText(file);
+            }
+
+            input.click();
+        }
+
         function load_tree() {
             $("#tree-view-from-json").jstree(JSON.parse($("#tree-view-from-json").text()));
          }
@@ -421,7 +462,6 @@
             if (targ.nodeType == 3) targ = targ.parentNode;
 
             var value = targ.getAttribute("value");
-            console.log(value);
             if (value == null) {
                 return;
             }
@@ -473,6 +513,28 @@
 
         return false;
         }
+
+        function save_model() {
+
+            var model = $("#tree-view-from-json").jstree(true).settings.core.data[0];
+
+            var url = "http://127.0.0.1:5000/save";
+
+            promise = Promise.resolve($.ajax({
+                        url: url,
+                        type: 'post',
+                        data: JSON.stringify(model),
+                        dataType: 'json',
+                        contentType: 'application/json;charset=UTF-8',
+                        success: function(e) {
+                              console.log(e.core.data);
+                        }
+                      })
+            );
+            console.log(promise);
+            return false;
+        }
+
 
         window.onload = load_tree();
     </script>
