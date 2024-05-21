@@ -3,6 +3,7 @@ import pkgutil
 import os
 import inspect
 import sys
+import re
 
 from pathlib import Path
 from collections.abc import Iterable
@@ -70,7 +71,7 @@ def import_submodules_from_absolute_path(root_path, root_module_name):
     return submodules
 
 
-def find_submodule_from_absolute_path(module_name, root_path, root_module_name):
+def find_submodule_from_absolute_path(root_path, root_module_name):
     os.chdir(root_path)
     submodules = import_submodules(root_module_name, root_module_name+".")
     return submodules
@@ -156,3 +157,18 @@ def get_os_root():
         return os.path.splitdrive(os.path.abspath('.'))[0]
     else:
         return os.sep
+
+
+def get_general_path(path):
+    parts = [item for item in re.split(r"\\|\/", path) if item not in ["", "/."]]
+    return os.path.join(*parts)
+
+
+def get_general_absolute_path(path):
+    parts = [item for item in re.split(r"\\|\/", path) if item not in ["", "/.", "."]]
+    cvd_path = [item for item in re.split(r"\\|\/", os.getcwd()) if item not in ["", "/.", "."]]
+
+    if not os.path.isabs(path):
+        return os.path.join(get_os_root(), *cvd_path[:-1], *parts)
+    else:
+        return os.path.join(get_os_root(), *parts)

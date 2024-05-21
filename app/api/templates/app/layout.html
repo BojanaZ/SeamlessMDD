@@ -105,18 +105,30 @@
             <!-- Divider -->
             <hr class="sidebar-divider">
 
-             <li class="nav-item">
-                <a class="nav-link" onclick="return open_file()" id="open_nav_link" url="{{ url_for('open') }}">
+            <!-- Nav Item - Project Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProject"
+                    aria-expanded="true" aria-controls="collapseProject">
                     <i class="fa fa-folder-open"></i>
-                    <span>Open project</span></a>
+                    <span>Project</span>
+                </a>
+                <div id="collapseProject" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" id="new_project_nav_link"
+                           url="{{ url_for('new_project') }}" data-toggle="modal" data-target="#projectModal">New</a>
+                        <a class="collapse-item" onclick="return open_file()" id="open_nav_link"
+                           url="{{ url_for('open_project') }}">Open</a>
+                    </div>
+                </div>
             </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider">
 
             <!-- Heading -->
-            <div class="sidebar-heading">
+            <!--div class="sidebar-heading">
                 Interface
-            </div>
+            </div-->
 
             <!-- Nav Item - Model Collapse Menu -->
             <li class="nav-item">
@@ -322,6 +334,66 @@
         </div>
     </div>
 
+    <!-- New project modal -->
+    <div class="modal" tabindex="-1" id="projectModal" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Create new project</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Cancel">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="newProjectForm" onsubmit="new_project(event)" action="{{ url_for('new_project') }}" method="POST">
+                <div class="form-group">
+                    <label for="projectName">Project name</label>
+                    <input type="text" class="form-control" id="projectName" name="project_name"
+                           placeholder="Enter project name">
+                </div>
+                <div class="form-group">
+                    <label for="projectPath">Path</label>
+                    <input type="text" class="form-control" id="projectPath" name="project_path"
+                           placeholder="Enter project path">
+                </div>
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="generate_content" name="generate_content">
+                    <label class="form-check-label" for="generate_content">Generate initial content</label>
+                  </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button form="newProjectForm" type="submit" class="btn btn-primary">Ok</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <!-- Project folder already exists -->
+    <div class="modal" tabindex="-1" id="projectFolderExistsModal" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Project folder already exists</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Cancel">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div id="projectFolderExistsModalText" class="modal-body">
+            Project folder already exists. Create new project anyway?
+          </div>
+          <div class="modal-footer">
+              <form action="{{ url_for('create_project_anyway') }}" onsubmit="create_anyway(event)" id="createAnywayForm" method="post">
+                <button type="submit"  class="btn btn-primary">Yes</button>
+              </form>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <!-- Bootstrap core JavaScript-->
     <script src="{{ url_for('static',filename='vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ url_for('static',filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
@@ -365,11 +437,12 @@
                         data: JSON.stringify(reader.result),
                         dataType: 'json',
                         contentType: 'application/json;charset=UTF-8',
-<!--                        success: function(e) {-->
-<!--                              console.log(e.core.data);-->
-<!--                              $("#tree-view-from-json").jstree(true).settings.core.data = e.core.data;-->
-<!--                              $("#tree-view-from-json").jstree(true).refresh();-->
-<!--                        }-->
+                        success: function(e) {
+                              console.log(e.core.data);
+                              $("#tree-view-from-json").jstree(true).settings.core.data = e.core.data;
+                              $("#tree-view-from-json").jstree(true).refresh();
+                              window.location("/model");
+                        }
                       })
                       );
                }
@@ -378,6 +451,54 @@
             }
 
             input.click();
+        }
+
+        function create_anyway(e) {
+
+            e.preventDefault();
+
+            var projectForm = document.getElementById("newProjectForm");
+            var params = getFormData($("#newProjectForm"));
+
+            var createAnywayForm = document.getElementById("createAnywayForm");
+            var actionUrl = createAnywayForm.getAttribute('action');
+
+            $.ajax({
+                type: "POST",
+                url: actionUrl,
+                data: params,
+                success: function(data)
+                {
+                    ($("#projectFolderExistsModal")).modal('hide');
+                    ($("#projectModal")).modal('hide');
+                    location.reload();
+                }
+            });
+
+        }
+
+        function new_project(e) {
+
+            e.preventDefault();
+
+            var form = document.getElementById("newProjectForm");
+            var actionUrl = form.getAttribute('action');
+            var params = getFormData($("#newProjectForm"));
+            var path = params["project_path"];
+
+            $.ajax({
+                type: "POST",
+                url: actionUrl,
+                data: params,
+                success: function(data)
+                {
+                    var text = `Project folder \n ${data.path} \n already exists. Create new project anyway?`;
+                    ($("#projectFolderExistsModalText")).text(text);
+                    $('#projectModal').modal('hide');
+                    ($("#projectFolderExistsModal")).modal();
+                }
+            });
+
         }
 
         function load_tree() {

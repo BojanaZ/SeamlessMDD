@@ -25,7 +25,7 @@ class WorkspaceProject(object):
         self._tracer = None
         self._generator_handler = None
 
-        self._init()
+        self.init()
     
     @property
     def path(self):
@@ -99,21 +99,31 @@ class WorkspaceProject(object):
     def tracer(self, value):
         self._tracer = value
 
-    def _init(self):
-        modules, main_module = self.load_project()
-        self.remove_temp_files()
-
-        self._metamodel = main_module.make(modules)
-        self._data_manipulation = DataManipulation(self._path, self._metamodel)
+    def create_initial_content(self):
+        self._data_manipulation = DataManipulation(self._path)
         self._generator_handler = GeneratorHandler(self)
         self._tracer = Tracer(self._path)
 
-        try:
-            self._data_manipulation.load_from_xmi()
-            self._generator_handler.load_from_json()
-            self._tracer.load_from_json()
-        except FileNotFoundError as e:
-            print("Project {} from {} could not be loaded.".format(self._name, self._path))
+        self._data_manipulation.save_to_xmi()
+        self._generator_handler.save_to_json()
+        self._tracer.save_to_json()
+
+    def init(self):
+        modules, main_module = self.load_project()
+        self.remove_temp_files()
+
+        if main_module is not None:
+            self._metamodel = main_module.make(modules)
+            self._data_manipulation = DataManipulation(self._path, self._metamodel)
+            self._generator_handler = GeneratorHandler(self)
+            self._tracer = Tracer(self._path)
+
+            try:
+                self._data_manipulation.load_from_xmi()
+                self._generator_handler.load_from_json()
+                self._tracer.load_from_json()
+            except FileNotFoundError as e:
+                print("Project {} from {} could not be loaded.".format(self._name, self._path))
 
     def load_project(self):
         # project_config_path = os.path.join(path, config_filename)
@@ -123,7 +133,11 @@ class WorkspaceProject(object):
         #     raise ProjectNotFoundException("Current folder is not a SeamlessMDD project.")
         modules = import_project_from_absolute_path(self._path, self._name)
 
-        main_module = modules[self._name + "." + self._main_module_name]
+        main_module_name = self._name + "." + self._main_module_name
+        main_module = None
+        if main_module_name in modules:
+            main_module = modules[self._name + "." + self._main_module_name]
+
         return modules, main_module
 
     def remove_temp_files(self):

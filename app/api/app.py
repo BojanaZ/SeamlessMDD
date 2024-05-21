@@ -1,5 +1,5 @@
 import os
-import re
+import json
 
 from flask import Flask, request, jsonify, make_response, render_template, redirect, url_for
 from transformation.generators.generator_register import GeneratorRegister
@@ -8,12 +8,16 @@ from transformation.data_manipulation import VersionUnavailableError
 from transformation.conflict_resolution.question import Question
 from view.tree_view import prepare_model_for_tree_view
 from exceptions import ElementNotFoundError
-from utilities.utilities import class_object_to_underscore_format, class_name_to_underscore_format, get_os_root
+from utilities.utilities import class_object_to_underscore_format, class_name_to_underscore_format,\
+    get_general_absolute_path
 from projects.project_loader import WorkspaceProject
 from pyecore_utilities import get_class_from_metamodel
 
+app = None
+
 
 def create_app():
+    global app
     app = Flask(__name__, template_folder='templates')
     app.config["DEBUG"] = True
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -32,19 +36,66 @@ def create_app():
         return redirect(url_for('model'))
 
     @app.route('/open', methods=['POST'])
-    def open():
+    def open_project():
         if request.method == 'POST':
-            import json
             content = request.get_json()
             content = json.loads(content.replace("'", "\""))
-            parts = [item for item in re.split(r"\\|\/", content['project_path']) if item != ""]
-            project_path = os.path.join(get_os_root(), *parts)
+
+            project_path = get_general_absolute_path(content['project_path'])
+
             project_name = content['project_name']
             global project
             project = WorkspaceProject(project_path, project_name)
             initialize()
             project.templates_path = os.path.join(app.root_path, app.template_folder)
             return redirect(url_for('model'))
+
+    @app.route('/new-project', methods=['POST'])
+    def new_project():
+        if request.method == 'POST':
+            project_name = request.form['project_name']
+            project_path = request.form['project_path']
+            generate_content = 'generate_content' in request.form and request.form['generate_content'] == 'on'
+
+            full_path = os.path.join(get_general_absolute_path(project_path), project_name)
+
+            if not os.path.exists(full_path):
+                os.makedirs(full_path)
+                seamless_file_content = render_template("config_file_templates/seamless.jinja2",
+                                                        project_path=project_path, project_name=project_name)
+
+                seamless_file_path = os.path.join(full_path, ".seamless")
+                with open(seamless_file_path, 'w') as file:
+                    file.write(seamless_file_content)
+
+                global project
+                project = WorkspaceProject(get_general_absolute_path(project_path), project_name)
+                os.chdir(full_path)
+                project.create_initial_content()
+                initialize()
+                project.templates_path = os.path.join(app.root_path, app.template_folder)
+                return redirect(url_for('model'))
+
+            else:
+                response = app.response_class(
+                    response=json.dumps({'folder_found': True,
+                                         'path': full_path}),
+                    status=200,
+                    mimetype='application/json'
+                )
+                return response
+
+    @app.route('/create_project_anyway', methods=['POST'])
+    def create_project_anyway():
+        if request.method == 'POST':
+            project_name = request.form['project_name']
+            project_path = request.form['project_path']
+            global project
+            project = WorkspaceProject(get_general_absolute_path(project_path), project_name)
+            project.create_initial_content()
+            initialize()
+            project.templates_path = os.path.join(app.root_path, app.template_folder)
+            return make_response("OK", 200)
 
     @app.route('/models/<version_id>', methods=['GET'])
     def model_by_version(version_id):
@@ -305,10 +356,11 @@ def create_app():
         generator_id = int(generator_id)
         question_preview_pairs.clear()
         if project.generator_handler.element_generator_table.has_generator_by_id(generator_id):
-            for questions, outfolder, preview in project.generator_handler.generate_single_generator(project.data_manipulation,
-                                                                                           generator_id,
-                                                                                           "../../files/",
-                                                                                           generate):
+            for questions, outfolder, preview in project.generator_handler.generate_single_generator(
+                    project.data_manipulation,
+                    generator_id,
+                    "../../files/",
+                    generate):
                 if questions is None or len(questions) == 0:
                     question_preview_pairs.append((None, preview))
                 else:
@@ -342,6 +394,7 @@ def main():
     project_package = "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/projects/FirstProject"
     global project
     project = WorkspaceProject(project_package, "FirstProject")
+    global app
     app = create_app()
     project.templates_path = os.path.join(app.root_path, app.template_folder)
 

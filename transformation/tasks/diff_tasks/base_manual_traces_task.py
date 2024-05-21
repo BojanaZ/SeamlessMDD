@@ -5,7 +5,7 @@ from transformation.tasks.diff_tasks.base_diff_task import BaseDiffTask
 from transformation.assignment.assignment import Assignment
 from transformation.assignment.assignment_set import AssignmentSet
 from utilities.utilities import class_object_to_underscore_format
-from jinja2 import Environment, PackageLoader,FileSystemLoader
+from jinja2 import Environment, PackageLoader, FileSystemLoader
 from diff.operation_type import OperationType
 from tracing.manual_tracing import IManualTracing
 from transformation.conflict_resolution.question import Question
