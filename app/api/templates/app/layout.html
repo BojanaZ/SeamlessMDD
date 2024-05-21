@@ -438,10 +438,7 @@
                         dataType: 'json',
                         contentType: 'application/json;charset=UTF-8',
                         success: function(e) {
-                              console.log(e.core.data);
-                              $("#tree-view-from-json").jstree(true).settings.core.data = e.core.data;
-                              $("#tree-view-from-json").jstree(true).refresh();
-                              window.location("/model");
+                              location.reload();
                         }
                       })
                       );
@@ -467,7 +464,7 @@
                 type: "POST",
                 url: actionUrl,
                 data: params,
-                success: function(data)
+                success: function()
                 {
                     ($("#projectFolderExistsModal")).modal('hide');
                     ($("#projectModal")).modal('hide');
@@ -492,10 +489,14 @@
                 data: params,
                 success: function(data)
                 {
-                    var text = `Project folder \n ${data.path} \n already exists. Create new project anyway?`;
-                    ($("#projectFolderExistsModalText")).text(text);
                     $('#projectModal').modal('hide');
-                    ($("#projectFolderExistsModal")).modal();
+                    if (data.folder_found) {
+                        var text = `Project folder \n ${data.path} \n already exists. Create new project anyway?`;
+                        ($("#projectFolderExistsModalText")).text(text);
+                        ($("#projectFolderExistsModal")).modal();
+                    } else {
+                        location.reload();
+                    }
                 }
             });
 

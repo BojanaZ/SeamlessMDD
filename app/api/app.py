@@ -9,7 +9,7 @@ from transformation.conflict_resolution.question import Question
 from view.tree_view import prepare_model_for_tree_view
 from exceptions import ElementNotFoundError
 from utilities.utilities import class_object_to_underscore_format, class_name_to_underscore_format,\
-    get_general_absolute_path
+    get_general_absolute_path, get_project_absolute_path_from_flask_app
 from projects.project_loader import WorkspaceProject
 from pyecore_utilities import get_class_from_metamodel
 
@@ -41,14 +41,20 @@ def create_app():
             content = request.get_json()
             content = json.loads(content.replace("'", "\""))
 
-            project_path = get_general_absolute_path(content['project_path'])
-
             project_name = content['project_name']
+            project_path = os.path.join(get_general_absolute_path(content['project_path']), project_name)
+
             global project
             project = WorkspaceProject(project_path, project_name)
             initialize()
             project.templates_path = os.path.join(app.root_path, app.template_folder)
-            return redirect(url_for('model'))
+
+            response = app.response_class(
+                response=json.dumps({}),
+                status=200,
+                mimetype='application/json'
+            )
+            return response
 
     @app.route('/new-project', methods=['POST'])
     def new_project():
@@ -58,8 +64,8 @@ def create_app():
             generate_content = 'generate_content' in request.form and request.form['generate_content'] == 'on'
 
             full_path = os.path.join(get_general_absolute_path(project_path), project_name)
-
-            if not os.path.exists(full_path):
+            folder_found = os.path.exists(full_path)
+            if not folder_found:
                 os.makedirs(full_path)
                 seamless_file_content = render_template("config_file_templates/seamless.jinja2",
                                                         project_path=project_path, project_name=project_name)
@@ -69,33 +75,39 @@ def create_app():
                     file.write(seamless_file_content)
 
                 global project
-                project = WorkspaceProject(get_general_absolute_path(project_path), project_name)
+                project = WorkspaceProject(full_path, project_name)
                 os.chdir(full_path)
                 project.create_initial_content()
                 initialize()
                 project.templates_path = os.path.join(app.root_path, app.template_folder)
-                return redirect(url_for('model'))
 
-            else:
-                response = app.response_class(
-                    response=json.dumps({'folder_found': True,
-                                         'path': full_path}),
-                    status=200,
-                    mimetype='application/json'
-                )
-                return response
+            response = app.response_class(
+                response=json.dumps({'folder_found': folder_found,
+                                     'path': full_path}),
+                status=200,
+                mimetype='application/json'
+            )
+            return response
 
     @app.route('/create_project_anyway', methods=['POST'])
     def create_project_anyway():
         if request.method == 'POST':
             project_name = request.form['project_name']
             project_path = request.form['project_path']
+
+            full_project_path = os.path.join(get_general_absolute_path(project_path), project_name)
             global project
-            project = WorkspaceProject(get_general_absolute_path(project_path), project_name)
+            project = WorkspaceProject(full_project_path, project_name)
             project.create_initial_content()
             initialize()
             project.templates_path = os.path.join(app.root_path, app.template_folder)
-            return make_response("OK", 200)
+            response = app.response_class(
+                response=json.dumps({'folder_found': True,
+                                     'path': full_project_path}),
+                status=200,
+                mimetype='application/json'
+            )
+            return response
 
     @app.route('/models/<version_id>', methods=['GET'])
     def model_by_version(version_id):
@@ -391,9 +403,10 @@ def initialize():
 
 
 def main():
-    project_package = "/Users/bojana/Documents/Private/Fakultet/doktorske/DMS-rad/SeamlessMDD/projects/FirstProject"
+    project_name = "FirstProject"
+    project_package = os.path.join(get_project_absolute_path_from_flask_app("."), project_name)
     global project
-    project = WorkspaceProject(project_package, "FirstProject")
+    project = WorkspaceProject(project_package, project_name)
     global app
     app = create_app()
     project.templates_path = os.path.join(app.root_path, app.template_folder)

@@ -172,3 +172,16 @@ def get_general_absolute_path(path):
         return os.path.join(get_os_root(), *cvd_path[:-1], *parts)
     else:
         return os.path.join(get_os_root(), *parts)
+
+
+def get_project_absolute_path_from_flask_app(path):
+    parts = [item for item in re.split(r"\\|\/", path) if item not in ["", "/.", "."]]
+    cvd_path = [item for item in re.split(r"\\|\/", os.getcwd()) if item not in ["", "/.", "."]]
+
+    if not os.path.isabs(path):
+        return os.path.join(get_os_root(), *cvd_path[:-2], 'projects', *parts)
+    else:
+        if len(parts) > 1:
+            return os.path.join(get_os_root(), *parts[:-2])
+        else:
+            return os.path.join(get_os_root(), *parts)
